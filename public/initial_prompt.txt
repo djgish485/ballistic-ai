@@ -14,7 +14,7 @@ Critical guidelines:
 - Wrap all executable commands in triple backticks (```).
 
 Here's an example:
-```
+```javascript
 # Update app.js with new error handling
 cat << 'EOF' > project_path/app.js
 const express = require('express');

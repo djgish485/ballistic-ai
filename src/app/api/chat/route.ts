@@ -181,7 +181,7 @@ async function fetchAPIResponse(apiKey: { type: string; key: string }, systemPro
   } else if (apiKey.type === 'OpenAI') {
     headers['Authorization'] = `Bearer ${apiKey.key}`;
     body = {
-      model: 'gpt-4',
+      model: 'gpt-4o',
       messages: [{ role: 'system', content: systemPrompt }, ...messages],
       max_tokens: 4096,
       stream: true

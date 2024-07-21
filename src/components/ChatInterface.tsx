@@ -18,6 +18,22 @@ interface SystemMessage {
 }
 
 const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
+  const handleExecute = async (code: string) => {
+    try {
+      const response = await fetch('/api/execute-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const result = await response.json();
+
+      alert(`Execution Result:\n${result.output}`);
+    } catch (error) {
+      console.error('Error executing code:', error);
+      alert('Error executing code, please check the console for more details.');
+    }
+  };
+
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
@@ -25,14 +41,22 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
         code({ node, inline, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || '');
           return !inline && match ? (
-            <SyntaxHighlighter
-              style={tomorrow}
-              language={match[1]}
-              PreTag="div"
-              {...props}
-            >
-              {String(children).replace(/\n$/, '')}
-            </SyntaxHighlighter>
+            <div>
+              <SyntaxHighlighter
+                style={tomorrow}
+                language={match[1]}
+                PreTag="div"
+                {...props}
+              >
+                {String(children).replace(/\n$/, '')}
+              </SyntaxHighlighter>
+              <button
+                onClick={() => handleExecute(String(children))}
+                className="px-2 py-1 bg-green-500 text-white rounded mt-2 hover:bg-green-600"
+              >
+                Execute
+              </button>
+            </div>
           ) : (
             <code className={className} {...props}>
               {children}
@@ -114,14 +138,14 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       const response = await fetch('/api/project-backup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectDir })
+        body: JSON.stringify({ projectDir }),
       });
       const data = await response.json();
       if (response.ok) {
         setHasBackup(true);
         setSystemMessages(prev => [
           ...prev,
-          { type: 'backup', content: 'Project backup created. Previous backup (if any) was overwritten.' }
+          { type: 'backup', content: 'Project backup created. Previous backup (if any) was overwritten.' },
         ]);
       } else {
         throw new Error(data.error || 'Failed to create backup');
@@ -145,7 +169,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       const analyzeResponse = await fetch('/api/analyze-project', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectDir })
+        body: JSON.stringify({ projectDir }),
       });
       const analyzeData = await analyzeResponse.json();
       console.log('Analyze project response:', analyzeData);
@@ -154,7 +178,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectDir, isInitial: true, conversationHistory: [] })
+        body: JSON.stringify({ projectDir, isInitial: true, conversationHistory: [] }),
       });
 
       await processStreamResponse(response);
@@ -178,7 +202,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ projectDir, message: input, isInitial: false, conversationHistory: messages })
+          body: JSON.stringify({ projectDir, message: input, isInitial: false, conversationHistory: messages }),
         });
 
         await processStreamResponse(response);
@@ -201,20 +225,26 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       const response = await fetch('/api/project-backup', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectDir })
+        body: JSON.stringify({ projectDir }),
       });
       const data = await response.json();
       if (response.ok) {
         setMessages([]);
         setIsStarted(false);
         setHasBackup(false);
-        setSystemMessages(prev => [...prev, { type: 'restore', content: 'Project restored successfully. You can start a new analysis by clicking the "Start" button.' }]);
+        setSystemMessages(prev => [
+          ...prev,
+          { type: 'restore', content: 'Project restored successfully. You can start a new analysis by clicking the "Start" button.' },
+        ]);
       } else {
         throw new Error(data.error || 'Failed to restore backup');
       }
     } catch (error) {
       console.error('Error restoring backup:', error);
-      setSystemMessages(prev => [...prev, { type: 'restore', content: `Error restoring backup: ${error.message}` }]);
+      setSystemMessages(prev => [
+        ...prev,
+        { type: 'restore', content: `Error restoring backup: ${error.message}` },
+      ]);
     }
   };
 
@@ -240,13 +270,23 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       </div>
       <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-100 rounded">
         {systemMessages.map((msg, index) => (
-          <div key={`system-${index}`} className={`p-4 rounded ${styles.markdownContent} ${msg.type === 'backup' ? 'bg-blue-100' : 'bg-yellow-100'}`}>
+          <div
+            key={`system-${index}`}
+            className={`p-4 rounded ${styles.markdownContent} ${
+              msg.type === 'backup' ? 'bg-blue-100' : 'bg-yellow-100'
+            }`}
+          >
             <strong>{msg.type === 'backup' ? 'Backup: ' : 'Restore: '}</strong>
             {msg.content}
           </div>
         ))}
         {messages.map((msg, index) => (
-          <div key={`chat-${index}`} className={`p-4 rounded ${styles.markdownContent} ${msg.role === 'user' ? 'bg-blue-100' : 'bg-white'}`}>
+          <div
+            key={`chat-${index}`}
+            className={`p-4 rounded ${styles.markdownContent} ${
+              msg.role === 'user' ? 'bg-blue-100' : 'bg-white'
+            }`}
+          >
             <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
             <FormattedMessage content={msg.content} />
           </div>
