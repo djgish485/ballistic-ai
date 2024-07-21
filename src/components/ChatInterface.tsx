@@ -17,8 +17,21 @@ interface SystemMessage {
   content: string;
 }
 
+interface ExecutionResult {
+  id: string;
+  output: string;
+}
+
 const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
-  const handleExecute = async (code: string) => {
+  const [executionResults, setExecutionResults] = useState<ExecutionResult[]>([]);
+  const [codeBlockIds, setCodeBlockIds] = useState<Record<number, string>>({});
+
+  const generateId = () => `code-${Math.random().toString(36).substr(2, 9)}`;
+
+  const handleExecute = async (code: string, id: string) => {
+   // console.log(`Executing code block (${id}):`);
+   // console.log(code);
+    
     try {
       const response = await fetch('/api/execute-code', {
         method: 'POST',
@@ -26,11 +39,22 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
         body: JSON.stringify({ code }),
       });
       const result = await response.json();
+      const linesCount = code.split('\n').length;
 
-      alert(`Execution Result:\n${result.output}`);
+      console.log(`Execution result (${id}):`, result);
+
+      setExecutionResults((prevResults) => {
+        const newResult = { id, output: `Executed ${linesCount} lines of code.\n\n${result.output}` };
+       // console.log('Setting execution result:', newResult);
+        return [...prevResults.filter((res) => res.id !== id), newResult];
+      });
     } catch (error) {
-      console.error('Error executing code:', error);
-      alert('Error executing code, please check the console for more details.');
+      console.error(`Error executing code block (${id}):`, error);
+      setExecutionResults((prevResults) => {
+        const newResult = { id, output: 'Error executing code, please check the console for more details.' };
+        console.log('Setting error execution result:', newResult);
+        return [...prevResults.filter((res) => res.id !== id), newResult];
+      });
     }
   };
 
@@ -39,29 +63,62 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
       remarkPlugins={[remarkGfm]}
       components={{
         code({ node, inline, className, children, ...props }) {
-          const match = /language-(\w+)/.exec(className || '');
-          return !inline && match ? (
-            <div>
-              <SyntaxHighlighter
-                style={tomorrow}
-                language={match[1]}
-                PreTag="div"
-                {...props}
-              >
-                {String(children).replace(/\n$/, '')}
-              </SyntaxHighlighter>
-              <button
-                onClick={() => handleExecute(String(children))}
-                className="px-2 py-1 bg-green-500 text-white rounded mt-2 hover:bg-green-600"
-              >
-                Execute
-              </button>
-            </div>
-          ) : (
-            <code className={className} {...props}>
-              {children}
-            </code>
-          );
+          if (inline) {
+            return (
+              <code className={className} {...props}>
+                {children}
+              </code>
+            );
+          } else {
+            const nodeIndex = node.position?.start.line ?? Math.random();
+            let id = codeBlockIds[nodeIndex];
+            if (!id) {
+              id = generateId();
+              setCodeBlockIds((prevIds) => ({
+                ...prevIds,
+                [nodeIndex]: id,
+              }));
+            }
+
+            const match = /language-(\w+)/.exec(className || '');
+
+            return match ? (
+              <div>
+                <SyntaxHighlighter
+                  style={tomorrow}
+                  language={match[1]}
+                  PreTag="div"
+                  {...props}
+                >
+                  {String(children).replace(/\n$/, '')}
+                </SyntaxHighlighter>
+                <button
+                  onClick={() => handleExecute(String(children), id)}
+                  className="px-2 py-1 bg-green-500 text-white rounded mt-2 hover:bg-green-600"
+                >
+                  Execute
+                </button>
+                <div className="mt-2 bg-gray-100 p-2 rounded">
+                  {executionResults.find((res) => res.id === id)?.output}
+                </div>
+              </div>
+            ) : (
+              <div>
+                <pre className={className} {...props}>
+                  {children}
+                </pre>
+                <button
+                  onClick={() => handleExecute(String(children), id)}
+                  className="px-2 py-1 bg-green-500 text-white rounded mt-2 hover:bg-green-600"
+                >
+                  Execute
+                </button>
+                <div className="mt-2 bg-gray-100 p-2 rounded">
+                  {executionResults.find((res) => res.id === id)?.output}
+                </div>
+              </div>
+            );
+          }
         },
       }}
     >
@@ -100,7 +157,6 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       if (done) break;
 
       const chunk = decoder.decode(value);
-      console.log('Received chunk:', chunk);
 
       const lines = chunk.split('\n');
 
@@ -108,10 +164,9 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         if (line.startsWith('data: ')) {
           try {
             const data = JSON.parse(line.slice(6));
-            console.log('Parsed data:', data);
             if (data.content) {
               currentContent += data.content;
-              setMessages(prev => {
+              setMessages((prev) => {
                 const newMessages = [...prev];
                 if (newMessages.length > 0 && newMessages[newMessages.length - 1].role === 'assistant') {
                   newMessages[newMessages.length - 1].content = currentContent;
@@ -121,7 +176,6 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
                 return newMessages;
               });
             } else if (data.conversationHistory) {
-              console.log('Received conversation history:', data.conversationHistory);
               setMessages(data.conversationHistory);
             }
           } catch (error) {
@@ -143,7 +197,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       const data = await response.json();
       if (response.ok) {
         setHasBackup(true);
-        setSystemMessages(prev => [
+        setSystemMessages((prev) => [
           ...prev,
           { type: 'backup', content: 'Project backup created. Previous backup (if any) was overwritten.' },
         ]);
@@ -152,7 +206,10 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       }
     } catch (error) {
       console.error('Error creating backup:', error);
-      setSystemMessages(prev => [...prev, { type: 'backup', content: `Error creating backup: ${error.message}` }]);
+      setSystemMessages((prev) => [
+        ...prev,
+        { type: 'backup', content: `Error creating backup: ${error.message}` },
+      ]);
     }
   };
 
@@ -194,7 +251,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     if (input.trim() && !isLoading) {
       console.log('Sending message:', input);
       const userMessage: Message = { role: 'user', content: input };
-      setMessages(prev => [...prev, userMessage]);
+      setMessages((prev) => [...prev, userMessage]);
       setInput('');
       setIsLoading(true);
 
@@ -208,7 +265,10 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         await processStreamResponse(response);
       } catch (error) {
         console.error('Error sending message:', error);
-        setMessages(prev => [...prev, { role: 'assistant', content: 'An error occurred while processing your message.' }]);
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: 'An error occurred while processing your message.' },
+        ]);
       } finally {
         setIsLoading(false);
       }
@@ -218,7 +278,9 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const handleRestore = async () => {
     if (!hasBackup) return;
 
-    const confirmed = window.confirm('Are you sure you want to restore the project to the latest backup? This will replace your current project with the backup.');
+    const confirmed = window.confirm(
+      'Are you sure you want to restore the project to the latest backup? This will replace your current project with the backup.'
+    );
     if (!confirmed) return;
 
     try {
@@ -232,16 +294,19 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         setMessages([]);
         setIsStarted(false);
         setHasBackup(false);
-        setSystemMessages(prev => [
+        setSystemMessages((prev) => [
           ...prev,
-          { type: 'restore', content: 'Project restored successfully. You can start a new analysis by clicking the "Start" button.' },
+          {
+            type: 'restore',
+            content: 'Project restored successfully. You can start a new analysis by clicking the "Start" button.',
+          },
         ]);
       } else {
         throw new Error(data.error || 'Failed to restore backup');
       }
     } catch (error) {
       console.error('Error restoring backup:', error);
-      setSystemMessages(prev => [
+      setSystemMessages((prev) => [
         ...prev,
         { type: 'restore', content: `Error restoring backup: ${error.message}` },
       ]);
