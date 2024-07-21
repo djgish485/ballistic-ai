@@ -1,11 +1,45 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import styles from './ChatInterface.module.css';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
+
+const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
+  return (
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        code({ node, inline, className, children, ...props }) {
+          const match = /language-(\w+)/.exec(className || '');
+          return !inline && match ? (
+            <SyntaxHighlighter
+              style={tomorrow}
+              language={match[1]}
+              PreTag="div"
+              {...props}
+            >
+              {String(children).replace(/\n$/, '')}
+            </SyntaxHighlighter>
+          ) : (
+            <code className={className} {...props}>
+              {children}
+            </code>
+          );
+        },
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  );
+};
 
 const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -136,11 +170,11 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
           {isStarted ? 'Next feature/fix' : 'Start'}
         </button>
       </div>
-      <div className="flex-grow overflow-y-auto p-4 space-y-2 bg-gray-100 rounded">
+      <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-100 rounded">
         {messages.map((msg, index) => (
-          <div key={index} className={`p-2 rounded ${msg.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-white'}`}>
+          <div key={index} className={`p-4 rounded ${styles.markdownContent} ${msg.role === 'user' ? 'bg-blue-100' : 'bg-white'}`}>
             <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
-            {msg.content}
+            <FormattedMessage content={msg.content} />
           </div>
         ))}
         <div ref={chatEndRef} />
