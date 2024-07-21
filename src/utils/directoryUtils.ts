@@ -37,3 +37,53 @@ export function setupDirectories(projectDir: string): void {
     }
   });
 }
+
+export function createProjectBackup(projectDir: string): string {
+  const backupBaseDir = getProjectBackupsDir(projectDir);
+  const backupDir = path.join(backupBaseDir, 'latest_backup');
+
+  // Remove existing backup if it exists
+  if (fs.existsSync(backupDir)) {
+    fs.rmSync(backupDir, { recursive: true, force: true });
+  }
+
+  fs.mkdirSync(backupDir, { recursive: true });
+
+  const copyRecursive = (src: string, dest: string) => {
+    if (fs.statSync(src).isDirectory()) {
+      fs.mkdirSync(dest, { recursive: true });
+      fs.readdirSync(src).forEach(childItemName => {
+        copyRecursive(path.join(src, childItemName), path.join(dest, childItemName));
+      });
+    } else {
+      fs.copyFileSync(src, dest);
+    }
+  };
+
+  copyRecursive(projectDir, backupDir);
+
+  return backupDir;
+}
+
+export function restoreProjectBackup(projectDir: string, backupDir: string): void {
+  // Clear the project directory
+  fs.rmSync(projectDir, { recursive: true, force: true });
+  fs.mkdirSync(projectDir, { recursive: true });
+
+  // Copy the backup to the project directory
+  const copyRecursive = (src: string, dest: string) => {
+    if (fs.statSync(src).isDirectory()) {
+      fs.mkdirSync(dest, { recursive: true });
+      fs.readdirSync(src).forEach(childItemName => {
+        copyRecursive(path.join(src, childItemName), path.join(dest, childItemName));
+      });
+    } else {
+      fs.copyFileSync(src, dest);
+    }
+  };
+
+  copyRecursive(backupDir, projectDir);
+
+  // Recreate .superhero directory if it doesn't exist after restoration
+  setupDirectories(projectDir);
+}

@@ -12,6 +12,11 @@ interface Message {
   content: string;
 }
 
+interface SystemMessage {
+  type: 'backup' | 'restore';
+  content: string;
+}
+
 const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
   return (
     <ReactMarkdown
@@ -43,9 +48,11 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
 
 const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [systemMessages, setSystemMessages] = useState<SystemMessage[]>([]);
   const [input, setInput] = useState('');
   const [isStarted, setIsStarted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasBackup, setHasBackup] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -102,6 +109,29 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     console.log('Stream processing completed');
   };
 
+  const createBackup = async () => {
+    try {
+      const response = await fetch('/api/project-backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectDir })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setHasBackup(true);
+        setSystemMessages(prev => [
+          ...prev,
+          { type: 'backup', content: 'Project backup created. Previous backup (if any) was overwritten.' }
+        ]);
+      } else {
+        throw new Error(data.error || 'Failed to create backup');
+      }
+    } catch (error) {
+      console.error('Error creating backup:', error);
+      setSystemMessages(prev => [...prev, { type: 'backup', content: `Error creating backup: ${error.message}` }]);
+    }
+  };
+
   const handleStart = async () => {
     console.log('Start button clicked');
     setIsStarted(true);
@@ -109,6 +139,8 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     setIsLoading(true);
 
     try {
+      await createBackup();
+
       console.log('Analyzing project');
       const analyzeResponse = await fetch('/api/analyze-project', {
         method: 'POST',
@@ -159,9 +191,36 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     }
   };
 
+  const handleRestore = async () => {
+    if (!hasBackup) return;
+
+    const confirmed = window.confirm('Are you sure you want to restore the project to the latest backup? This will replace your current project with the backup.');
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch('/api/project-backup', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectDir })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setMessages([]);
+        setIsStarted(false);
+        setHasBackup(false);
+        setSystemMessages(prev => [...prev, { type: 'restore', content: 'Project restored successfully. You can start a new analysis by clicking the "Start" button.' }]);
+      } else {
+        throw new Error(data.error || 'Failed to restore backup');
+      }
+    } catch (error) {
+      console.error('Error restoring backup:', error);
+      setSystemMessages(prev => [...prev, { type: 'restore', content: `Error restoring backup: ${error.message}` }]);
+    }
+  };
+
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-4">
+      <div className="mb-4 flex space-x-2">
         <button
           onClick={handleStart}
           className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
@@ -169,10 +228,25 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         >
           {isStarted ? 'Next feature/fix' : 'Start'}
         </button>
+        {hasBackup && (
+          <button
+            onClick={handleRestore}
+            className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:bg-gray-400"
+            disabled={isLoading}
+          >
+            Restore Latest Backup
+          </button>
+        )}
       </div>
       <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-100 rounded">
+        {systemMessages.map((msg, index) => (
+          <div key={`system-${index}`} className={`p-4 rounded ${styles.markdownContent} ${msg.type === 'backup' ? 'bg-blue-100' : 'bg-yellow-100'}`}>
+            <strong>{msg.type === 'backup' ? 'Backup: ' : 'Restore: '}</strong>
+            {msg.content}
+          </div>
+        ))}
         {messages.map((msg, index) => (
-          <div key={index} className={`p-4 rounded ${styles.markdownContent} ${msg.role === 'user' ? 'bg-blue-100' : 'bg-white'}`}>
+          <div key={`chat-${index}`} className={`p-4 rounded ${styles.markdownContent} ${msg.role === 'user' ? 'bg-blue-100' : 'bg-white'}`}>
             <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
             <FormattedMessage content={msg.content} />
           </div>
