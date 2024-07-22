@@ -97,7 +97,7 @@ const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff }) 
   };
 
   return (
-    <>
+    <div className="whitespace-pre-wrap break-words">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -165,7 +165,7 @@ const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff }) 
       >
         {content}
       </ReactMarkdown>
-    </>
+    </div>
   );
 };
 
