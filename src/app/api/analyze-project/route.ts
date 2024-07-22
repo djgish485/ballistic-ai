@@ -38,6 +38,7 @@ export async function POST(request: Request) {
 
   // Analyze project structure
   let structureContent = `Project Structure:\n=================\n\nRoot: ${projectDir}\n\n`;
+  let fileCount = 0;
   function analyzeStructure(dir: string, level: number = 0) {
     console.log(`Analyzing structure of: ${dir}`);
     const items = fs.readdirSync(dir);
@@ -51,6 +52,7 @@ export async function POST(request: Request) {
         analyzeStructure(fullPath, level + 1);
       } else {
         structureContent += `${indent}${item}\n`;
+        fileCount++;
       }
     }
   }
@@ -85,5 +87,5 @@ export async function POST(request: Request) {
   console.log('Writing content file');
   fs.writeFileSync(contentFile, contentContent);
 
-  return NextResponse.json({ message: `Project analyzed. Results saved in ${structureFile} and ${contentFile}` });
+  return NextResponse.json({ message: `${fileCount} files added to project context` });
 }

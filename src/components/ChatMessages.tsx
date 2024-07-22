@@ -10,7 +10,7 @@ interface Message {
 }
 
 interface SystemMessage {
-  type: 'backup' | 'restore';
+  type: 'backup' | 'restore' | 'analysis';
   content: string;
 }
 
@@ -27,10 +27,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
         <div
           key={`system-${index}`}
           className={`p-4 rounded ${styles.markdownContent} ${
-            msg.type === 'backup' ? 'bg-blue-100' : 'bg-yellow-100'
+            msg.type === 'restore' ? 'bg-yellow-100' : 'bg-blue-100'
           }`}
         >
-          <strong>{msg.type === 'backup' ? 'Backup: ' : 'Restore: '}</strong>
+          {msg.type === 'backup' && <strong></strong>}
+          {msg.type === 'restore' && <strong>Restore: </strong>}
           {msg.content}
         </div>
       ))}

@@ -9,7 +9,7 @@ interface Message {
 }
 
 interface SystemMessage {
-  type: 'backup' | 'restore';
+  type: 'backup' | 'restore' | 'analysis';
   content: string;
 }
 
@@ -30,7 +30,6 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const [diffCommand, setDiffCommand] = useState('');
 
   const scrollToBottom = useCallback(() => {
-    console.log('Attempting to scroll to bottom');
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
@@ -39,25 +38,15 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     const documentHeight = document.documentElement.scrollHeight;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     
-    console.log('Scroll event detected');
-    console.log('windowHeight:', windowHeight);
-    console.log('documentHeight:', documentHeight);
-    console.log('scrollTop:', scrollTop);
-    
     const isScrollingDown = scrollTop > lastScrollTop.current;
-    const isScrolledToBottom = scrollTop + windowHeight >= documentHeight - 5;
-    
-    console.log('Is scrolling down:', isScrollingDown);
-    console.log('Is scrolled to bottom:', isScrolledToBottom);
+    const isScrolledToBottom = scrollTop + windowHeight >= documentHeight - 7; // 7 pixels allowed before auto scroll is disabled
     
     setUserScrolledUp(!isScrolledToBottom);
     lastScrollTop.current = scrollTop;
     
-    console.log('userScrolledUp set to:', !isScrolledToBottom);
   }, []);
 
   useEffect(() => {
-    console.log('Setting up scroll event listener on window');
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -65,13 +54,9 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   }, [handleScroll]);
 
   useEffect(() => {
-    console.log('Setting up Intersection Observer');
     const observer = new IntersectionObserver(
       ([entry]) => {
-        console.log('Intersection Observer callback triggered');
-        console.log('Entry is intersecting:', entry.isIntersecting);
         if (entry.isIntersecting) {
-          console.log('Chat end is visible, user has scrolled to bottom');
           setUserScrolledUp(false);
         }
       },
@@ -90,7 +75,6 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   }, []);
 
   useEffect(() => {
-    console.log('Messages updated, current userScrolledUp state:', userScrolledUp);
     if (!userScrolledUp) {
       scrollToBottom();
     }
@@ -172,6 +156,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     console.log('Start button clicked');
     setIsStarted(true);
     setMessages([]);
+    setSystemMessages([]);
     setIsLoading(true);
     setIsAIResponding(true);
 
@@ -186,6 +171,15 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       });
       const analyzeData = await analyzeResponse.json();
       console.log('Analyze project response:', analyzeData);
+
+      // Add a system message about the project analysis
+      setSystemMessages((prev) => [
+        ...prev,
+        {
+          type: 'analysis',
+          content: analyzeData.message,
+        },
+      ]);
 
       console.log('Starting chat');
       abortControllerRef.current = new AbortController();
@@ -207,7 +201,13 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         console.log('Request was cancelled');
       } else {
         console.error('Error starting chat:', error);
-        setMessages([{ role: 'assistant', content: 'An error occurred while starting the chat.' }]);
+        setSystemMessages((prev) => [
+          ...prev,
+          { 
+            type: 'analysis', 
+            content: 'An error occurred while analyzing the project or starting the chat.' 
+          },
+        ]);
       }
     } finally {
       setIsLoading(false);
@@ -246,9 +246,9 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
           console.log('Request was cancelled');
         } else {
           console.error('Error sending message:', error);
-          setMessages((prev) => [
+          setSystemMessages((prev) => [
             ...prev,
-            { role: 'assistant', content: 'An error occurred while processing your message.' },
+            { type: 'analysis', content: 'An error occurred while processing your message.' },
           ]);
         }
       } finally {
