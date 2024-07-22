@@ -1,11 +1,6 @@
-'use client';
-
 import React, { useState, useEffect, useRef } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
-import styles from './ChatInterface.module.css';
+import ChatMessages from './ChatMessages';
+import ChatInput from './ChatInput';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -16,112 +11,6 @@ interface SystemMessage {
   type: 'backup' | 'restore';
   content: string;
 }
-
-interface ExecutionResult {
-  id: string;
-  output: string;
-}
-
-const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
-  const [executionResults, setExecutionResults] = useState<ExecutionResult[]>([]);
-  const [codeBlockIds, setCodeBlockIds] = useState<Record<number, string>>({});
-
-  const generateId = () => `code-${Math.random().toString(36).substr(2, 9)}`;
-
-  const handleExecute = async (code: string, id: string) => {
-    try {
-      const response = await fetch('/api/execute-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code }),
-      });
-      const result = await response.json();
-      const linesCount = code.split('\n').length;
-
-      console.log(`Execution result (${id}):`, result);
-
-      setExecutionResults((prevResults) => {
-        const newResult = { id, output: `Executed ${linesCount} lines of code.\n\n${result.output}` };
-        return [...prevResults.filter((res) => res.id !== id), newResult];
-      });
-    } catch (error) {
-      console.error(`Error executing code block (${id}):`, error);
-      setExecutionResults((prevResults) => {
-        const newResult = { id, output: 'Error executing code, please check the console for more details.' };
-        console.log('Setting error execution result:', newResult);
-        return [...prevResults.filter((res) => res.id !== id), newResult];
-      });
-    }
-  };
-
-  return (
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      components={{
-        code({ node, inline, className, children, ...props }) {
-          if (inline) {
-            return (
-              <code className={className} {...props}>
-                {children}
-              </code>
-            );
-          } else {
-            const nodeIndex = node.position?.start.line ?? Math.random();
-            let id = codeBlockIds[nodeIndex];
-            if (!id) {
-              id = generateId();
-              setCodeBlockIds((prevIds) => ({
-                ...prevIds,
-                [nodeIndex]: id,
-              }));
-            }
-
-            const match = /language-(\w+)/.exec(className || '');
-
-            return match ? (
-              <div>
-                <SyntaxHighlighter
-                  style={tomorrow as any}
-                  language={match[1]}
-                  PreTag="div"
-                  {...props}
-                >
-                  {String(children).replace(/\n$/, '')}
-                </SyntaxHighlighter>
-                <button
-                  onClick={() => handleExecute(String(children), id)}
-                  className="px-2 py-1 bg-green-500 text-white rounded mt-2 hover:bg-green-600"
-                >
-                  Execute
-                </button>
-                <div className="mt-2 bg-gray-100 p-2 rounded">
-                  {executionResults.find((res) => res.id === id)?.output}
-                </div>
-              </div>
-            ) : (
-              <div>
-                <pre className={className} {...props}>
-                  {children}
-                </pre>
-                <button
-                  onClick={() => handleExecute(String(children), id)}
-                  className="px-2 py-1 bg-green-500 text-white rounded mt-2 hover:bg-green-600"
-                >
-                  Execute
-                </button>
-                <div className="mt-2 bg-gray-100 p-2 rounded">
-                  {executionResults.find((res) => res.id === id)?.output}
-                </div>
-              </div>
-            );
-          }
-        },
-      }}
-    >
-      {content}
-    </ReactMarkdown>
-  );
-};
 
 const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -155,7 +44,6 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       if (done) break;
 
       const chunk = decoder.decode(value);
-
       const lines = chunk.split('\n');
 
       for (const line of lines) {
@@ -358,57 +246,18 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         )}
       </div>
       <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-100 rounded">
-        {systemMessages.map((msg, index) => (
-          <div
-            key={`system-${index}`}
-            className={`p-4 rounded ${styles.markdownContent} ${
-              msg.type === 'backup' ? 'bg-blue-100' : 'bg-yellow-100'
-            }`}
-          >
-            <strong>{msg.type === 'backup' ? 'Backup: ' : 'Restore: '}</strong>
-            {msg.content}
-          </div>
-        ))}
-        {messages.map((msg, index) => (
-          <div
-            key={`chat-${index}`}
-            className={`p-4 rounded ${styles.markdownContent} ${
-              msg.role === 'user' ? 'bg-blue-100' : 'bg-white'
-            }`}
-          >
-            <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
-            <FormattedMessage content={msg.content} />
-          </div>
-        ))}
+        <ChatMessages systemMessages={systemMessages} messages={messages} />
         <div ref={chatEndRef} />
       </div>
       <div className="p-4 bg-gray-200 rounded-b">
-        <div className="flex space-x-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="flex-grow px-2 py-1 border rounded"
-            placeholder="Type your message..."
-            disabled={isLoading}
-          />
-          {isAIResponding ? (
-            <button
-              onClick={handleCancel}
-              className="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              Cancel
-            </button>
-          ) : (
-            <button
-              onClick={handleSend}
-              className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-              disabled={isLoading}
-            >
-              Send
-            </button>
-          )}
-        </div>
+        <ChatInput
+          input={input}
+          setInput={setInput}
+          handleSend={handleSend}
+          handleCancel={handleCancel}
+          isLoading={isLoading}
+          isAIResponding={isAIResponding}
+        />
       </div>
     </div>
   );

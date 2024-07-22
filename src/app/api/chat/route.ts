@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
             if (done) break;
 
             const chunk = new TextDecoder().decode(value);
-            console.log('Received chunk:', chunk);
+            //console.log('Received chunk:', chunk);
 
             const lines = chunk.split('\n');
 
@@ -157,9 +157,10 @@ async function fetchAPIResponse(apiKey: { type: string; key: string }, systemPro
   if (apiKey.type === 'Claude') {
     headers['x-api-key'] = apiKey.key;
     headers['anthropic-version'] = '2023-06-01';
+    headers["anthropic-beta"] = "max-tokens-3-5-sonnet-2024-07-15";
     body = {
       model: 'claude-3-5-sonnet-20240620',
-      max_tokens: 4096,
+      max_tokens: 8192,
       system: systemPrompt,
       messages: messages,
       stream: true
