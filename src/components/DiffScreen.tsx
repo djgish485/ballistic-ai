@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { diffLines, Change } from 'diff';
 
 interface DiffScreenProps {
   command: string;
@@ -8,18 +9,18 @@ interface DiffScreenProps {
 }
 
 const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
-  const [fileContent, setFileContent] = useState<string | null>(null);
+  const [diff, setDiff] = useState<Change[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchFileContent = async () => {
+    const fetchFileContentAndGenerateDiff = async () => {
       try {
         console.log('Command received:', command);
-        const filePath = parseFilePath(command);
+        const { filePath, newContent } = parseCommand(command);
         console.log('Parsed file path:', filePath);
 
-        if (!filePath) {
-          setError('Matching file not found');
+        if (!filePath || !newContent) {
+          setError('Invalid command format');
           return;
         }
 
@@ -38,33 +39,64 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
         }
 
         const data = await response.json();
-        console.log('Received file content:', data.content.slice(0, 100) + '...');
-        setFileContent(data.content);
+        const existingContent = data.content;
+        console.log('Received existing file content:', existingContent.slice(0, 100) + '...');
+
+        const diffResult = diffLines(existingContent, newContent);
+        setDiff(diffResult);
       } catch (err) {
-        console.error('Error in fetchFileContent:', err);
+        console.error('Error in fetchFileContentAndGenerateDiff:', err);
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       }
     };
 
-    fetchFileContent();
+    fetchFileContentAndGenerateDiff();
   }, [command]);
 
-  const parseFilePath = (cmd: string): string | null => {
+  const parseCommand = (cmd: string): { filePath: string | null; newContent: string | null } => {
     console.log('Parsing command:', cmd);
     const lines = cmd.split('\n');
-    for (let i = 0; i < Math.min(5, lines.length); i++) {
+    let filePath: string | null = null;
+    let newContent: string | null = null;
+
+    for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       console.log('Checking line:', line);
       if (line.includes("cat << 'EOF' >")) {
         const match = line.match(/cat << 'EOF' > (.+)/);
         if (match && match[1]) {
-          console.log('Found file path:', match[1]);
-          return match[1].trim();
+          filePath = match[1].trim();
+          const contentLines = lines.slice(i + 1);
+          const eofIndex = contentLines.findIndex(l => l.startsWith('EOF'));
+          if (eofIndex !== -1) {
+            newContent = contentLines.slice(0, eofIndex).join('\n');
+          } else {
+            newContent = contentLines.join('\n');
+          }
+          break;
         }
       }
     }
-    console.log('No file path found');
-    return null;
+
+    console.log('File path:', filePath);
+    console.log('New content:', newContent?.slice(0, 100) + '...');
+    return { filePath, newContent };
+  };
+
+  const renderDiff = () => {
+    return diff.map((part, index) => {
+      const color = part.added ? 'bg-green-100' : part.removed ? 'bg-red-100' : 'bg-white';
+      const prefix = part.added ? '+' : part.removed ? '-' : ' ';
+      return (
+        <pre key={index} className={`${color} p-1`}>
+          {part.value.split('\n').map((line, lineIndex) => (
+            <div key={lineIndex}>
+              {prefix} {line}
+            </div>
+          ))}
+        </pre>
+      );
+    });
   };
 
   return (
@@ -73,12 +105,12 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
         <h2 className="text-xl font-bold mb-4">File Diff</h2>
         {error ? (
           <p className="text-red-500">{error}</p>
-        ) : fileContent === null ? (
-          <p>Loading file content...</p>
+        ) : diff.length === 0 ? (
+          <p>Loading diff...</p>
         ) : (
-          <pre className="bg-gray-100 p-4 rounded overflow-x-auto">
-            <code>{fileContent}</code>
-          </pre>
+          <div className="bg-gray-100 p-4 rounded overflow-x-auto">
+            {renderDiff()}
+          </div>
         )}
         <button
           onClick={onClose}

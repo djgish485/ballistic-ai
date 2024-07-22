@@ -12,7 +12,12 @@ interface ExecutionResult {
   output: string;
 }
 
-const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
+interface FormattedMessageProps {
+  content: string;
+  onDiff: (command: string) => void;
+}
+
+const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff }) => {
   const [executionResults, setExecutionResults] = useState<ExecutionResult[]>([]);
   const [codeBlockIds, setCodeBlockIds] = useState<Record<number, string>>({});
   const [showDiff, setShowDiff] = useState(false);
@@ -47,8 +52,7 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
   };
 
   const handleDiffClick = (code: string) => {
-    setDiffCommand(code);
-    setShowDiff(true);
+    onDiff(code);
   };
 
   return (
@@ -134,12 +138,6 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
       >
         {content}
       </ReactMarkdown>
-      {showDiff && (
-        <DiffScreen
-          command={diffCommand}
-          onClose={() => setShowDiff(false)}
-        />
-      )}
     </>
   );
 };

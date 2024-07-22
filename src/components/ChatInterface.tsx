@@ -27,7 +27,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastScrollTop = useRef(0);
   const [showDiff, setShowDiff] = useState(false);
-  const [diffFilePath, setDiffFilePath] = useState('');
+  const [diffCommand, setDiffCommand] = useState('');
 
   const scrollToBottom = useCallback(() => {
     console.log('Attempting to scroll to bottom');
@@ -305,8 +305,8 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     }
   };
 
-  const handleDiff = (filePath: string) => {
-    setDiffFilePath(filePath);
+  const handleDiff = (command: string) => {
+    setDiffCommand(command);
     setShowDiff(true);
   };
 
@@ -352,7 +352,10 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         />
       </div>
       {showDiff && (
-        <DiffScreen filePath={diffFilePath} onClose={() => setShowDiff(false)} />
+        <DiffScreen
+          command={diffCommand}
+          onClose={() => setShowDiff(false)}
+        />
       )}
     </div>
   );
