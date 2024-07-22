@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { getProjectFilesDir, getProjectBackupsDir } from '@/utils/directoryUtils';
-import { getSelectedAPIKey } from '@/utils/apiKeyManager';
+import { getSelectedAPIKey, readAPIKeys } from '@/utils/apiKeyManager';
 
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
@@ -15,15 +15,21 @@ type Message = {
 export async function POST(req: NextRequest) {
   console.log('Received POST request to /api/chat');
   try {
-    const { projectDir, message, isInitial, conversationHistory } = await req.json();
-    console.log('Request body:', { projectDir, message, isInitial, conversationHistory });
+    const { projectDir, message, isInitial, conversationHistory, selectedAPIKeyIndex } = await req.json();
+    console.log('Request body:', { projectDir, message, isInitial, conversationHistory, selectedAPIKeyIndex });
 
     if (!projectDir) {
       console.error('Project directory is required');
       return NextResponse.json({ error: 'Project directory is required' }, { status: 400 });
     }
 
-    const apiKey = getSelectedAPIKey();
+    let apiKey;
+    if (selectedAPIKeyIndex !== null) {
+      const apiKeys = readAPIKeys();
+      apiKey = apiKeys.keys[parseInt(selectedAPIKeyIndex)];
+    } else {
+      apiKey = getSelectedAPIKey();
+    }
     console.log('Selected API key type:', apiKey?.type);
 
     if (!apiKey) {
@@ -38,7 +44,7 @@ export async function POST(req: NextRequest) {
     console.log('Project files loaded');
 
     const systemPrompt = initialPrompt;
-    const initialMessage = `Please provide a SHORT overview of the project based on the following information. I will then ask for specific changes or improvements.\n\nHere are the project files:\n\n${projectFiles}`;
+    const initialMessage = `Please provide a SHORT, CONCISE overview of the project based on the following information. I will then ask for specific changes or improvements.\n\nHere are the project files:\n\n${projectFiles}`;
 
     let serverMessages: Message[] = [];
     if (isInitial) {
@@ -56,7 +62,7 @@ export async function POST(req: NextRequest) {
       console.log('Reconstructed conversation history');
     }
 
-    console.log('Server messages:', serverMessages);
+   // console.log('Server messages:', serverMessages);
 
     let fullResponse = '';
 
@@ -147,7 +153,7 @@ export async function POST(req: NextRequest) {
 }
 
 async function fetchAPIResponse(apiKey: { type: string; key: string }, systemPrompt: string, messages: Message[]) {
-  console.log('Fetching API response');
+  console.log('Fetching API response using', apiKey.type, 'API');
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   };
@@ -165,7 +171,7 @@ async function fetchAPIResponse(apiKey: { type: string; key: string }, systemPro
       messages: messages,
       stream: true
     };
-    console.log('Sending request to Claude API:', JSON.stringify(body, null, 2));
+    //console.log('Sending request to Claude API:', JSON.stringify(body, null, 2));
     const response = await fetch(CLAUDE_API_URL, {
       method: 'POST',
       headers,
@@ -187,7 +193,7 @@ async function fetchAPIResponse(apiKey: { type: string; key: string }, systemPro
       max_tokens: 4096,
       stream: true
     };
-    console.log('Sending request to OpenAI API:', JSON.stringify(body, null, 2));
+   // console.log('Sending request to OpenAI API:', JSON.stringify(body, null, 2));
     const response = await fetch(OPENAI_API_URL, {
       method: 'POST',
       headers,

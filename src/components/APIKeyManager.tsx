@@ -23,7 +23,23 @@ const APIKeyManager: React.FC = () => {
       if (!response.ok) throw new Error('Failed to fetch API keys');
       const data = await response.json();
       setApiKeys(data.keys);
-      setSelectedIndex(data.selected);
+      
+      // Check sessionStorage for selectedAPIKeyIndex
+      const storedIndex = sessionStorage.getItem('selectedAPIKeyIndex');
+      if (storedIndex !== null) {
+        const index = parseInt(storedIndex, 10);
+        if (index >= 0 && index < data.keys.length) {
+          setSelectedIndex(index);
+          await selectKey(index);
+        } else {
+          // If stored index is invalid, clear it
+          sessionStorage.removeItem('selectedAPIKeyIndex');
+        }
+      } else if (data.selected !== null) {
+        // If no stored index, use the server's selected index
+        setSelectedIndex(data.selected);
+        sessionStorage.setItem('selectedAPIKeyIndex', data.selected.toString());
+      }
     } catch (error) {
       console.error('Error fetching API keys:', error);
     }
@@ -51,6 +67,10 @@ const APIKeyManager: React.FC = () => {
       const response = await fetch(`/api/api-keys?index=${index}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete API key');
       await fetchAPIKeys();
+      if (selectedIndex === index) {
+        setSelectedIndex(null);
+        sessionStorage.removeItem('selectedAPIKeyIndex');
+      }
     } catch (error) {
       console.error('Error deleting API key:', error);
     }
@@ -65,6 +85,7 @@ const APIKeyManager: React.FC = () => {
       });
       if (!response.ok) throw new Error('Failed to select API key');
       setSelectedIndex(index);
+      sessionStorage.setItem('selectedAPIKeyIndex', index.toString());
     } catch (error) {
       console.error('Error selecting API key:', error);
     }

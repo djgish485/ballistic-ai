@@ -123,7 +123,12 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectDir, isInitial: true, conversationHistory: [] }),
+        body: JSON.stringify({ 
+          projectDir, 
+          isInitial: true, 
+          conversationHistory: [],
+          selectedAPIKeyIndex: sessionStorage.getItem('selectedAPIKeyIndex')
+        }),
         signal: abortControllerRef.current.signal,
       });
 
@@ -156,7 +161,13 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ projectDir, message: input, isInitial: false, conversationHistory: messages }),
+          body: JSON.stringify({ 
+            projectDir, 
+            message: input, 
+            isInitial: false, 
+            conversationHistory: messages,
+            selectedAPIKeyIndex: sessionStorage.getItem('selectedAPIKeyIndex')
+          }),
           signal: abortControllerRef.current.signal,
         });
 
