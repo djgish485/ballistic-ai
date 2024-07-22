@@ -3,14 +3,51 @@ const http = require('http');
 const { Server } = require('socket.io');
 const next = require('next');
 const path = require('path');
+const net = require('net');
+const readline = require('readline');
 
 const dev = process.env.NODE_ENV !== 'production';
-const app = next({ dev });
+const app = next({ dev, conf: { webpack: (config) => {
+  config.watch = false;
+  return config;
+}}});
 const handle = app.getRequestHandler();
 
 const projectDir = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();
 
-app.prepare().then(() => {
+function findAvailablePort(startPort) {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.unref();
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        resolve(findAvailablePort(startPort + 1));
+      } else {
+        reject(err);
+      }
+    });
+    server.listen(startPort, () => {
+      server.close(() => {
+        resolve(startPort);
+      });
+    });
+  });
+}
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+function promptUser(question) {
+  return new Promise((resolve) => {
+    rl.question(question, (answer) => {
+      resolve(answer.toLowerCase());
+    });
+  });
+}
+
+app.prepare().then(async () => {
   const server = express();
   const httpServer = http.createServer(server);
   const io = new Server(httpServer);
@@ -38,9 +75,31 @@ app.prepare().then(() => {
     return handle(req, res);
   });
 
-  httpServer.listen(3000, (err) => {
-    if (err) throw err;
-    console.log('> Ready on http://localhost:3000');
-    console.log('> Project directory:', projectDir);
-  });
+  const defaultPort = 3000;
+  let port = defaultPort;
+
+  try {
+    port = await findAvailablePort(defaultPort);
+    
+    if (port !== defaultPort) {
+      console.log(`Port ${defaultPort} is not available. Suggested port: ${port}`);
+      const answer = await promptUser(`Do you want to use port ${port}? (y/n) `);
+      
+      if (answer !== 'y') {
+        console.log('Server startup cancelled by user.');
+        process.exit(0);
+      }
+    }
+
+    httpServer.listen(port, (err) => {
+      if (err) throw err;
+      console.log(`> Ready on http://localhost:${port}`);
+      console.log('> Project directory:', projectDir);
+    });
+  } catch (err) {
+    console.error('Error starting server:', err);
+    process.exit(1);
+  } finally {
+    rl.close();
+  }
 });

@@ -19,7 +19,7 @@ function getProjectSpecificDir(projectDir: string, type: 'files' | 'backups'): s
 }
 
 function shouldExclude(basename: string): boolean {
-  const excludeDirs = new Set(['node_modules', '.git', 'dist', 'build', '.vscode', '.idea', 'venv', 'superhero_env', '__pycache__', 'example_project']);
+  const excludeDirs = new Set(['node_modules', '.git', 'dist', 'build', '.vscode', '.idea', 'venv', 'superhero_env', '__pycache__', 'example_project', 'package-lock.json']);
   const excludeFiles = new Set(['.DS_Store']);
   return excludeDirs.has(basename) || excludeFiles.has(basename) || basename.startsWith('.');
 }

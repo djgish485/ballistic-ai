@@ -51,10 +51,12 @@ export function createProjectBackup(projectDir: string): string {
 
   const copyRecursive = (src: string, dest: string) => {
     if (fs.statSync(src).isDirectory()) {
-      fs.mkdirSync(dest, { recursive: true });
-      fs.readdirSync(src).forEach(childItemName => {
-        copyRecursive(path.join(src, childItemName), path.join(dest, childItemName));
-      });
+      if (path.basename(src) !== '.superhero') { // Exclude .superhero directories
+        fs.mkdirSync(dest, { recursive: true });
+        fs.readdirSync(src).forEach(childItemName => {
+          copyRecursive(path.join(src, childItemName), path.join(dest, childItemName));
+        });
+      }
     } else {
       fs.copyFileSync(src, dest);
     }

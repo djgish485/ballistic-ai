@@ -2,12 +2,18 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 
+interface FileInfo {
+  name: string;
+  size: number;
+}
+
 interface Props {
   projectDir: string;
 }
 
 const FileList: React.FC<Props> = ({ projectDir }) => {
-  const [files, setFiles] = useState<string[]>([]);
+  const [files, setFiles] = useState<FileInfo[]>([]);
+  const [totalSize, setTotalSize] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -32,6 +38,7 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
       const data = await response.json();
       console.log('Received file list:', data.files);
       setFiles(data.files);
+      setTotalSize(data.totalSize);
     } catch (err) {
       console.error('Error fetching files:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -72,10 +79,18 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
     }
   };
 
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   return (
     <div className="bg-white p-4 rounded shadow">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Files</h2>
+        <h2 className="text-lg font-semibold text-gray-900">Context</h2>
         <button
           onClick={handleAddFile}
           className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -97,13 +112,19 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
       ) : files.length === 0 ? (
         <p className="text-gray-600">No files found.</p>
       ) : (
-        <ul className="space-y-1">
-          {files.map((file, index) => (
-            <li key={index} className="hover:bg-gray-100 p-1 rounded text-gray-900">
-              {file}
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="space-y-1 mb-4">
+            {files.map((file, index) => (
+              <li key={index} className="flex justify-between hover:bg-gray-100 p-1 rounded text-gray-900">
+                <span>{file.name}</span>
+                <span className="text-gray-500">{formatFileSize(file.size)}</span>
+              </li>
+            ))}
+          </ul>
+          <div className="text-right text-gray-600">
+            Total size: {formatFileSize(totalSize)}
+          </div>
+        </>
       )}
     </div>
   );
