@@ -43,7 +43,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
           }`}
         >
           <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
-          <FormattedMessage content={msg.content} onDiff={onDiff} />
+          <FormattedMessage content={msg.content} onDiff={onDiff} role={msg.role} />
         </div>
       ))}
     </>

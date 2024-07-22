@@ -15,9 +15,10 @@ interface ExecutionResult {
 interface FormattedMessageProps {
   content: string;
   onDiff: (command: string) => void;
+  role: 'user' | 'assistant';
 }
 
-const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff }) => {
+const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff, role }) => {
   const [executionResults, setExecutionResults] = useState<ExecutionResult[]>([]);
   const [codeBlockIds, setCodeBlockIds] = useState<Record<number, string>>({});
   const [originalFileContents, setOriginalFileContents] = useState<Record<string, string>>({});
@@ -96,8 +97,12 @@ const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff }) 
     onDiff(code);
   };
 
+  if (role === 'user') {
+    return <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
+  }
+
   return (
-    <div className="whitespace-pre-wrap break-words">
+    <div>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
