@@ -130,7 +130,9 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const [isStarted, setIsStarted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasBackup, setHasBackup] = useState(false);
+  const [isAIResponding, setIsAIResponding] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -214,6 +216,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     setIsStarted(true);
     setMessages([]);
     setIsLoading(true);
+    setIsAIResponding(true);
 
     try {
       await createBackup();
@@ -228,18 +231,26 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       console.log('Analyze project response:', analyzeData);
 
       console.log('Starting chat');
+      abortControllerRef.current = new AbortController();
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ projectDir, isInitial: true, conversationHistory: [] }),
+        signal: abortControllerRef.current.signal,
       });
 
       await processStreamResponse(response);
     } catch (error) {
-      console.error('Error starting chat:', error);
-      setMessages([{ role: 'assistant', content: 'An error occurred while starting the chat.' }]);
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('Request was cancelled');
+      } else {
+        console.error('Error starting chat:', error);
+        setMessages([{ role: 'assistant', content: 'An error occurred while starting the chat.' }]);
+      }
     } finally {
       setIsLoading(false);
+      setIsAIResponding(false);
+      abortControllerRef.current = null;
     }
   };
 
@@ -250,24 +261,41 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       setMessages((prev) => [...prev, userMessage]);
       setInput('');
       setIsLoading(true);
+      setIsAIResponding(true);
 
       try {
+        abortControllerRef.current = new AbortController();
         const response = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ projectDir, message: input, isInitial: false, conversationHistory: messages }),
+          signal: abortControllerRef.current.signal,
         });
 
         await processStreamResponse(response);
       } catch (error) {
-        console.error('Error sending message:', error);
-        setMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: 'An error occurred while processing your message.' },
-        ]);
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.log('Request was cancelled');
+        } else {
+          console.error('Error sending message:', error);
+          setMessages((prev) => [
+            ...prev,
+            { role: 'assistant', content: 'An error occurred while processing your message.' },
+          ]);
+        }
       } finally {
         setIsLoading(false);
+        setIsAIResponding(false);
+        abortControllerRef.current = null;
       }
+    }
+  };
+
+  const handleCancel = () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+      setIsAIResponding(false);
+      setIsLoading(false);
     }
   };
 
@@ -364,13 +392,22 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
             placeholder="Type your message..."
             disabled={isLoading}
           />
-          <button
-            onClick={handleSend}
-            className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-            disabled={isLoading}
-          >
-            Send
-          </button>
+          {isAIResponding ? (
+            <button
+              onClick={handleCancel}
+              className="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Cancel
+            </button>
+          ) : (
+            <button
+              onClick={handleSend}
+              className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
+              disabled={isLoading}
+            >
+              Send
+            </button>
+          )}
         </div>
       </div>
     </div>

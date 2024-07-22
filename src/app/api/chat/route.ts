@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     console.log('Project files loaded');
 
     const systemPrompt = initialPrompt;
-    const initialMessage = `Please provide a brief overview of the project based on the following information, including how well it meets the requirements. I will then ask for specific changes or improvements.\n\nHere are the project files:\n\n${projectFiles}`;
+    const initialMessage = `Please provide a SHORT overview of the project based on the following information. I will then ask for specific changes or improvements.\n\nHere are the project files:\n\n${projectFiles}`;
 
     let serverMessages: Message[] = [];
     if (isInitial) {
