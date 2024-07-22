@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';
 
@@ -20,12 +20,78 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasBackup, setHasBackup] = useState(false);
   const [isAIResponding, setIsAIResponding] = useState(false);
+  const [userScrolledUp, setUserScrolledUp] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const lastScrollTop = useRef(0);
+
+  const scrollToBottom = useCallback(() => {
+    console.log('Attempting to scroll to bottom');
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    console.log('Scroll event detected');
+    console.log('windowHeight:', windowHeight);
+    console.log('documentHeight:', documentHeight);
+    console.log('scrollTop:', scrollTop);
+    
+    const isScrollingDown = scrollTop > lastScrollTop.current;
+    const isScrolledToBottom = scrollTop + windowHeight >= documentHeight - 5;
+    
+    console.log('Is scrolling down:', isScrollingDown);
+    console.log('Is scrolled to bottom:', isScrolledToBottom);
+    
+    setUserScrolledUp(!isScrolledToBottom);
+    lastScrollTop.current = scrollTop;
+    
+    console.log('userScrolledUp set to:', !isScrolledToBottom);
+  }, []);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    console.log('Setting up scroll event listener on window');
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll]);
+
+  useEffect(() => {
+    console.log('Setting up Intersection Observer');
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        console.log('Intersection Observer callback triggered');
+        console.log('Entry is intersecting:', entry.isIntersecting);
+        if (entry.isIntersecting) {
+          console.log('Chat end is visible, user has scrolled to bottom');
+          setUserScrolledUp(false);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (chatEndRef.current) {
+      observer.observe(chatEndRef.current);
+    }
+
+    return () => {
+      if (chatEndRef.current) {
+        observer.unobserve(chatEndRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('Messages updated, current userScrolledUp state:', userScrolledUp);
+    if (!userScrolledUp) {
+      scrollToBottom();
+    }
+  }, [messages, userScrolledUp, scrollToBottom]);
 
   const processStreamResponse = async (response: Response) => {
     console.log('Processing stream response');
@@ -256,7 +322,10 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
           </button>
         )}
       </div>
-      <div className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-100 rounded">
+      <div 
+        className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-100 rounded"
+        ref={chatContainerRef}
+      >
         <ChatMessages systemMessages={systemMessages} messages={messages} />
         <div ref={chatEndRef} />
       </div>
