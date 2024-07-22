@@ -11,7 +11,12 @@ interface ExecutionResult {
   output: string;
 }
 
-const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
+interface FormattedMessageProps {
+  content: string;
+  onDiff: (filePath: string) => void;
+}
+
+const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff }) => {
   const [executionResults, setExecutionResults] = useState<ExecutionResult[]>([]);
   const [codeBlockIds, setCodeBlockIds] = useState<Record<number, string>>({});
 
@@ -40,6 +45,18 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
         console.log('Setting error execution result:', newResult);
         return [...prevResults.filter((res) => res.id !== id), newResult];
       });
+    }
+  };
+
+  const handleDiff = (code: string) => {
+    const lines = code.split('\n');
+    const catLine = lines.find(line => line.startsWith('cat << '));
+    if (catLine) {
+      const match = catLine.match(/'EOF'\s+>\s+(.*)/);
+      if (match) {
+        const filePath = match[1].trim();
+        onDiff(filePath);
+      }
     }
   };
 
@@ -77,12 +94,20 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
                 >
                   {String(children).replace(/\n$/, '')}
                 </SyntaxHighlighter>
-                <button
-                  onClick={() => handleExecute(String(children), id)}
-                  className="px-2 py-1 bg-green-500 text-white rounded mt-2 hover:bg-green-600"
-                >
-                  Execute
-                </button>
+                <div className="mt-2 space-x-2">
+                  <button
+                    onClick={() => handleExecute(String(children), id)}
+                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                  >
+                    Execute
+                  </button>
+                  <button
+                    onClick={() => handleDiff(String(children))}
+                    className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Diff
+                  </button>
+                </div>
                 <div className="mt-2 bg-gray-100 p-2 rounded">
                   {executionResults.find((res) => res.id === id)?.output}
                 </div>
@@ -92,12 +117,20 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
                 <pre className={className} {...props}>
                   {children}
                 </pre>
-                <button
-                  onClick={() => handleExecute(String(children), id)}
-                  className="px-2 py-1 bg-green-500 text-white rounded mt-2 hover:bg-green-600"
-                >
-                  Execute
-                </button>
+                <div className="mt-2 space-x-2">
+                  <button
+                    onClick={() => handleExecute(String(children), id)}
+                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                  >
+                    Execute
+                  </button>
+                  <button
+                    onClick={() => handleDiff(String(children))}
+                    className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Diff
+                  </button>
+                </div>
                 <div className="mt-2 bg-gray-100 p-2 rounded">
                   {executionResults.find((res) => res.id === id)?.output}
                 </div>

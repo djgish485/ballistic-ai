@@ -17,9 +17,10 @@ interface SystemMessage {
 interface ChatMessagesProps {
   systemMessages: SystemMessage[];
   messages: Message[];
+  onDiff: (filePath: string) => void;
 }
 
-const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages }) => {
+const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, onDiff }) => {
   return (
     <>
       {systemMessages.map((msg, index) => (
@@ -41,7 +42,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages })
           }`}
         >
           <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
-          <FormattedMessage content={msg.content} />
+          <FormattedMessage content={msg.content} onDiff={onDiff} />
         </div>
       ))}
     </>
