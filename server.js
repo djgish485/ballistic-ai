@@ -1,6 +1,5 @@
 const express = require('express');
 const http = require('http');
-const { Server } = require('socket.io');
 const next = require('next');
 const path = require('path');
 const net = require('net');
@@ -47,20 +46,6 @@ function promptUser(question) {
 app.prepare().then(async () => {
   const server = express();
   const httpServer = http.createServer(server);
-  const io = new Server(httpServer);
-
-  io.on('connection', (socket) => {
-    console.log('A user connected');
-    
-    socket.on('disconnect', () => {
-      console.log('User disconnected');
-    });
-  });
-
-  server.use((req, res, next) => {
-    req.io = io;
-    next();
-  });
 
   server.use('/project-files', express.static(projectDir));
 
