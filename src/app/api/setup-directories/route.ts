@@ -31,7 +31,7 @@ export async function POST(request: Request) {
 
   const directories = [superheroDir, internalsDir, filesDir, backupsDir];
 
-  const createdDirs = [];
+  const createdDirs: string[] = [];
   directories.forEach(dir => {
     console.log('Attempting to create directory:', dir);
     if (!fs.existsSync(dir)) {

@@ -7,10 +7,7 @@ const net = require('net');
 const readline = require('readline');
 
 const dev = process.env.NODE_ENV !== 'production';
-const app = next({ dev, conf: { webpack: (config) => {
-  config.watch = false;
-  return config;
-}}});
+const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const projectDir = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();

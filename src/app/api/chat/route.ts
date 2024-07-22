@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       // Reconstruct the server messages, ensuring the initial message is always first
       serverMessages = [
         { role: 'user', content: initialMessage },
-        ...conversationHistory.filter(msg => msg.role !== 'system')
+        ...conversationHistory
       ];
       if (message) {
         serverMessages.push({ role: 'user', content: message });

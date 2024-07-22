@@ -1,12 +1,18 @@
 /** @type {import('next').NextConfig} */
-
 const nextConfig = {
-  serverRuntimeConfig: {
-    PROJECT_ROOT: process.cwd()
+  reactStrictMode: true,
+  webpack: (config, { dev }) => {
+    if (!dev) {
+      // Disable HMR in production
+      config.optimization.runtimeChunk = false;
+      config.optimization.splitChunks = {
+        cacheGroups: {
+          default: false,
+        },
+      };
+    }
+    return config;
   },
-  experimental: {
-    serverComponentsExternalPackages: ['fs', 'path']
-  }
 };
 
 export default nextConfig;

@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Error during code execution:', error);
     return NextResponse.json({
-      error: error.message || 'An unknown error occurred',
+      error: error instanceof Error ? error.message : 'An unknown error occurred',
     }, { status: 500 });
   }
 } 

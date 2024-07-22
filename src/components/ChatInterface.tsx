@@ -29,9 +29,6 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
   const generateId = () => `code-${Math.random().toString(36).substr(2, 9)}`;
 
   const handleExecute = async (code: string, id: string) => {
-   // console.log(`Executing code block (${id}):`);
-   // console.log(code);
-    
     try {
       const response = await fetch('/api/execute-code', {
         method: 'POST',
@@ -45,7 +42,6 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
 
       setExecutionResults((prevResults) => {
         const newResult = { id, output: `Executed ${linesCount} lines of code.\n\n${result.output}` };
-       // console.log('Setting execution result:', newResult);
         return [...prevResults.filter((res) => res.id !== id), newResult];
       });
     } catch (error) {
@@ -85,7 +81,7 @@ const FormattedMessage: React.FC<{ content: string }> = ({ content }) => {
             return match ? (
               <div>
                 <SyntaxHighlighter
-                  style={tomorrow}
+                  style={tomorrow as any}
                   language={match[1]}
                   PreTag="div"
                   {...props}
@@ -208,7 +204,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       console.error('Error creating backup:', error);
       setSystemMessages((prev) => [
         ...prev,
-        { type: 'backup', content: `Error creating backup: ${error.message}` },
+        { type: 'backup', content: `Error creating backup: ${error instanceof Error ? error.message : 'Unknown error'}` },
       ]);
     }
   };
@@ -308,7 +304,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
       console.error('Error restoring backup:', error);
       setSystemMessages((prev) => [
         ...prev,
-        { type: 'restore', content: `Error restoring backup: ${error.message}` },
+        { type: 'restore', content: `Error restoring backup: ${error instanceof Error ? error.message : 'Unknown error'}` },
       ]);
     }
   };
@@ -329,7 +325,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
             className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:bg-gray-400"
             disabled={isLoading}
           >
-            Restore Latest Backup
+            Undo All & Restore Backup
           </button>
         )}
       </div>

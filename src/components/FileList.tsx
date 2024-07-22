@@ -130,4 +130,4 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
   );
 };
 
-export default FileList;
+export default FileList; 
