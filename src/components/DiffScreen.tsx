@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { diffLines, Change } from 'diff';
+import { parseCommand } from '@/utils/commandParser';
 
 interface DiffScreenProps {
   command: string;
@@ -15,9 +16,7 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
   useEffect(() => {
     const fetchFileContentAndGenerateDiff = async () => {
       try {
-        console.log('Command received:', command);
         const { filePath, newContent } = parseCommand(command);
-        console.log('Parsed file path:', filePath);
 
         if (!filePath || !newContent) {
           setError('Invalid command format');
@@ -32,56 +31,22 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
           body: JSON.stringify({ filePath }),
         });
 
-        console.log('API response status:', response.status);
-
         if (!response.ok) {
           throw new Error('Failed to fetch file content');
         }
 
         const data = await response.json();
         const existingContent = data.content;
-        console.log('Received existing file content:', existingContent.slice(0, 100) + '...');
 
         const diffResult = diffLines(existingContent, newContent);
         setDiff(diffResult);
       } catch (err) {
-        console.error('Error in fetchFileContentAndGenerateDiff:', err);
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       }
     };
 
     fetchFileContentAndGenerateDiff();
   }, [command]);
-
-  const parseCommand = (cmd: string): { filePath: string | null; newContent: string | null } => {
-    console.log('Parsing command:', cmd);
-    const lines = cmd.split('\n');
-    let filePath: string | null = null;
-    let newContent: string | null = null;
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      console.log('Checking line:', line);
-      if (line.includes("cat << 'EOF' >")) {
-        const match = line.match(/cat << 'EOF' > (.+)/);
-        if (match && match[1]) {
-          filePath = match[1].trim();
-          const contentLines = lines.slice(i + 1);
-          const eofIndex = contentLines.findIndex(l => l.startsWith('EOF'));
-          if (eofIndex !== -1) {
-            newContent = contentLines.slice(0, eofIndex).join('\n');
-          } else {
-            newContent = contentLines.join('\n');
-          }
-          break;
-        }
-      }
-    }
-
-    console.log('File path:', filePath);
-    console.log('New content:', newContent?.slice(0, 100) + '...');
-    return { filePath, newContent };
-  };
 
   const renderDiff = () => {
     return diff.map((part, index) => {
