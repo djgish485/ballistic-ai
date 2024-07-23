@@ -92,6 +92,8 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
 
     let currentContent = '';
 
+    setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
+
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -107,15 +109,12 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
               currentContent += data.content;
               setMessages((prev) => {
                 const newMessages = [...prev];
-                if (newMessages.length > 0 && newMessages[newMessages.length - 1].role === 'assistant') {
-                  newMessages[newMessages.length - 1].content = currentContent;
-                } else {
-                  newMessages.push({ role: 'assistant', content: currentContent });
-                }
+                newMessages[newMessages.length - 1].content = currentContent;
                 return newMessages;
               });
             } else if (data.conversationHistory) {
               setMessages(data.conversationHistory);
+              return; // Exit early if we're setting a new conversation history
             }
           } catch (error) {
             console.error('Error parsing JSON:', error);

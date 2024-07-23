@@ -1,6 +1,10 @@
 import { ReadableStream } from 'stream/web';
 
 export function createResponseStream(apiKey: { type: string; key: string }, apiResponse: Response, setMessages: (messages: any) => void) {
+  const startTime = Date.now();
+  let tokenCount = 0;
+  let totalResponseSize = 0;
+
   return new ReadableStream({
     async start(controller) {
       const reader = apiResponse.body!.getReader();
@@ -12,6 +16,7 @@ export function createResponseStream(apiKey: { type: string; key: string }, apiR
           if (done) break;
 
           const chunk = new TextDecoder().decode(value);
+          totalResponseSize += value.byteLength; // Accumulate the size of each chunk
           const lines = chunk.split('\n');
 
           for (const line of lines) {
@@ -25,6 +30,7 @@ export function createResponseStream(apiKey: { type: string; key: string }, apiR
                   content = data.choices[0].delta.content;
                 }
                 if (content) {
+                  tokenCount += content.split(/\s+/).length; // assuming tokens are similar to words
                   fullResponse += content;
                   controller.enqueue(`data: ${JSON.stringify({ content })}\n\n`);
                 }
@@ -36,6 +42,17 @@ export function createResponseStream(apiKey: { type: string; key: string }, apiR
         }
 
         setMessages((prev: any) => [...prev, { role: 'assistant', content: fullResponse }]);
+
+        // Calculate and log metrics
+        const endTime = Date.now();
+        const durationInSeconds = (endTime - startTime) / 1000;
+        const tokensPerSecond = tokenCount / durationInSeconds;
+        console.info(`API Type: ${apiKey.type}`);
+        console.info(`Total tokens: ${tokenCount}`);
+        console.info(`Total response size: ${totalResponseSize} bytes`);
+        console.info(`Duration: ${durationInSeconds.toFixed(2)} seconds`);
+        console.info(`Tokens per second: ${tokensPerSecond.toFixed(2)}`);
+
         controller.close();
       } catch (error) {
         controller.error(error);
