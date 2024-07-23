@@ -18,9 +18,10 @@ interface ChatMessagesProps {
   systemMessages: SystemMessage[];
   messages: Message[];
   onDiff: (filePath: string) => void;
+  isCodeBlockComplete: boolean;
 }
 
-const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, onDiff }) => {
+const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, onDiff, isCodeBlockComplete }) => {
   return (
     <>
       {systemMessages.map((msg, index) => (
@@ -43,7 +44,12 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
           }`}
         >
           <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
-          <FormattedMessage content={msg.content} onDiff={onDiff} role={msg.role} />
+          <FormattedMessage 
+            content={msg.content} 
+            onDiff={onDiff} 
+            role={msg.role}
+            isCodeBlockComplete={isCodeBlockComplete}
+          />
         </div>
       ))}
     </>

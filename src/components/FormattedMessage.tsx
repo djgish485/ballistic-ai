@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -16,16 +16,17 @@ interface FormattedMessageProps {
   content: string;
   onDiff: (command: string) => void;
   role: 'user' | 'assistant';
+  isCodeBlockComplete: boolean;
 }
 
-const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff, role }) => {
+const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content, onDiff, role, isCodeBlockComplete }) => {
   const [executionResults, setExecutionResults] = useState<ExecutionResult[]>([]);
-  const [codeBlockIds, setCodeBlockIds] = useState<Record<number, string>>({});
+  const [codeBlockIds] = useState<Record<number, string>>({});
   const [originalFileContents, setOriginalFileContents] = useState<Record<string, string>>({});
 
-  const generateId = () => `code-${Math.random().toString(36).substr(2, 9)}`;
+  const generateId = useCallback(() => `code-${Math.random().toString(36).substr(2, 9)}`, []);
 
-  const fetchFileContent = async (filePath: string): Promise<string> => {
+  const fetchFileContent = useCallback(async (filePath: string): Promise<string> => {
     const response = await fetch('/api/read-file', {
       method: 'POST',
       headers: {
@@ -40,9 +41,9 @@ const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff, ro
 
     const data = await response.json();
     return data.content;
-  };
+  }, []);
 
-  const handleExecute = async (code: string, id: string) => {
+  const handleExecute = useCallback(async (code: string, id: string) => {
     try {
       const { filePath, newContent } = parseCommand(code);
 
@@ -72,9 +73,9 @@ const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff, ro
         return [...prevResults.filter((res) => res.id !== id), newResult];
       });
     }
-  };
+  }, [fetchFileContent]);
 
-  const handleRestore = async (filePath: string, originalContent: string) => {
+  const handleRestore = useCallback(async (filePath: string, originalContent: string) => {
     try {
       const response = await fetch('/api/restore-file', {
         method: 'POST',
@@ -87,15 +88,80 @@ const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff, ro
       }
 
       alert('File restored successfully');
-      delete originalFileContents[filePath];
+      setOriginalFileContents(prev => {
+        const newContents = { ...prev };
+        delete newContents[filePath];
+        return newContents;
+      });
     } catch (error) {
       alert('Failed to restore file content');
     }
-  };
+  }, []);
 
-  const handleDiffClick = (code: string) => {
+  const handleDiffClick = useCallback((code: string) => {
     onDiff(code);
-  };
+  }, [onDiff]);
+
+  const CodeBlock = useMemo(() => React.memo(({ node, inline, className, children, ...props }: any) => {
+    if (inline) {
+      return (
+        <code className={className} {...props}>
+          {children}
+        </code>
+      );
+    } else {
+      const nodeIndex = node.position?.start.line ?? Math.random();
+      let id = codeBlockIds[nodeIndex];
+      if (!id) {
+        id = generateId();
+        codeBlockIds[nodeIndex] = id;
+      }
+
+      const match = /language-(\w+)/.exec(className || '');
+
+      return (
+        <div>
+          <SyntaxHighlighter
+            style={tomorrow}
+            language={match ? match[1] : ''}
+            PreTag="div"
+            {...props}
+          >
+            {String(children).replace(/\n$/, '')}
+          </SyntaxHighlighter>
+          {isCodeBlockComplete && (
+            <>
+              <div className="mt-2 space-x-2">
+                <button
+                  onClick={() => handleExecute(String(children), id)}
+                  className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                  Execute
+                </button>
+                <button
+                  onClick={() => handleDiffClick(String(children))}
+                  className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Diff
+                </button>
+                {parseCommand(String(children)).filePath && originalFileContents[parseCommand(String(children)).filePath] && (
+                  <button
+                    onClick={() => handleRestore(parseCommand(String(children)).filePath!, originalFileContents[parseCommand(String(children)).filePath!])}
+                    className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                  >
+                    Restore
+                  </button>
+                )}
+              </div>
+              <div className="mt-2 bg-gray-100 p-2 rounded">
+                {executionResults.find((res) => res.id === id)?.output}
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+  }), [codeBlockIds, generateId, handleExecute, handleDiffClick, handleRestore, originalFileContents, executionResults, isCodeBlockComplete]);
 
   if (role === 'user') {
     return <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
@@ -106,72 +172,15 @@ const FormattedMessage: React.FC<FormattedMessageProps> = ({ content, onDiff, ro
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          code({ node, inline, className, children, ...props }) {
-            if (inline) {
-              return (
-                <code className={className} {...props}>
-                  {children}
-                </code>
-              );
-            } else {
-              const nodeIndex = node.position?.start.line ?? Math.random();
-              let id = codeBlockIds[nodeIndex];
-              if (!id) {
-                id = generateId();
-                setCodeBlockIds((prevIds) => ({
-                  ...prevIds,
-                  [nodeIndex]: id,
-                }));
-              }
-
-              const match = /language-(\w+)/.exec(className || '');
-              const { filePath } = parseCommand(String(children));
-
-              return (
-                <div>
-                  <SyntaxHighlighter
-                    style={tomorrow as any}
-                    language={match ? match[1] : ''}
-                    PreTag="div"
-                    {...props}
-                  >
-                    {String(children).replace(/\n$/, '')}
-                  </SyntaxHighlighter>
-                  <div className="mt-2 space-x-2">
-                    <button
-                      onClick={() => handleExecute(String(children), id)}
-                      className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                    >
-                      Execute
-                    </button>
-                    <button
-                      onClick={() => handleDiffClick(String(children))}
-                      className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    >
-                      Diff
-                    </button>
-                    {filePath && originalFileContents[filePath] && (
-                      <button
-                        onClick={() => handleRestore(filePath, originalFileContents[filePath])}
-                        className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                      >
-                        Restore
-                      </button>
-                    )}
-                  </div>
-                  <div className="mt-2 bg-gray-100 p-2 rounded">
-                    {executionResults.find((res) => res.id === id)?.output}
-                  </div>
-                </div>
-              );
-            }
-          },
+          code: CodeBlock,
         }}
       >
         {content}
       </ReactMarkdown>
     </div>
   );
-};
+});
+
+FormattedMessage.displayName = 'FormattedMessage';
 
 export default FormattedMessage;

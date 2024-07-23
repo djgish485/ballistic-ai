@@ -22,6 +22,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const [hasBackup, setHasBackup] = useState(false);
   const [isAIResponding, setIsAIResponding] = useState(false);
   const [userScrolledUp, setUserScrolledUp] = useState(false);
+  const [isCodeBlockComplete, setIsCodeBlockComplete] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -91,8 +92,10 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     const decoder = new TextDecoder();
 
     let currentContent = '';
+    let isInCodeBlock = false;
 
     setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
+    setIsCodeBlockComplete(false);
 
     while (true) {
       const { done, value } = await reader.read();
@@ -107,6 +110,15 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
             const data = JSON.parse(line.slice(6));
             if (data.content) {
               currentContent += data.content;
+              
+              // Check for code block start/end
+              if (data.content.includes('```')) {
+                isInCodeBlock = !isInCodeBlock;
+                if (!isInCodeBlock) {
+                  setIsCodeBlockComplete(true);
+                }
+              }
+
               setMessages((prev) => {
                 const newMessages = [...prev];
                 newMessages[newMessages.length - 1].content = currentContent;
@@ -122,6 +134,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         }
       }
     }
+    setIsCodeBlockComplete(true);
     console.log('Stream processing completed');
   };
 
@@ -337,6 +350,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
           systemMessages={systemMessages} 
           messages={messages} 
           onDiff={handleDiff}
+          isCodeBlockComplete={isCodeBlockComplete}
         />
         <div ref={chatEndRef} />
       </div>
