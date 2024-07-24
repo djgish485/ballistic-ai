@@ -6,6 +6,7 @@ import { getProjectFilesDir, setupDirectories } from '@/utils/directoryUtils';
 interface FileInfo {
   name: string;
   size: number;
+  path: string;
 }
 
 function formatFileSize(bytes: number): string {
@@ -43,7 +44,8 @@ export async function GET(request: Request) {
       const stats = fs.statSync(filePath);
       return {
         name: fileName,
-        size: stats.size
+        size: stats.size,
+        path: path.relative(process.cwd(), filePath) // Use relative path from project root
       };
     });
 

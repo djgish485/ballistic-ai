@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
-import { ArrowUpTrayIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { ArrowUpTrayIcon, Cog6ToothIcon, TrashIcon } from '@heroicons/react/24/outline';
 import ContextSettings from './ContextSettings';
 
 interface FileInfo {
   name: string;
   size: number;
+  path: string;
 }
 
 interface Props {
@@ -21,6 +22,7 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate }) => {
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [hoveredFile, setHoveredFile] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFiles();
@@ -95,6 +97,35 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate }) => {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
+  const handleFileClick = (filePath: string) => {
+    window.open(`/api/file-content?filePath=${encodeURIComponent(filePath)}`, '_blank');
+  };
+
+  const handleDeleteFile = async (filePath: string, event: React.MouseEvent) => {
+    event.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this file?')) {
+      try {
+        const response = await fetch('/api/delete-file', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ filePath }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to delete file');
+        }
+
+        console.log('File deleted successfully');
+        fetchFiles(); // Refresh the file list
+      } catch (err) {
+        console.error('Error deleting file:', err);
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      }
+    }
+  };
+
   return (
     <div className="bg-white p-4 rounded shadow">
       <div className="flex justify-between items-center mb-4">
@@ -133,9 +164,28 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate }) => {
         <>
           <ul className="space-y-1 mb-4">
             {files.map((file, index) => (
-              <li key={index} className="flex justify-between hover:bg-gray-100 p-1 rounded text-gray-900">
-                <span>{file.name}</span>
-                <span className="text-gray-500">{formatFileSize(file.size)}</span>
+              <li 
+                key={index} 
+                className="flex justify-between hover:bg-gray-100 p-1 rounded text-gray-900"
+                onMouseEnter={() => setHoveredFile(file.path)}
+                onMouseLeave={() => setHoveredFile(null)}
+              >
+                <span
+                  className="cursor-pointer hover:underline"
+                  onClick={() => handleFileClick(file.path)}
+                >
+                  {file.name}
+                </span>
+                {hoveredFile === file.path ? (
+                  <button
+                    onClick={(e) => handleDeleteFile(file.path, e)}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </button>
+                ) : (
+                  <span className="text-gray-500">{formatFileSize(file.size)}</span>
+                )}
               </li>
             ))}
           </ul>

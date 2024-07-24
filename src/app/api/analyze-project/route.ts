@@ -2,12 +2,7 @@ import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import { getProjectFilesDir, getProjectSettingsDir } from '@/utils/directoryUtils';
-
-const DEFAULT_SETTINGS = {
-  includePaths: ['components', 'GenAI_creativity_scripts'],
-  excludeDirs: ['node_modules', '.git', 'dist', 'build', '.vscode', '.idea', 'venv', 'superhero_env', '__pycache__', 'example_project'],
-  fileExtensions: 'py|txt|md|json|js|ts|tsx|html|css|scss|less|xml|yml|yaml|ini|cfg|sh|bat|java|c|cpp|h|hpp|cs|rb|php|swift|kt|dart|rs|go|pl|lua|r|jl'
-};
+import { DEFAULT_SETTINGS } from '@/utils/settings';
 
 function getSettings(projectDir: string) {
   const settingsDir = getProjectSettingsDir(projectDir);

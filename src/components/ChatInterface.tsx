@@ -10,17 +10,30 @@ interface Message {
 }
 
 interface SystemMessage {
-  type: 'backup' | 'restore' | 'analysis';
+  type: string;
   content: string;
 }
 
-const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
+interface ChatInterfaceProps {
+  projectDir: string;
+  isStarted: boolean;
+  hasBackup: boolean;
+  onStart: () => void;
+  onRestore: () => void;
+  systemMessages: SystemMessage[];
+}
+
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
+  projectDir, 
+  isStarted, 
+  hasBackup, 
+  onStart, 
+  onRestore, 
+  systemMessages 
+}) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [systemMessages, setSystemMessages] = useState<SystemMessage[]>([]);
   const [input, setInput] = useState('');
-  const [isStarted, setIsStarted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [hasBackup, setHasBackup] = useState(false);
   const [isAIResponding, setIsAIResponding] = useState(false);
   const [userScrolledUp, setUserScrolledUp] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -29,6 +42,52 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const lastScrollTop = useRef(0);
   const [showDiff, setShowDiff] = useState(false);
   const [diffCommand, setDiffCommand] = useState('');
+
+  useEffect(() => {
+    console.log('ChatInterface: Props updated', { projectDir, isStarted, hasBackup, systemMessages });
+  }, [projectDir, isStarted, hasBackup, systemMessages]);
+
+  useEffect(() => {
+    if (isStarted && messages.length === 0) {
+      console.log('ChatInterface: Project started, initiating chat');
+      initiateChat();
+    }
+  }, [isStarted, messages.length]);
+
+  const initiateChat = async () => {
+    console.log('ChatInterface: Initiating chat');
+    setIsLoading(true);
+    setIsAIResponding(true);
+
+    try {
+      console.log('ChatInterface: Sending initial chat request');
+      abortControllerRef.current = new AbortController();
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          projectDir, 
+          isInitial: true, 
+          conversationHistory: [],
+          selectedAPIKeyIndex: sessionStorage.getItem('selectedAPIKeyIndex')
+        }),
+        signal: abortControllerRef.current.signal,
+      });
+
+      console.log('ChatInterface: Initial chat response received');
+      await processStreamResponse(response);
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('ChatInterface: Request was cancelled');
+      } else {
+        console.error('ChatInterface: Error starting chat:', error);
+      }
+    } finally {
+      setIsLoading(false);
+      setIsAIResponding(false);
+      abortControllerRef.current = null;
+    }
+  };
 
   const scrollToBottom = useCallback(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -40,7 +99,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     
     const isScrollingDown = scrollTop > lastScrollTop.current;
-    const isScrolledToBottom = scrollTop + windowHeight >= documentHeight - 7; // 7 pixels allowed before auto scroll is disabled
+    const isScrolledToBottom = scrollTop + windowHeight >= documentHeight - 7;
     
     setUserScrolledUp(!isScrolledToBottom);
     lastScrollTop.current = scrollTop;
@@ -78,12 +137,12 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     if (!userScrolledUp) {
       scrollToBottom();
     }
-  }, [messages, userScrolledUp, scrollToBottom]);
+  }, [messages, systemMessages, userScrolledUp, scrollToBottom]);
 
   const processStreamResponse = async (response: Response) => {
-    console.log('Processing stream response');
+    console.log('ChatInterface: Processing stream response');
     if (!response.body) {
-      console.error('No response body');
+      console.error('ChatInterface: No response body');
       throw new Error('No response body');
     }
 
@@ -118,17 +177,16 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
               });
             } else if (data.conversationHistory) {
               setMessages(data.conversationHistory.map((msg: Message) => ({ ...msg, isComplete: true })));
-              return; // Exit early if we're setting a new conversation history
+              return;
             }
           } catch (error) {
-            console.error('Error parsing JSON:', error);
+            console.error('ChatInterface: Error parsing JSON:', error);
           }
         }
       }
     }
-    console.log('Stream processing completed');
+    console.log('ChatInterface: Stream processing completed');
     
-    // Mark the last message as complete
     setMessages((prev) => {
       const newMessages = [...prev];
       newMessages[newMessages.length - 1] = {
@@ -139,99 +197,9 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     });
   };
 
-  const createBackup = async () => {
-    try {
-      const response = await fetch('/api/project-backup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectDir }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setHasBackup(true);
-        setSystemMessages((prev) => [
-          ...prev,
-          { type: 'backup', content: 'Project backup created. Previous backup (if any) was overwritten.' },
-        ]);
-      } else {
-        throw new Error(data.error || 'Failed to create backup');
-      }
-    } catch (error) {
-      console.error('Error creating backup:', error);
-      setSystemMessages((prev) => [
-        ...prev,
-        { type: 'backup', content: `Error creating backup: ${error instanceof Error ? error.message : 'Unknown error'}` },
-      ]);
-    }
-  };
-
-  const handleStart = async () => {
-    console.log('Start button clicked');
-    setIsStarted(true);
-    setMessages([]);
-    setSystemMessages([]);
-    setIsLoading(true);
-    setIsAIResponding(true);
-
-    try {
-      await createBackup();
-
-      console.log('Analyzing project');
-      const analyzeResponse = await fetch('/api/analyze-project', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectDir }),
-      });
-      const analyzeData = await analyzeResponse.json();
-      console.log('Analyze project response:', analyzeData);
-
-      // Add a system message about the project analysis
-      setSystemMessages((prev) => [
-        ...prev,
-        {
-          type: 'analysis',
-          content: analyzeData.message,
-        },
-      ]);
-
-      console.log('Starting chat');
-      abortControllerRef.current = new AbortController();
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          projectDir, 
-          isInitial: true, 
-          conversationHistory: [],
-          selectedAPIKeyIndex: sessionStorage.getItem('selectedAPIKeyIndex')
-        }),
-        signal: abortControllerRef.current.signal,
-      });
-
-      await processStreamResponse(response);
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        console.log('Request was cancelled');
-      } else {
-        console.error('Error starting chat:', error);
-        setSystemMessages((prev) => [
-          ...prev,
-          { 
-            type: 'analysis', 
-            content: 'An error occurred while analyzing the project or starting the chat.' 
-          },
-        ]);
-      }
-    } finally {
-      setIsLoading(false);
-      setIsAIResponding(false);
-      abortControllerRef.current = null;
-    }
-  };
-
   const handleSend = async () => {
     if (input.trim() && !isLoading) {
-      console.log('Sending message:', input);
+      console.log('ChatInterface: Sending message:', input);
       const userMessage: Message = { role: 'user', content: input, isComplete: true };
       setMessages((prev) => [...prev, userMessage]);
       setInput('');
@@ -256,13 +224,9 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         await processStreamResponse(response);
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
-          console.log('Request was cancelled');
+          console.log('ChatInterface: Request was cancelled');
         } else {
-          console.error('Error sending message:', error);
-          setSystemMessages((prev) => [
-            ...prev,
-            { type: 'analysis', content: 'An error occurred while processing your message.' },
-          ]);
+          console.error('ChatInterface: Error sending message:', error);
         }
       } finally {
         setIsLoading(false);
@@ -280,44 +244,6 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     }
   };
 
-  const handleRestore = async () => {
-    if (!hasBackup) return;
-
-    const confirmed = window.confirm(
-      'Are you sure you want to restore the project to the latest backup? This will replace your current project with the backup.'
-    );
-    if (!confirmed) return;
-
-    try {
-      const response = await fetch('/api/project-backup', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectDir }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setMessages([]);
-        setIsStarted(false);
-        setHasBackup(false);
-        setSystemMessages((prev) => [
-          ...prev,
-          {
-            type: 'restore',
-            content: 'Project restored successfully. You can start a new analysis by clicking the "Start" button.',
-          },
-        ]);
-      } else {
-        throw new Error(data.error || 'Failed to restore backup');
-      }
-    } catch (error) {
-      console.error('Error restoring backup:', error);
-      setSystemMessages((prev) => [
-        ...prev,
-        { type: 'restore', content: `Error restoring backup: ${error instanceof Error ? error.message : 'Unknown error'}` },
-      ]);
-    }
-  };
-
   const handleDiff = (command: string) => {
     setDiffCommand(command);
     setShowDiff(true);
@@ -325,24 +251,6 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="mb-4 flex space-x-2">
-        <button
-          onClick={handleStart}
-          className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
-          disabled={isLoading}
-        >
-          {isStarted ? 'Next feature/fix' : 'Start'}
-        </button>
-        {hasBackup && (
-          <button
-            onClick={handleRestore}
-            className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:bg-gray-400"
-            disabled={isLoading}
-          >
-            Undo All & Restore Backup
-          </button>
-        )}
-      </div>
       <div 
         className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-100 rounded"
         ref={chatContainerRef}
