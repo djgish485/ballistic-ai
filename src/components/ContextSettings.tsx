@@ -8,8 +8,8 @@ interface ContextSettingsProps {
 }
 
 const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, projectDir, onSettingsUpdate }) => {
-  const [includePaths, setIncludePaths] = useState<string[]>([]);
-  const [excludeDirs, setExcludeDirs] = useState<string[]>([]);
+  const [includePathsString, setIncludePathsString] = useState<string>('');
+  const [excludeDirsString, setExcludeDirsString] = useState<string>('');
   const [fileExtensions, setFileExtensions] = useState<string>('');
 
   useEffect(() => {
@@ -23,8 +23,8 @@ const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, proj
       const response = await fetch(`/api/context-settings?projectDir=${encodeURIComponent(projectDir)}`);
       if (response.ok) {
         const settings = await response.json();
-        setIncludePaths(settings.includePaths);
-        setExcludeDirs(settings.excludeDirs);
+        setIncludePathsString(settings.includePaths.join(', '));
+        setExcludeDirsString(settings.excludeDirs.join(', '));
         setFileExtensions(settings.fileExtensions);
       }
     } catch (error) {
@@ -34,6 +34,9 @@ const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, proj
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const includePaths = includePathsString.split(',').map(p => p.trim()).filter(p => p !== '');
+    const excludeDirs = excludeDirsString.split(',').map(d => d.trim()).filter(d => d !== '');
+
     try {
       const response = await fetch('/api/context-settings', {
         method: 'POST',
@@ -69,8 +72,8 @@ const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, proj
             <label className="block mb-2">Only Include Paths (comma-separated):</label>
             <input
               type="text"
-              value={includePaths.join(',')}
-              onChange={(e) => setIncludePaths(e.target.value.split(',').map(p => p.trim()).filter(p => p !== ''))}
+              value={includePathsString}
+              onChange={(e) => setIncludePathsString(e.target.value)}
               className="w-full p-2 border rounded"
             />
           </div>
@@ -78,8 +81,8 @@ const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, proj
             <label className="block mb-2">Exclude Directories (comma-separated):</label>
             <input
               type="text"
-              value={excludeDirs.join(',')}
-              onChange={(e) => setExcludeDirs(e.target.value.split(',').map(d => d.trim()).filter(d => d !== ''))}
+              value={excludeDirsString}
+              onChange={(e) => setExcludeDirsString(e.target.value)}
               className="w-full p-2 border rounded"
             />
           </div>
