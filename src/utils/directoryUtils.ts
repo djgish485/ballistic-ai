@@ -22,11 +22,17 @@ export function getProjectBackupsDir(projectDir: string): string {
   return path.join('.superhero', `${encodedDir}-backups`);
 }
 
+export function getProjectSettingsDir(projectDir: string): string {
+  const encodedDir = encodeProjectDir(projectDir);
+  return path.join('.superhero', `${encodedDir}-settings`);
+}
+
 export function setupDirectories(projectDir: string): void {
   const directories = [
     INTERNALS_DIR,
     getProjectFilesDir(projectDir),
-    getProjectBackupsDir(projectDir)
+    getProjectBackupsDir(projectDir),
+    getProjectSettingsDir(projectDir) // Add settings directory
   ];
 
   directories.forEach(dir => {

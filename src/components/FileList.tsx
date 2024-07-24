@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import { ArrowUpTrayIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
 
 interface FileInfo {
   name: string;
@@ -79,6 +80,11 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
     }
   };
 
+  const handleSettings = () => {
+    // Implement settings functionality here
+    console.log('Settings clicked');
+  };
+
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -91,12 +97,22 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
     <div className="bg-white p-4 rounded shadow">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Context</h2>
-        <button
-          onClick={handleAddFile}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Add File
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={handleAddFile}
+            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            title="Upload file"
+          >
+            <ArrowUpTrayIcon className="h-5 w-5" />
+          </button>
+          <button
+            onClick={handleSettings}
+            className="p-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            title="Settings"
+          >
+            <Cog6ToothIcon className="h-5 w-5" />
+          </button>
+        </div>
         <input
           type="file"
           ref={fileInputRef}
@@ -130,4 +146,4 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
   );
 };
 
-export default FileList; 
+export default FileList;
