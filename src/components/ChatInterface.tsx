@@ -6,6 +6,7 @@ import DiffScreen from './DiffScreen';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  isComplete: boolean;
 }
 
 interface SystemMessage {
@@ -22,7 +23,6 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const [hasBackup, setHasBackup] = useState(false);
   const [isAIResponding, setIsAIResponding] = useState(false);
   const [userScrolledUp, setUserScrolledUp] = useState(false);
-  const [isCodeBlockComplete, setIsCodeBlockComplete] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -44,7 +44,6 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     
     setUserScrolledUp(!isScrolledToBottom);
     lastScrollTop.current = scrollTop;
-    
   }, []);
 
   useEffect(() => {
@@ -92,10 +91,8 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
     const decoder = new TextDecoder();
 
     let currentContent = '';
-    let isInCodeBlock = false;
 
-    setMessages((prev) => [...prev, { role: 'assistant', content: '' }]);
-    setIsCodeBlockComplete(false);
+    setMessages((prev) => [...prev, { role: 'assistant', content: '', isComplete: false }]);
 
     while (true) {
       const { done, value } = await reader.read();
@@ -110,22 +107,17 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
             const data = JSON.parse(line.slice(6));
             if (data.content) {
               currentContent += data.content;
-              
-              // Check for code block start/end
-              if (data.content.includes('```')) {
-                isInCodeBlock = !isInCodeBlock;
-                if (!isInCodeBlock) {
-                  setIsCodeBlockComplete(true);
-                }
-              }
 
               setMessages((prev) => {
                 const newMessages = [...prev];
-                newMessages[newMessages.length - 1].content = currentContent;
+                newMessages[newMessages.length - 1] = {
+                  ...newMessages[newMessages.length - 1],
+                  content: currentContent,
+                };
                 return newMessages;
               });
             } else if (data.conversationHistory) {
-              setMessages(data.conversationHistory);
+              setMessages(data.conversationHistory.map((msg: Message) => ({ ...msg, isComplete: true })));
               return; // Exit early if we're setting a new conversation history
             }
           } catch (error) {
@@ -134,8 +126,17 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
         }
       }
     }
-    setIsCodeBlockComplete(true);
     console.log('Stream processing completed');
+    
+    // Mark the last message as complete
+    setMessages((prev) => {
+      const newMessages = [...prev];
+      newMessages[newMessages.length - 1] = {
+        ...newMessages[newMessages.length - 1],
+        isComplete: true,
+      };
+      return newMessages;
+    });
   };
 
   const createBackup = async () => {
@@ -231,7 +232,7 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
   const handleSend = async () => {
     if (input.trim() && !isLoading) {
       console.log('Sending message:', input);
-      const userMessage: Message = { role: 'user', content: input };
+      const userMessage: Message = { role: 'user', content: input, isComplete: true };
       setMessages((prev) => [...prev, userMessage]);
       setInput('');
       setIsLoading(true);
@@ -350,7 +351,6 @@ const ChatInterface: React.FC<{ projectDir: string }> = ({ projectDir }) => {
           systemMessages={systemMessages} 
           messages={messages} 
           onDiff={handleDiff}
-          isCodeBlockComplete={isCodeBlockComplete}
         />
         <div ref={chatEndRef} />
       </div>

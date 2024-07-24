@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { tomorrow } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { parseCommand } from '@/utils/commandParser';
 
 interface ExecutionResult {
@@ -16,10 +14,10 @@ interface FormattedMessageProps {
   content: string;
   onDiff: (command: string) => void;
   role: 'user' | 'assistant';
-  isCodeBlockComplete: boolean;
+  isComplete: boolean;
 }
 
-const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content, onDiff, role, isCodeBlockComplete }) => {
+const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content, onDiff, role, isComplete }) => {
   const [executionResults, setExecutionResults] = useState<ExecutionResult[]>([]);
   const [codeBlockIds] = useState<Record<number, string>>({});
   const [originalFileContents, setOriginalFileContents] = useState<Record<string, string>>({});
@@ -117,19 +115,14 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
         codeBlockIds[nodeIndex] = id;
       }
 
-      const match = /language-(\w+)/.exec(className || '');
-
       return (
         <div>
-          <SyntaxHighlighter
-            style={tomorrow}
-            language={match ? match[1] : ''}
-            PreTag="div"
-            {...props}
-          >
-            {String(children).replace(/\n$/, '')}
-          </SyntaxHighlighter>
-          {isCodeBlockComplete && (
+          <pre {...props}>
+            <code>
+              {String(children).replace(/\n$/, '')}
+            </code>
+          </pre>
+          {isComplete && (
             <>
               <div className="mt-2 space-x-2">
                 <button
@@ -144,7 +137,7 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
                 >
                   Diff
                 </button>
-                {parseCommand(String(children)).filePath && originalFileContents[parseCommand(String(children)).filePath] && (
+                {parseCommand(String(children)).filePath && originalFileContents[parseCommand(String(children)).filePath!] && (
                   <button
                     onClick={() => handleRestore(parseCommand(String(children)).filePath!, originalFileContents[parseCommand(String(children)).filePath!])}
                     className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
@@ -161,7 +154,7 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
         </div>
       );
     }
-  }), [codeBlockIds, generateId, handleExecute, handleDiffClick, handleRestore, originalFileContents, executionResults, isCodeBlockComplete]);
+  }), [codeBlockIds, generateId, handleExecute, handleDiffClick, handleRestore, originalFileContents, executionResults, isComplete]);
 
   if (role === 'user') {
     return <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;

@@ -7,6 +7,7 @@ import styles from './ChatInterface.module.css';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  isComplete: boolean;
 }
 
 interface SystemMessage {
@@ -18,10 +19,9 @@ interface ChatMessagesProps {
   systemMessages: SystemMessage[];
   messages: Message[];
   onDiff: (filePath: string) => void;
-  isCodeBlockComplete: boolean;
 }
 
-const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, onDiff, isCodeBlockComplete }) => {
+const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, onDiff }) => {
   return (
     <>
       {systemMessages.map((msg, index) => (
@@ -48,7 +48,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
             content={msg.content} 
             onDiff={onDiff} 
             role={msg.role}
-            isCodeBlockComplete={isCodeBlockComplete}
+            isComplete={msg.isComplete}
           />
         </div>
       ))}
