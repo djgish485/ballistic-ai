@@ -4,9 +4,10 @@ interface ContextSettingsProps {
   isOpen: boolean;
   onClose: () => void;
   projectDir: string;
+  onSettingsUpdate: (newIncludePaths: string[]) => void;
 }
 
-const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, projectDir }) => {
+const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, projectDir, onSettingsUpdate }) => {
   const [includePaths, setIncludePaths] = useState<string[]>([]);
   const [excludeDirs, setExcludeDirs] = useState<string[]>([]);
   const [fileExtensions, setFileExtensions] = useState<string>('');
@@ -47,6 +48,7 @@ const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, proj
         }),
       });
       if (response.ok) {
+        onSettingsUpdate(includePaths);
         onClose();
       } else {
         console.error('Failed to save settings');
@@ -64,11 +66,11 @@ const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, proj
         <h2 className="text-lg font-medium mb-4">Context Settings</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block mb-2">Include Paths (comma-separated):</label>
+            <label className="block mb-2">Only Include Paths (comma-separated):</label>
             <input
               type="text"
               value={includePaths.join(',')}
-              onChange={(e) => setIncludePaths(e.target.value.split(',').map(p => p.trim()))}
+              onChange={(e) => setIncludePaths(e.target.value.split(',').map(p => p.trim()).filter(p => p !== ''))}
               className="w-full p-2 border rounded"
             />
           </div>
@@ -77,7 +79,7 @@ const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, proj
             <input
               type="text"
               value={excludeDirs.join(',')}
-              onChange={(e) => setExcludeDirs(e.target.value.split(',').map(d => d.trim()))}
+              onChange={(e) => setExcludeDirs(e.target.value.split(',').map(d => d.trim()).filter(d => d !== ''))}
               className="w-full p-2 border rounded"
             />
           </div>

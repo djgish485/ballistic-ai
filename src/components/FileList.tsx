@@ -11,9 +11,10 @@ interface FileInfo {
 
 interface Props {
   projectDir: string;
+  onSettingsUpdate: (newIncludePaths: string[]) => void;
 }
 
-const FileList: React.FC<Props> = ({ projectDir }) => {
+const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate }) => {
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [totalSize, setTotalSize] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -147,6 +148,7 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
         projectDir={projectDir}
+        onSettingsUpdate={onSettingsUpdate}
       />
     </div>
   );
