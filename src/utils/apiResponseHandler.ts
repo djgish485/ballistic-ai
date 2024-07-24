@@ -7,6 +7,11 @@ export async function fetchAPIResponse(apiKey: { type: string; key: string }, sy
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   let body: any;
 
+  console.log("Messages being sent to the API:");
+  messages.forEach((msg, index) => {
+    console.log(`Message ${index}: [Role: ${msg.role}] [Content: ${msg.content?.substring(0, 20)}]`);
+  });
+
   if (apiKey.type === 'Claude') {
     headers['x-api-key'] = apiKey.key;
     headers['anthropic-version'] = '2023-06-01';
