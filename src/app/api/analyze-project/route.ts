@@ -74,7 +74,6 @@ export async function POST(request: Request) {
     const items = fs.readdirSync(dir);
     for (const item of items) {
       const fullPath = path.join(dir, item);
-      if (shouldExclude(item, fullPath, projectDir, settings)) continue;
       const relativePath = path.relative(projectDir, fullPath);
       const indent = '  '.repeat(level);
       if (fs.statSync(fullPath).isDirectory()) {

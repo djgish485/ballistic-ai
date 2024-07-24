@@ -65,18 +65,7 @@ export default function Home() {
       }
 
       // Analyze project
-      console.log('Analyzing project...');
-      const analyzeResponse = await fetch('/api/analyze-project', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectDir }),
-      });
-      const analyzeData = await analyzeResponse.json();
-      setSystemMessages(prev => [...prev, { type: 'analysis', content: analyzeData.message }]);
-      console.log('Analyze project response:', analyzeData);
-
-      // Refresh file list after analysis
-      setFileListKey(prevKey => prevKey + 1);
+      await analyzeProject();
 
       console.log('Project started successfully. Current state:', { isStarted: true, hasBackup: true });
     } catch (error) {
@@ -86,6 +75,21 @@ export default function Home() {
       console.log('Project start failed. isStarted set back to false.');
     }
   }, [projectDir]);
+
+  const analyzeProject = async () => {
+    console.log('Analyzing project...');
+    const analyzeResponse = await fetch('/api/analyze-project', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ projectDir }),
+    });
+    const analyzeData = await analyzeResponse.json();
+    setSystemMessages(prev => [...prev, { type: 'analysis', content: analyzeData.message }]);
+    console.log('Analyze project response:', analyzeData);
+
+    // Refresh file list after analysis
+    setFileListKey(prevKey => prevKey + 1);
+  };
 
   const handleRestore = useCallback(async () => {
     if (!hasBackup || !projectDir) return;
@@ -172,6 +176,8 @@ export default function Home() {
                     key={fileListKey}
                     projectDir={projectDir}
                     onSettingsUpdate={handleSettingsUpdate}
+                    isChatStarted={isStarted}
+                    onAnalyzeProject={analyzeProject}
                   />
                 )}
                 <APIKeyManager />

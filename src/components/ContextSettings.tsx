@@ -5,9 +5,18 @@ interface ContextSettingsProps {
   onClose: () => void;
   projectDir: string;
   onSettingsUpdate: (newIncludePaths: string[]) => void;
+  isChatStarted: boolean;
+  onAnalyzeProject: () => Promise<void>;
 }
 
-const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, projectDir, onSettingsUpdate }) => {
+const ContextSettings: React.FC<ContextSettingsProps> = ({ 
+  isOpen, 
+  onClose, 
+  projectDir, 
+  onSettingsUpdate, 
+  isChatStarted,
+  onAnalyzeProject
+}) => {
   const [includePathsString, setIncludePathsString] = useState<string>('');
   const [excludeDirsString, setExcludeDirsString] = useState<string>('');
   const [fileExtensions, setFileExtensions] = useState<string>('');
@@ -52,6 +61,9 @@ const ContextSettings: React.FC<ContextSettingsProps> = ({ isOpen, onClose, proj
       });
       if (response.ok) {
         onSettingsUpdate(includePaths);
+        if (isChatStarted) {
+          await onAnalyzeProject();
+        }
         onClose();
       } else {
         console.error('Failed to save settings');
