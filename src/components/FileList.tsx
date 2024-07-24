@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { ArrowUpTrayIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import ContextSettings from './ContextSettings';
 
 interface FileInfo {
   name: string;
@@ -18,6 +19,7 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     fetchFiles();
@@ -80,9 +82,8 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
     }
   };
 
-  const handleSettings = () => {
-    // Implement settings functionality here
-    console.log('Settings clicked');
+  const handleSettingsClick = () => {
+    setIsSettingsOpen(true);
   };
 
   const formatFileSize = (bytes: number): string => {
@@ -106,7 +107,7 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
             <ArrowUpTrayIcon className="h-5 w-5" />
           </button>
           <button
-            onClick={handleSettings}
+            onClick={handleSettingsClick}
             className="p-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
             title="Settings"
           >
@@ -142,6 +143,11 @@ const FileList: React.FC<Props> = ({ projectDir }) => {
           </div>
         </>
       )}
+      <ContextSettings
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        projectDir={projectDir}
+      />
     </div>
   );
 };

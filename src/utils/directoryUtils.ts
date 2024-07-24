@@ -28,20 +28,29 @@ export function getProjectSettingsDir(projectDir: string): string {
 }
 
 export function setupDirectories(projectDir: string): void {
+  console.log('Setting up directories for project:', projectDir);
   const directories = [
     INTERNALS_DIR,
     getProjectFilesDir(projectDir),
     getProjectBackupsDir(projectDir),
-    getProjectSettingsDir(projectDir) // Add settings directory
+    getProjectSettingsDir(projectDir)
   ];
 
   directories.forEach(dir => {
-    const fullPath = path.join(projectDir, dir);
+    const fullPath = path.join(process.cwd(), dir);
+    console.log('Attempting to create directory:', fullPath);
     if (!fs.existsSync(fullPath)) {
-      fs.mkdirSync(fullPath, { recursive: true });
-      console.log(`Created directory: ${fullPath}`);
+      try {
+        fs.mkdirSync(fullPath, { recursive: true });
+        console.log(`Created directory: ${fullPath}`);
+      } catch (error) {
+        console.error(`Error creating directory ${fullPath}:`, error);
+      }
+    } else {
+      console.log(`Directory already exists: ${fullPath}`);
     }
   });
+  console.log('Directory setup complete');
 }
 
 export function createProjectBackup(projectDir: string): string {

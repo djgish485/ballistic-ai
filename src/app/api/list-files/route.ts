@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { getProjectFilesDir } from '@/utils/directoryUtils';
+import { getProjectFilesDir, setupDirectories } from '@/utils/directoryUtils';
 
 interface FileInfo {
   name: string;
@@ -32,11 +32,8 @@ export async function GET(request: Request) {
   console.log('Superhero files directory:', superheroFilesDir);
 
   try {
-    console.log('Attempting to create directory if it does not exist:', superheroFilesDir);
-    if (!fs.existsSync(superheroFilesDir)) {
-      fs.mkdirSync(superheroFilesDir, { recursive: true });
-      console.log(`Created directory: ${superheroFilesDir}`);
-    }
+    console.log('Setting up directories');
+    setupDirectories(projectDir);
 
     console.log('Attempting to read directory:', superheroFilesDir);
     const fileNames = fs.readdirSync(superheroFilesDir);

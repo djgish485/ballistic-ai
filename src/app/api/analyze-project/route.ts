@@ -1,9 +1,24 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
+import { getProjectFilesDir, getProjectSettingsDir } from '@/utils/directoryUtils';
 
-const SUPERHERO_DIR = '.superhero';
-const INCLUDE_PATHS = ['components', 'GenAI_creativity_scripts']; // Paths to exclusively include
+const DEFAULT_SETTINGS = {
+  includePaths: ['components', 'GenAI_creativity_scripts'],
+  excludeDirs: ['node_modules', '.git', 'dist', 'build', '.vscode', '.idea', 'venv', 'superhero_env', '__pycache__', 'example_project'],
+  fileExtensions: 'py|txt|md|json|js|ts|tsx|html|css|scss|less|xml|yml|yaml|ini|cfg|sh|bat|java|c|cpp|h|hpp|cs|rb|php|swift|kt|dart|rs|go|pl|lua|r|jl'
+};
+
+function getSettings(projectDir: string) {
+  const settingsDir = getProjectSettingsDir(projectDir);
+  const settingsFile = path.join(settingsDir, 'context-settings.json');
+
+  if (fs.existsSync(settingsFile)) {
+    return JSON.parse(fs.readFileSync(settingsFile, 'utf-8'));
+  }
+
+  return DEFAULT_SETTINGS;
+}
 
 function encodeProjectDir(projectDir: string): string {
   const basename = path.basename(projectDir);
@@ -14,27 +29,18 @@ function encodeProjectDir(projectDir: string): string {
   return encoded.slice(0, 255);
 }
 
-function getProjectSpecificDir(projectDir: string, type: 'files' | 'backups'): string {
-  const encodedDir = encodeProjectDir(projectDir);
-  return path.join(SUPERHERO_DIR, `${encodedDir}-${type}`);
-}
-
-function isPathIncluded(fullPath) {
-  // Check if INCLUDE_PATHS is empty
-  if (INCLUDE_PATHS.length === 0) {
+function isPathIncluded(fullPath: string, includePaths: string[]) {
+  if (includePaths.length === 0) {
     return true;
   }
 
-  // Regular expression to check if the path is a file (contains a file extension)
   const fileRegex = /\.[0-9a-z]+$/i;
 
-  // If it's a directory, always return true
   if (!fileRegex.test(fullPath)) {
     return true;
   }
 
-  // If it's a file, check if it includes any of the paths in INCLUDE_PATHS
-  for (const includePath of INCLUDE_PATHS) {
+  for (const includePath of includePaths) {
     if (fullPath.includes(includePath)) {
       return true;
     }
@@ -42,10 +48,10 @@ function isPathIncluded(fullPath) {
   return false;
 }
 
-function shouldExclude(basename: string, fullPath: string, projectDir: string): boolean {
-  const excludeDirs = new Set(['node_modules', '.git', 'dist', 'build', '.vscode', '.idea', 'venv', 'superhero_env', '__pycache__', 'example_project', 'package-lock.json']);
+function shouldExclude(basename: string, fullPath: string, projectDir: string, settings: any): boolean {
+  const excludeDirs = new Set(settings.excludeDirs);
   const excludeFiles = new Set(['.DS_Store']);
-  if (!isPathIncluded(fullPath)) {
+  if (!isPathIncluded(fullPath, settings.includePaths)) {
     return true;
   }
   return excludeDirs.has(basename) || excludeFiles.has(basename) || basename.startsWith('.');
@@ -56,7 +62,9 @@ export async function POST(request: Request) {
   const { projectDir } = await request.json();
   console.log('Received project directory:', projectDir);
   
-  const superheroFilesDir = path.join(process.cwd(), getProjectSpecificDir(projectDir, 'files'));
+  const settings = getSettings(projectDir);
+  
+  const superheroFilesDir = path.join(process.cwd(), getProjectFilesDir(projectDir));
   const structureFile = path.join(superheroFilesDir, 'project-structure.txt');
   const contentFile = path.join(superheroFilesDir, 'project-content.txt');
 
@@ -71,7 +79,7 @@ export async function POST(request: Request) {
     const items = fs.readdirSync(dir);
     for (const item of items) {
       const fullPath = path.join(dir, item);
-      if (shouldExclude(item, fullPath, projectDir)) continue;
+      if (shouldExclude(item, fullPath, projectDir, settings)) continue;
       const relativePath = path.relative(projectDir, fullPath);
       const indent = '  '.repeat(level);
       if (fs.statSync(fullPath).isDirectory()) {
@@ -95,11 +103,11 @@ export async function POST(request: Request) {
     const items = fs.readdirSync(dir);
     for (const item of items) {
       const fullPath = path.join(dir, item);
-      if (shouldExclude(item, fullPath, projectDir)) continue;
+      if (shouldExclude(item, fullPath, projectDir, settings)) continue;
       const relativePath = path.relative(projectDir, fullPath);
       if (fs.statSync(fullPath).isDirectory()) {
         analyzeContent(fullPath);
-      } else if (item.match(/\.(py|txt|md|json|js|ts|tsx|html|css|scss|less|xml|yml|yaml|ini|cfg|sh|bat|java|c|cpp|h|hpp|cs|rb|php|swift|kt|dart|rs|go|pl|lua|r|jl)$/)) {
+      } else if (item.match(new RegExp(`\\.(${settings.fileExtensions})$`, 'i'))) {
         contentContent += `File: ${relativePath}\n${'='.repeat(relativePath.length + 6)}\n`;
         try {
           contentContent += fs.readFileSync(fullPath, 'utf8') + '\n\n';
