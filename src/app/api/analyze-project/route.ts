@@ -43,13 +43,17 @@ function isPathIncluded(fullPath: string, includePaths: string[]) {
   return false;
 }
 
-function shouldExclude(basename: string, fullPath: string, projectDir: string, settings: any): boolean {
+function shouldExcludeStructure(basename: string, fullPath: string, projectDir: string, settings: any): boolean {
   const excludeDirs = new Set(settings.excludeDirs);
   const excludeFiles = new Set(['.DS_Store']);
+  return excludeDirs.has(basename) || excludeFiles.has(basename) || basename.startsWith('.');
+}
+
+function shouldExcludeContent(basename: string, fullPath: string, projectDir: string, settings: any): boolean {
   if (!isPathIncluded(fullPath, settings.includePaths)) {
     return true;
   }
-  return excludeDirs.has(basename) || excludeFiles.has(basename) || basename.startsWith('.');
+  return shouldExcludeStructure(basename, fullPath, projectDir, settings);
 }
 
 export async function POST(request: Request) {
@@ -68,7 +72,6 @@ export async function POST(request: Request) {
 
   // Analyze project structure
   let structureContent = `Project Structure:\n=================\n\nRoot: ${projectDir}\n\n`;
-  let fileCount = 0;
   function analyzeStructure(dir: string, level: number = 0) {
     console.log(`Analyzing structure of: ${dir}`);
     const items = fs.readdirSync(dir);
@@ -76,12 +79,12 @@ export async function POST(request: Request) {
       const fullPath = path.join(dir, item);
       const relativePath = path.relative(projectDir, fullPath);
       const indent = '  '.repeat(level);
+      if (shouldExcludeStructure(item, fullPath, projectDir, settings)) continue;
       if (fs.statSync(fullPath).isDirectory()) {
         structureContent += `${indent}${item}/\n`;
         analyzeStructure(fullPath, level + 1);
       } else {
         structureContent += `${indent}${item}\n`;
-        fileCount++;
       }
     }
   }
@@ -92,19 +95,20 @@ export async function POST(request: Request) {
 
   // Analyze project content
   let contentContent = `Project Content:\n================\n\n`;
+  let fileCount = 0;
   function analyzeContent(dir: string) {
     console.log(`Analyzing content of: ${dir}`);
     const items = fs.readdirSync(dir);
     for (const item of items) {
       const fullPath = path.join(dir, item);
-      if (shouldExclude(item, fullPath, projectDir, settings)) continue;
-      const relativePath = path.relative(projectDir, fullPath);
+      if (shouldExcludeContent(item, fullPath, projectDir, settings)) continue;
       if (fs.statSync(fullPath).isDirectory()) {
         analyzeContent(fullPath);
       } else if (item.match(new RegExp(`\\.(${settings.fileExtensions})$`, 'i'))) {
-        contentContent += `File: ${relativePath}\n${'='.repeat(relativePath.length + 6)}\n`;
+        contentContent += `File: ${fullPath}\n${'='.repeat(fullPath.length + 6)}\n`;
         try {
           contentContent += fs.readFileSync(fullPath, 'utf8') + '\n\n';
+          fileCount++;
         } catch (error) {
           contentContent += `Error reading file: ${error}\n\n`;
         }
