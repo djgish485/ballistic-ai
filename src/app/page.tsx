@@ -15,6 +15,7 @@ export default function Home() {
   const [isStarted, setIsStarted] = useState(false);
   const [hasBackup, setHasBackup] = useState(false);
   const [systemMessages, setSystemMessages] = useState<{ type: string; content: string }[]>([]);
+  const [fileListKey, setFileListKey] = useState(0);
 
   useEffect(() => {
     if (projectDir) {
@@ -74,6 +75,9 @@ export default function Home() {
       setSystemMessages(prev => [...prev, { type: 'analysis', content: analyzeData.message }]);
       console.log('Analyze project response:', analyzeData);
 
+      // Refresh file list after analysis
+      setFileListKey(prevKey => prevKey + 1);
+
       console.log('Project started successfully. Current state:', { isStarted: true, hasBackup: true });
     } catch (error) {
       console.error('Error starting project:', error);
@@ -104,6 +108,8 @@ export default function Home() {
         setHasBackup(false);
         setSystemMessages(prev => [...prev, { type: 'restore', content: 'Project restored successfully.' }]);
         console.log('Project restored successfully');
+        // Refresh file list after restoration
+        setFileListKey(prevKey => prevKey + 1);
       } else {
         throw new Error(data.error || 'Failed to restore backup');
       }
@@ -161,7 +167,13 @@ export default function Home() {
                 </div>
               </div>
               <div className="w-1/3 space-y-4">
-                {projectDir && <FileList projectDir={projectDir} onSettingsUpdate={handleSettingsUpdate} />}
+                {projectDir && (
+                  <FileList
+                    key={fileListKey}
+                    projectDir={projectDir}
+                    onSettingsUpdate={handleSettingsUpdate}
+                  />
+                )}
                 <APIKeyManager />
               </div>
             </div>
