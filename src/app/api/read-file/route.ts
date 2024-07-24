@@ -1,8 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs/promises';
 import path from 'path';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const { filePath } = await request.json();
     console.log('Received file path:', filePath);
@@ -22,7 +22,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid file path' }, { status: 400 });
     }
 
-    console.log('Attempting to read file:', normalizedPath);
+    console.log('Checking if file exists:', normalizedPath);
+
+    // Check if the file exists
+    try {
+      await fs.access(normalizedPath, fs.constants.F_OK);
+    } catch (error) {
+      console.log('File does not exist:', normalizedPath);
+      // If the file doesn't exist, return an empty content
+      return NextResponse.json({ content: '' });
+    }
+
+    console.log('File exists. Attempting to read file:', normalizedPath);
 
     const content = await fs.readFile(normalizedPath, 'utf8');
     console.log('File content read successfully. Length:', content.length);
