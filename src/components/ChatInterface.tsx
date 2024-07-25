@@ -36,6 +36,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isAIResponding, setIsAIResponding] = useState(false);
   const [userScrolledUp, setUserScrolledUp] = useState(false);
+  const [isBackupInProgress, setIsBackupInProgress] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -60,6 +61,19 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setIsAIResponding(true);
 
     try {
+      console.log('ChatInterface: Starting backup process');
+      setIsBackupInProgress(true);
+      const backupResponse = await fetch('/api/project-backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectDir }),
+      });
+      if (backupResponse.ok) {
+        console.log('ChatInterface: Backup process initiated');
+      } else {
+        console.error('ChatInterface: Failed to initiate backup');
+      }
+
       console.log('ChatInterface: Sending initial chat request');
       abortControllerRef.current = new AbortController();
       const response = await fetch('/api/chat', {
@@ -255,6 +269,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-100 rounded"
         ref={chatContainerRef}
       >
+        {isBackupInProgress && (
+          <div className="bg-yellow-100 p-2 rounded">
+            Backup in progress yo...
+          </div>
+        )}
         <ChatMessages 
           systemMessages={systemMessages} 
           messages={messages} 

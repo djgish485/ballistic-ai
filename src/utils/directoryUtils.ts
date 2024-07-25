@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { Worker } from 'worker_threads';
 
 export const INTERNALS_DIR = '.superhero/internals';
 
@@ -53,33 +54,30 @@ export function setupDirectories(projectDir: string): void {
   console.log('Directory setup complete');
 }
 
-export function createProjectBackup(projectDir: string): string {
-  const backupBaseDir = getProjectBackupsDir(projectDir);
-  const backupDir = path.join(backupBaseDir, 'latest_backup');
+export function createProjectBackupAsync(projectDir: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const backupBaseDir = getProjectBackupsDir(projectDir);
+    const backupDir = path.join(backupBaseDir, 'latest_backup');
 
-  // Remove existing backup if it exists
-  if (fs.existsSync(backupDir)) {
-    fs.rmSync(backupDir, { recursive: true, force: true });
-  }
+    const worker = new Worker(path.join(process.cwd(), 'src', 'utils', 'backupWorker.ts'), {
+      workerData: { projectDir, backupDir }
+    });
 
-  fs.mkdirSync(backupDir, { recursive: true });
-
-  const copyRecursive = (src: string, dest: string) => {
-    if (fs.statSync(src).isDirectory()) {
-      if (path.basename(src) !== '.superhero') { // Exclude .superhero directories
-        fs.mkdirSync(dest, { recursive: true });
-        fs.readdirSync(src).forEach(childItemName => {
-          copyRecursive(path.join(src, childItemName), path.join(dest, childItemName));
-        });
+    worker.on('message', (message) => {
+      if (message.status === 'completed') {
+        resolve(message.backupDir);
+      } else if (message.status === 'error') {
+        reject(new Error(message.error));
       }
-    } else {
-      fs.copyFileSync(src, dest);
-    }
-  };
+    });
 
-  copyRecursive(projectDir, backupDir);
-
-  return backupDir;
+    worker.on('error', reject);
+    worker.on('exit', (code) => {
+      if (code !== 0) {
+        reject(new Error(`Backup worker stopped with exit code ${code}`));
+      }
+    });
+  });
 }
 
 export function restoreProjectBackup(projectDir: string, backupDir: string): void {

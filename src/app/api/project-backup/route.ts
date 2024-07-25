@@ -1,16 +1,23 @@
 import { NextResponse } from 'next/server';
-import { createProjectBackup, restoreProjectBackup, getProjectBackupsDir } from '@/utils/directoryUtils';
+import { createProjectBackupAsync, restoreProjectBackup, getProjectBackupsDir } from '@/utils/directoryUtils';
 import path from 'path';
 
 export async function POST(request: Request) {
   const { projectDir } = await request.json();
 
   try {
-    const backupDir = createProjectBackup(projectDir);
-    return NextResponse.json({ message: 'Backup created successfully', backupDir });
+    createProjectBackupAsync(projectDir)
+      .then((backupDir) => {
+        console.log('Backup completed:', backupDir);
+      })
+      .catch((error) => {
+        console.error('Backup failed:', error);
+      });
+
+    return NextResponse.json({ message: 'Backup process started' });
   } catch (error) {
-    console.error('Error creating backup:', error);
-    return NextResponse.json({ error: 'Failed to create backup' }, { status: 500 });
+    console.error('Error initiating backup:', error);
+    return NextResponse.json({ error: 'Failed to initiate backup' }, { status: 500 });
   }
 }
 
