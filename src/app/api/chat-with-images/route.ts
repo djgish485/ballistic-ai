@@ -35,11 +35,11 @@ export async function POST(req: NextRequest) {
       throw new Error('No API key selected');
     }
 
-    // Log received images
+    // Collect received images
     const images: File[] = [];
     for (let i = 0; i < 10; i++) { // Assuming a maximum of 10 images
       const image = formData.get(`image${i}`) as File | null;
-      if (image) {
+      if (image && image instanceof File) {
         images.push(image);
       } else {
         break;
@@ -50,8 +50,6 @@ export async function POST(req: NextRequest) {
       console.log(`chat-with-images: Image ${index + 1}: ${image.name} (${image.size} bytes)`);
     });
 
-    // TODO: Process images or include them in the API request as needed
-
     const initialPrompt = getInitialPrompt();
     const projectFiles = await getProjectFiles(projectDir);
     const systemPrompt = initialPrompt;
@@ -61,7 +59,7 @@ export async function POST(req: NextRequest) {
     console.log('chat-with-images: Server messages constructed:', serverMessages.length);
 
     console.log('chat-with-images: Fetching API response');
-    const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages);
+    const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages, images);
 
     console.log('chat-with-images: Creating response stream');
     const stream = createResponseStream(apiKey, apiResponse, (messages: Message[]) => {
