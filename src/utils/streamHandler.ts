@@ -16,10 +16,14 @@ export function createResponseStream(apiKey: { type: string; key: string }, apiR
           if (done) break;
 
           const chunk = new TextDecoder().decode(value);
-          totalResponseSize += value.byteLength; // Accumulate the size of each chunk
+          totalResponseSize += value.byteLength;
           const lines = chunk.split('\n');
 
           for (const line of lines) {
+            if (line.trim() === 'data: [DONE]') {
+              console.log('Stream completed');
+              continue;
+            }
             if (line.startsWith('data: ')) {
               try {
                 const data = JSON.parse(line.slice(6));
@@ -30,7 +34,7 @@ export function createResponseStream(apiKey: { type: string; key: string }, apiR
                   content = data.choices[0].delta.content;
                 }
                 if (content) {
-                  tokenCount += content.split(/\s+/).length; // assuming tokens are similar to words
+                  tokenCount += content.split(/\s+/).length;
                   fullResponse += content;
                   controller.enqueue(`data: ${JSON.stringify({ content })}\n\n`);
                 }
@@ -43,7 +47,6 @@ export function createResponseStream(apiKey: { type: string; key: string }, apiR
 
         setMessages((prev: any) => [...prev, { role: 'assistant', content: fullResponse }]);
 
-        // Calculate and log metrics
         const endTime = Date.now();
         const durationInSeconds = (endTime - startTime) / 1000;
         const tokensPerSecond = tokenCount / durationInSeconds;

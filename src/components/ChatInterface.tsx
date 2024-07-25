@@ -211,9 +211,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     });
   };
 
-  const handleSend = async () => {
+  const handleSend = async (images: File[]) => {
     if (input.trim() && !isLoading) {
       console.log('ChatInterface: Sending message:', input);
+      console.log('ChatInterface: Number of images:', images.length);
+      images.forEach((image, index) => {
+        console.log(`ChatInterface: Image ${index + 1}:`, image.name, image.type, image.size);
+      });
+
       const userMessage: Message = { role: 'user', content: input, isComplete: true };
       setMessages((prev) => [...prev, userMessage]);
       setInput('');
@@ -222,19 +227,44 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
       try {
         abortControllerRef.current = new AbortController();
-        const response = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            projectDir, 
-            message: input, 
-            isInitial: false, 
-            conversationHistory: messages,
-            selectedAPIKeyIndex: sessionStorage.getItem('selectedAPIKeyIndex')
-          }),
-          signal: abortControllerRef.current.signal,
-        });
 
+        let response;
+        if (images.length > 0) {
+          const formData = new FormData();
+          formData.append('projectDir', projectDir);
+          formData.append('message', input);
+          formData.append('isInitial', 'false');
+          formData.append('conversationHistory', JSON.stringify(messages));
+          formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
+          images.forEach((image, index) => {
+            formData.append(`image${index}`, image);
+          });
+
+          console.log('ChatInterface: Sending request to /api/chat-with-images');
+          console.log('ChatInterface: FormData keys:', [...formData.keys()]);
+
+          response = await fetch('/api/chat-with-images', {
+            method: 'POST',
+            body: formData,
+            signal: abortControllerRef.current.signal,
+          });
+        } else {
+          console.log('ChatInterface: Sending request to /api/chat');
+          response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+              projectDir, 
+              message: input, 
+              isInitial: false, 
+              conversationHistory: messages,
+              selectedAPIKeyIndex: sessionStorage.getItem('selectedAPIKeyIndex')
+            }),
+            signal: abortControllerRef.current.signal,
+          });
+        }
+
+        console.log('ChatInterface: Response status:', response.status);
         await processStreamResponse(response);
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
@@ -271,7 +301,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       >
         {isBackupInProgress && (
           <div className="bg-yellow-100 p-2 rounded">
-            Backup in progress yo...
+            Backup in progress...
           </div>
         )}
         <ChatMessages 
