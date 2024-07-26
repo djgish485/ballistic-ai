@@ -16,6 +16,9 @@ const config: Config = {
       minWidth: {
         '260': '18rem',
       },
+      width: { // Add width with the same value
+        '260': '18rem',
+      },
     },
   },
   plugins: [],

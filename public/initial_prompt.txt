@@ -11,7 +11,6 @@ Additional guidelines:
 - Only suggest necessary changes that directly address my requests.
 - Provide commands in a format that can be easily copied and pasted. Separate these commands into different code blocks.
 - All commands should be executable from the project root directory on a Mac command line. Do not include commands to change directories.
-- If creating new files is necessary, provide the full content of the new file and the command to create it.
 - Always explain the purpose of each change briefly.
 - Ensure all commands are compatible with macOS.
 - IMPORTANT: Always use the full project path provided in the project structure file when referring to files or directories in your commands.

@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     console.log('chat-with-images: FormData keys:', [...formData.keys()]);
 
-    const projectDir = formData.get('projectDir') as string;
+    const projectDir = formData.get('projectDir');
     const message = formData.get('message') as string;
     const isInitial = formData.get('isInitial') === 'true';
     const conversationHistory = JSON.parse(formData.get('conversationHistory') as string) as Message[];
@@ -21,9 +21,9 @@ export async function POST(req: NextRequest) {
     console.log('chat-with-images: Parsed form data:', { projectDir, message, isInitial, selectedAPIKeyIndex });
     console.log('chat-with-images: Conversation history length:', conversationHistory.length);
 
-    if (!projectDir) {
-      console.error('chat-with-images: Project directory is missing');
-      return NextResponse.json({ error: 'Project directory is required' }, { status: 400 });
+    if (!projectDir || typeof projectDir !== 'string') {
+      console.error('chat-with-images: Invalid project directory:', projectDir);
+      return NextResponse.json({ error: 'Invalid project directory' }, { status: 400 });
     }
 
     let apiKey = selectedAPIKeyIndex !== null && selectedAPIKeyIndex !== ''
@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
     console.log('chat-with-images: Server messages constructed:', serverMessages.length);
 
     console.log('chat-with-images: Fetching API response');
-    const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages, images);
+    const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages, projectDir, images);
 
     console.log('chat-with-images: Creating response stream');
     const stream = createResponseStream(apiKey, apiResponse, (messages: Message[]) => {

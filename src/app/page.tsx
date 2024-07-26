@@ -170,7 +170,7 @@ export default function Home() {
                   )}
                 </div>
               </div>
-              <div className="min-w-260 space-y-4">
+              <div className="min-w-260 w-260 space-y-4">
                 {projectDir && (
                   <FileList
                     key={fileListKey}
