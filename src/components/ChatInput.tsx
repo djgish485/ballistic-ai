@@ -48,6 +48,22 @@ const ChatInput: React.FC<ChatInputProps> = ({
   }, [handleSend, selectedImages]);
 
   const handleImageUpload = () => {
+    const selectedAPIKeyIndex = sessionStorage.getItem('selectedAPIKeyIndex');
+    console.log('handleImageUpload: Selected API Key Index:', selectedAPIKeyIndex);
+
+    if (!selectedAPIKeyIndex) {
+      alert('No API key selected.');
+      return;
+    }
+
+    const selectedAPIKeyType = sessionStorage.getItem('selectedAPIKeyType');
+    console.log('handleImageUpload: Selected API Key Type:', selectedAPIKeyType);
+
+    if (selectedAPIKeyType !== 'Claude') {
+      alert('Only Claude API supports image attachments.');
+      return;
+    }
+
     fileInputRef.current?.click();
   };
 

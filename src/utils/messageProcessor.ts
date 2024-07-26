@@ -7,7 +7,7 @@ export function getInitialPrompt(): string {
 }
 
 export function constructInitialMessage(projectFiles: string): string {
-  return `Please provide a SHORT, CONCISE overview of the project based on the following information. Limit your response to 2-3 sentences focusing on the main purpose and key features. I will then ask for specific changes or improvements.\n\nHere are the project files:\n\n${projectFiles}`;
+  return `Please provide a SHORT, CONCISE overview of the project based on the following information. Limit your response to 2-3 sentences focusing on the main purpose and key features. After the overview, invite the user to ask questions about the project or request specific changes and improvements.\n\nHere are the project files:\n\n${projectFiles}`;
 }
 
 export function constructServerMessages(isInitial: boolean, initialMessage: string, conversationHistory: Message[], message?: string): Message[] {

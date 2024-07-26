@@ -30,15 +30,17 @@ const APIKeyManager: React.FC = () => {
         const index = parseInt(storedIndex, 10);
         if (index >= 0 && index < data.keys.length) {
           setSelectedIndex(index);
-          await selectKey(index);
+          sessionStorage.setItem('selectedAPIKeyType', data.keys[index].type); // Correctly set the type
         } else {
           // If stored index is invalid, clear it
           sessionStorage.removeItem('selectedAPIKeyIndex');
+          sessionStorage.removeItem('selectedAPIKeyType');
         }
       } else if (data.selected !== null) {
         // If no stored index, use the server's selected index
         setSelectedIndex(data.selected);
         sessionStorage.setItem('selectedAPIKeyIndex', data.selected.toString());
+        sessionStorage.setItem('selectedAPIKeyType', data.keys[data.selected].type);
       }
     } catch (error) {
       console.error('Error fetching API keys:', error);
@@ -70,6 +72,7 @@ const APIKeyManager: React.FC = () => {
       if (selectedIndex === index) {
         setSelectedIndex(null);
         sessionStorage.removeItem('selectedAPIKeyIndex');
+        sessionStorage.removeItem('selectedAPIKeyType');
       }
     } catch (error) {
       console.error('Error deleting API key:', error);
@@ -86,6 +89,7 @@ const APIKeyManager: React.FC = () => {
       if (!response.ok) throw new Error('Failed to select API key');
       setSelectedIndex(index);
       sessionStorage.setItem('selectedAPIKeyIndex', index.toString());
+      sessionStorage.setItem('selectedAPIKeyType', apiKeys[index].type);  // Correctly set the type
     } catch (error) {
       console.error('Error selecting API key:', error);
     }
