@@ -157,18 +157,16 @@ export default function Home() {
             </div>
             <div className="flex flex-grow">
               <div className="flex-grow mr-4">
-                <div className="bg-white p-4 rounded shadow h-full">
-                  {projectDir && (
-                    <ChatInterface
-                      projectDir={projectDir}
-                      isStarted={isStarted}
-                      hasBackup={hasBackup}
-                      onStart={handleStart}
-                      onRestore={handleRestore}
-                      systemMessages={systemMessages}
-                    />
-                  )}
-                </div>
+                {projectDir && (
+                  <ChatInterface
+                    projectDir={projectDir}
+                    isStarted={isStarted}
+                    hasBackup={hasBackup}
+                    onStart={handleStart}
+                    onRestore={handleRestore}
+                    systemMessages={systemMessages}
+                  />
+                )}
               </div>
               <div className="min-w-260 w-260 space-y-4">
                 {projectDir && (

@@ -280,7 +280,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   return (
     <div className="flex flex-col h-full">
       <div 
-        className="flex-grow overflow-y-auto p-4 space-y-4 bg-gray-100 rounded"
+        className="flex-grow overflow-y-auto space-y-4"
         ref={chatContainerRef}
       >
         {isBackupInProgress && (
@@ -295,7 +295,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         />
         <div ref={chatEndRef} />
       </div>
-      <div className="p-4 bg-gray-200 rounded-b">
+      <div className="mt-4">
         <ChatInput
           input={input}
           setInput={setInput}
