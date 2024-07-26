@@ -18,7 +18,7 @@ Additional guidelines:
 
 Here's an example of how to provide a full file update:
 ```javascript
-# Update app.js with new error handling
+# Update app.js with new error handling, showing full file contents
 cat << 'EOF' > /full/path/to/project/app.js
 const express = require('express');
 const app = express();

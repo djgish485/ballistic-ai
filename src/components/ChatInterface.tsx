@@ -29,6 +29,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [isBackupInProgress, setIsBackupInProgress] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
+  const inputContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastScrollTop = useRef(0);
   const [showDiff, setShowDiff] = useState(false);
@@ -44,6 +45,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       initiateChat();
     }
   }, [isStarted, messages.length]);
+
+  useEffect(() => {
+    const updateInputPosition = () => {
+      if (chatContainerRef.current && inputContainerRef.current) {
+        const rect = chatContainerRef.current.getBoundingClientRect();
+        inputContainerRef.current.style.width = `${rect.width}px`;
+        inputContainerRef.current.style.left = `${rect.left}px`;
+      }
+    };
+
+    updateInputPosition();
+    window.addEventListener('resize', updateInputPosition);
+
+    return () => {
+      window.removeEventListener('resize', updateInputPosition);
+    };
+  }, []);
 
   const initiateChat = async () => {
     console.log('ChatInterface: Initiating chat');
@@ -278,11 +296,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <div 
-        className="flex-grow overflow-y-auto space-y-4"
-        ref={chatContainerRef}
-      >
+    <div className="flex flex-col h-full" ref={chatContainerRef}>
+      <div className="flex-grow overflow-y-auto space-y-4 pb-24">
         {isBackupInProgress && (
           <div className="bg-yellow-100 p-2 rounded">
             Backup in progress...
@@ -295,7 +310,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         />
         <div ref={chatEndRef} />
       </div>
-      <div className="mt-4">
+      <div 
+        ref={inputContainerRef}
+        className="fixed bottom-0 bg-gray-100 pb-6 z-10"
+        style={{ width: '100%' }}
+      >
         <ChatInput
           input={input}
           setInput={setInput}
