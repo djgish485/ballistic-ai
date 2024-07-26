@@ -29,10 +29,9 @@ export async function POST(req: NextRequest) {
 
     const serverMessages = constructServerMessages(isInitial, initialMessage, conversationHistory, message);
 
-    const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages);
+    const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages, projectDir);
 
     const stream = createResponseStream(apiKey, apiResponse, (messages: Message[]) => {
-      // This function would typically update some state, but in this context it's a no-op
       console.log('Messages updated:', messages);
     });
 

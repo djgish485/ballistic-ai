@@ -1,5 +1,7 @@
 import { Message } from '@/types/chat';
 import fs from 'fs/promises';
+import path from 'path';
+import { getProjectBackupsDir } from './directoryUtils';
 
 const CLAUDE_API_URL = 'https://api.anthropic.com/v1/messages';
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
@@ -26,7 +28,22 @@ async function fileToBase64(file: File): Promise<string> {
   return buffer.toString('base64');
 }
 
-export async function fetchAPIResponse(apiKey: { type: string; key: string }, systemPrompt: string, messages: Message[], images?: File[]) {
+async function logAPIRequest(projectDir: string, apiType: string, requestBody: any) {
+  const backupsDir = getProjectBackupsDir(projectDir);
+  const logFileName = `api_request_log_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+  const logFilePath = path.join(backupsDir, logFileName);
+
+  const logContent = JSON.stringify({
+    timestamp: new Date().toISOString(),
+    apiType,
+    requestBody
+  }, null, 2);
+
+  await fs.writeFile(logFilePath, logContent, 'utf-8');
+  console.log(`API request logged to: ${logFilePath}`);
+}
+
+export async function fetchAPIResponse(apiKey: { type: string; key: string }, systemPrompt: string, messages: Message[], projectDir: string, images?: File[]) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   let body: any;
 
@@ -111,6 +128,9 @@ export async function fetchAPIResponse(apiKey: { type: string; key: string }, sy
   } else {
     throw new Error('Unsupported API type');
   }
+
+  // Log the API request
+  await logAPIRequest(projectDir, apiKey.type, body);
 
   const response = await fetch(apiKey.type === 'Claude' ? CLAUDE_API_URL : OPENAI_API_URL, {
     method: 'POST',
