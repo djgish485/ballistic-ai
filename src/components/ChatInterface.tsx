@@ -64,6 +64,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     };
   }, []);
 
+  const getCurrentApiType = (): 'Claude 3.5 Sonnet' | 'GPT-4o' => {
+    const selectedAPIKeyType = sessionStorage.getItem('selectedAPIKeyType');
+    return selectedAPIKeyType === 'OpenAI' ? 'GPT-4o' : 'Claude 3.5 Sonnet';
+  };
+
   const initiateChat = async () => {
     console.log('ChatInterface: Initiating chat');
     setIsLoading(true);
@@ -168,7 +173,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     let currentContent = '';
 
-    setMessages((prev) => [...prev, { role: 'assistant', content: '', isComplete: false }]);
+    setMessages((prev) => [...prev, { 
+      role: 'assistant', 
+      content: '', 
+      isComplete: false,
+      apiType: getCurrentApiType()
+    }]);
 
     while (true) {
       const { done, value } = await reader.read();
@@ -193,7 +203,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 return newMessages;
               });
             } else if (data.conversationHistory) {
-              setMessages(data.conversationHistory.map((msg: Message) => ({ ...msg, isComplete: true })));
+              setMessages(data.conversationHistory.map((msg: Message) => ({ 
+                ...msg, 
+                isComplete: true,
+                apiType: getCurrentApiType()
+              })));
               return;
             }
           } catch (error) {
@@ -222,7 +236,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         console.log(`ChatInterface: Image ${index + 1}:`, image.name, image.type, image.size);
       });
 
-      const userMessage: Message = { role: 'user', content: input, images };
+      const userMessage: Message = { 
+        role: 'user', 
+        content: input, 
+        images,
+        isComplete: true,
+        apiType: getCurrentApiType()
+      };
       setMessages((prev) => [...prev, userMessage]);
       setInput('');
       setIsLoading(true);

@@ -10,6 +10,7 @@ interface Message {
   content: string;
   isComplete: boolean;
   images?: File[];
+  apiType?: 'Claude 3.5 Sonnet' | 'GPT-4o';
 }
 
 interface SystemMessage {
@@ -52,7 +53,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
               ))}
             </div>
           )}
-          <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
+          <strong>{msg.role === 'user' ? 'You: ' : `${msg.apiType}: `}</strong>
           <FormattedMessage 
             content={msg.content} 
             onDiff={onDiff} 
