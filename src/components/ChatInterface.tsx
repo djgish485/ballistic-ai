@@ -34,6 +34,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const lastScrollTop = useRef(0);
   const [showDiff, setShowDiff] = useState(false);
   const [diffCommand, setDiffCommand] = useState('');
+  const isAutoScrolling = useRef(false);
 
   useEffect(() => {
     console.log('ChatInterface: Props updated', { projectDir, isStarted, hasBackup, systemMessages });
@@ -112,18 +113,31 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const scrollToBottom = useCallback(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (chatEndRef.current) {
+      isAutoScrolling.current = true;
+      chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => {
+        isAutoScrolling.current = false;
+      }, 100);
+    }
   }, []);
 
   const handleScroll = useCallback(() => {
+    if (isAutoScrolling.current) return;
+
     const windowHeight = window.innerHeight;
     const documentHeight = document.documentElement.scrollHeight;
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     
-    const isScrollingDown = scrollTop > lastScrollTop.current;
-    const isScrolledToBottom = scrollTop + windowHeight >= documentHeight - 7;
+    const isScrollingUp = scrollTop < lastScrollTop.current;
+    const isScrolledToBottom = scrollTop + windowHeight >= documentHeight - 1;
     
-    setUserScrolledUp(!isScrolledToBottom);
+    if (isScrollingUp && !isScrolledToBottom) {
+      setUserScrolledUp(true);
+    } else if (isScrolledToBottom) {
+      setUserScrolledUp(false);
+    }
+    
     lastScrollTop.current = scrollTop;
   }, []);
 
@@ -133,27 +147,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       window.removeEventListener('scroll', handleScroll);
     };
   }, [handleScroll]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setUserScrolledUp(false);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (chatEndRef.current) {
-      observer.observe(chatEndRef.current);
-    }
-
-    return () => {
-      if (chatEndRef.current) {
-        observer.unobserve(chatEndRef.current);
-      }
-    };
-  }, []);
 
   useEffect(() => {
     if (!userScrolledUp) {
