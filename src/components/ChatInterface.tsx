@@ -78,9 +78,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         body: JSON.stringify({ projectDir }),
       });
       if (backupResponse.ok) {
-        console.log('ChatInterface: Backup process initiated');
+        console.log('ChatInterface: Backup process completed');
+        setIsBackupInProgress(false);
       } else {
         console.error('ChatInterface: Failed to initiate backup');
+        setIsBackupInProgress(false);
       }
 
       console.log('ChatInterface: Sending initial chat request');
