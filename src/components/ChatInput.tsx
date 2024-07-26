@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect, useCallback, useState } from 'react';
+import { PhotoIcon, PaperAirplaneIcon, StopIcon } from '@heroicons/react/24/solid';
 
 interface ChatInputProps {
   input: string;
@@ -103,44 +104,39 @@ const ChatInput: React.FC<ChatInputProps> = ({
           ))}
         </div>
       )}
-      <div className="flex space-x-2">
-        <div className="flex-grow flex items-center border rounded overflow-hidden">
-          <button
-            type="button"
-            onClick={handleImageUpload}
-            className="px-2 py-1 bg-gray-200 text-gray-700 hover:bg-gray-300 focus:outline-none"
-          >
-            U
-          </button>
+      <div className="flex-grow flex border rounded-lg overflow-hidden bg-white">
+        <button
+          type="button"
+          onClick={handleImageUpload}
+          className="p-2 text-blue-500 hover:text-blue-600 focus:outline-none self-end"
+        >
+          <PhotoIcon className="h-8 w-8" />
+        </button>
+        <div className="flex-grow flex items-end">
           <textarea
             ref={textareaRef}
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            className="flex-grow px-2 py-1 resize-none overflow-y-auto focus:outline-none"
+            className="w-full px-2 py-2 resize-none overflow-y-auto focus:outline-none"
             placeholder="Type your message..."
             disabled={isLoading}
             rows={1}
-            style={{ minHeight: '24px', maxHeight: '216px' }}
+            style={{ minHeight: '44px', maxHeight: '216px' }}
           />
         </div>
-        {isAIResponding ? (
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-          >
-            Cancel
-          </button>
-        ) : (
-          <button
-            type="submit"
-            className="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
-            disabled={isLoading}
-          >
-            Send
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={isAIResponding ? handleCancel : handleSendMessage}
+          className="p-2 text-blue-500 hover:text-blue-600 focus:outline-none disabled:text-gray-400 self-end"
+          disabled={!isAIResponding && (isLoading || (!input.trim() && selectedImages.length === 0))}
+        >
+          {isAIResponding ? (
+            <StopIcon className="h-8 w-8" />
+          ) : (
+            <PaperAirplaneIcon className="h-8 w-8" />
+          )}
+        </button>
       </div>
       <input
         type="file"
