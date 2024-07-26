@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { diffLines, Change } from 'diff';
 import { parseCommand } from '@/utils/commandParser';
+import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface DiffScreenProps {
   command: string;
@@ -12,6 +13,8 @@ interface DiffScreenProps {
 const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
   const [diff, setDiff] = useState<Change[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [fileName, setFileName] = useState<string>('');
+  const popupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchFileContentAndGenerateDiff = async () => {
@@ -22,6 +25,8 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
           setError('Invalid command format');
           return;
         }
+
+        setFileName(filePath.split('/').pop() || '');
 
         const response = await fetch('/api/read-file', {
           method: 'POST',
@@ -64,25 +69,42 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
     });
   };
 
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-      <div className="bg-white p-6 rounded-lg max-w-3xl w-full max-h-[80vh] overflow-auto">
-        <h2 className="text-xl font-bold mb-4">File Diff</h2>
-        {error ? (
-          <p className="text-red-500">{error}</p>
-        ) : diff.length === 0 ? (
-          <p>Loading diff...</p>
-        ) : (
-          <div className="bg-gray-100 p-4 rounded overflow-x-auto">
-            {renderDiff()}
-          </div>
-        )}
-        <button
-          onClick={onClose}
-          className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Close
-        </button>
+    <div 
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={handleOverlayClick}
+    >
+      <div 
+        ref={popupRef}
+        className="bg-white rounded-lg max-w-3xl w-full max-h-[80vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="sticky top-0 bg-white p-4 rounded-t-lg border-b flex justify-between items-center">
+          <h2 className="text-xl font-bold">File Diff: {fileName}</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+          >
+            <XMarkIcon className="h-6 w-6" />
+          </button>
+        </div>
+        <div className="overflow-auto p-4 flex-grow">
+          {error ? (
+            <p className="text-red-500">{error}</p>
+          ) : diff.length === 0 ? (
+            <p>Loading diff...</p>
+          ) : (
+            <div className="bg-gray-100 p-4 rounded overflow-x-auto">
+              {renderDiff()}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
