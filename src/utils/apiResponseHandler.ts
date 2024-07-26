@@ -18,14 +18,35 @@ function truncateField(field: any, maxLength: number = 30): string {
   }
 }
 
-function filterMessages(messages: Message[]): { role: string, content: string }[] {
-  return messages.map(({ role, content }) => ({ role, content }));
-}
-
 async function fileToBase64(file: File): Promise<string> {
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
   return buffer.toString('base64');
+}
+
+async function filterMessages(messages: Message[]): Promise<{ role: string, content: string | { type: string, text?: string, source?: any }[] }[]> {
+  const filteredMessages = [];
+  for (const { role, content, images } of messages) {
+    if (images && images.length > 0) {
+      const contentArray: { type: string, text?: string, source?: any }[] = [];
+      for (const image of images) {
+        const base64Data = await fileToBase64(image);
+        contentArray.push({
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: image.type,
+            data: base64Data,
+          },
+        });
+      }
+      contentArray.push({ type: 'text', text: content });
+      filteredMessages.push({ role, content: contentArray });
+    } else {
+      filteredMessages.push({ role, content });
+    }
+  }
+  return filteredMessages;
 }
 
 async function logAPIRequest(projectDir: string, apiType: string, requestBody: any) {
@@ -43,11 +64,11 @@ async function logAPIRequest(projectDir: string, apiType: string, requestBody: a
   console.log(`API request logged to: ${logFilePath}`);
 }
 
-export async function fetchAPIResponse(apiKey: { type: string; key: string }, systemPrompt: string, messages: Message[], projectDir: string, images?: File[]) {
+export async function fetchAPIResponse(apiKey: { type: string; key: string }, systemPrompt: string, messages: Message[], projectDir: string) {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   let body: any;
 
-  const filteredMessages = filterMessages(messages);
+  const filteredMessages = await filterMessages(messages);
 
   console.log("Messages being sent to the API:");
   filteredMessages.forEach((msg, index) => {
@@ -62,42 +83,11 @@ export async function fetchAPIResponse(apiKey: { type: string; key: string }, sy
     headers['anthropic-version'] = '2023-06-01';
     headers["anthropic-beta"] = "max-tokens-3-5-sonnet-2024-07-15";
     
-    let lastMessageContent: any[] = [];
-
-    if (images && images.length > 0) {
-      for (const image of images) {
-        const base64Data = await fileToBase64(image);
-        lastMessageContent.push({
-          type: "image",
-          source: {
-            type: "base64",
-            media_type: image.type,
-            data: base64Data,
-          },
-        });
-      }
-    }
-
-    // Add the text message
-    lastMessageContent.push({
-      type: "text",
-      text: filteredMessages[filteredMessages.length - 1].content,
-    });
-
     body = {
       model: 'claude-3-5-sonnet-20240620',
       max_tokens: 8192,
       system: systemPrompt,
-      messages: [
-        ...filteredMessages.slice(0, -1).map(msg => ({
-          role: msg.role,
-          content: msg.content,
-        })),
-        {
-          role: 'user',
-          content: lastMessageContent,
-        },
-      ],
+      messages: filteredMessages,
       stream: true
     };
 

@@ -35,19 +35,33 @@ export async function POST(req: NextRequest) {
       throw new Error('No API key selected');
     }
 
-    // Collect received images
-    const images: File[] = [];
-    for (let i = 0; i < 10; i++) { // Assuming a maximum of 10 images
-      const image = formData.get(`image${i}`) as File | null;
-      if (image && image instanceof File) {
-        images.push(image);
-      } else {
-        break;
+    // Collect received images for all messages
+    const messageImages: { [key: string]: File[] } = {};
+    for (const [key, value] of formData.entries()) {
+      if (key.startsWith('image_') && value instanceof File) {
+        const [_, msgIndex, imgIndex] = key.split('_');
+        if (!messageImages[msgIndex]) {
+          messageImages[msgIndex] = [];
+        }
+        messageImages[msgIndex].push(value);
       }
     }
-    console.log(`chat-with-images: Received ${images.length} images:`);
-    images.forEach((image, index) => {
-      console.log(`chat-with-images: Image ${index + 1}: ${image.name} (${image.size} bytes)`);
+
+    console.log('chat-with-images: Collected images for messages:', Object.keys(messageImages).length);
+
+    // Attach images to the correct messages in the conversation history
+    const updatedConversationHistory = conversationHistory.map((msg, index) => {
+      if (messageImages[index.toString()]) {
+        return { ...msg, images: messageImages[index.toString()] };
+      }
+      return msg;
+    });
+
+    // Add the new message with images
+    updatedConversationHistory.push({
+      role: 'user',
+      content: message,
+      images: messageImages[conversationHistory.length.toString()] || []
     });
 
     const initialPrompt = getInitialPrompt();
@@ -55,11 +69,11 @@ export async function POST(req: NextRequest) {
     const systemPrompt = initialPrompt;
     const initialMessage = constructInitialMessage(projectFiles);
 
-    const serverMessages = constructServerMessages(isInitial, initialMessage, conversationHistory, message);
+    const serverMessages = constructServerMessages(isInitial, initialMessage, updatedConversationHistory);
     console.log('chat-with-images: Server messages constructed:', serverMessages.length);
 
     console.log('chat-with-images: Fetching API response');
-    const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages, projectDir, images);
+    const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages, projectDir);
 
     console.log('chat-with-images: Creating response stream');
     const stream = createResponseStream(apiKey, apiResponse, (messages: Message[]) => {

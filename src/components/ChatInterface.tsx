@@ -2,17 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';
 import DiffScreen from './DiffScreen';
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  isComplete: boolean;
-}
-
-interface SystemMessage {
-  type: string;
-  content: string;
-}
+import { Message, SystemMessage } from '@/types/chat';
 
 interface ChatInterfaceProps {
   projectDir: string;
@@ -212,14 +202,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const handleSend = async (images: File[]) => {
-    if (input.trim() && !isLoading) {
+    if (input.trim() || images.length > 0) {
       console.log('ChatInterface: Sending message:', input);
       console.log('ChatInterface: Number of images:', images.length);
       images.forEach((image, index) => {
         console.log(`ChatInterface: Image ${index + 1}:`, image.name, image.type, image.size);
       });
 
-      const userMessage: Message = { role: 'user', content: input, isComplete: true };
+      const userMessage: Message = { role: 'user', content: input, images };
       setMessages((prev) => [...prev, userMessage]);
       setInput('');
       setIsLoading(true);
@@ -228,41 +218,35 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       try {
         abortControllerRef.current = new AbortController();
 
-        let response;
-        if (images.length > 0) {
-          const formData = new FormData();
-          formData.append('projectDir', projectDir);
-          formData.append('message', input);
-          formData.append('isInitial', 'false');
-          formData.append('conversationHistory', JSON.stringify(messages));
-          formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
-          images.forEach((image, index) => {
-            formData.append(`image${index}`, image);
+        const formData = new FormData();
+        formData.append('projectDir', projectDir);
+        formData.append('message', input);
+        formData.append('isInitial', 'false');
+        formData.append('conversationHistory', JSON.stringify(messages.map(msg => ({
+          ...msg,
+          images: undefined // We'll handle images separately
+        }))));
+        formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
+        
+        // Append all images from all messages
+        messages.forEach((msg, msgIndex) => {
+          msg.images?.forEach((image, imgIndex) => {
+            formData.append(`image_${msgIndex}_${imgIndex}`, image);
           });
+        });
+        // Append new images
+        images.forEach((image, index) => {
+          formData.append(`image_${messages.length}_${index}`, image);
+        });
 
-          console.log('ChatInterface: Sending request to /api/chat-with-images');
-          console.log('ChatInterface: FormData keys:', [...formData.keys()]);
+        console.log('ChatInterface: Sending request to /api/chat-with-images');
+        console.log('ChatInterface: FormData keys:', [...formData.keys()]);
 
-          response = await fetch('/api/chat-with-images', {
-            method: 'POST',
-            body: formData,
-            signal: abortControllerRef.current.signal,
-          });
-        } else {
-          console.log('ChatInterface: Sending request to /api/chat');
-          response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-              projectDir, 
-              message: input, 
-              isInitial: false, 
-              conversationHistory: messages,
-              selectedAPIKeyIndex: sessionStorage.getItem('selectedAPIKeyIndex')
-            }),
-            signal: abortControllerRef.current.signal,
-          });
-        }
+        const response = await fetch('/api/chat-with-images', {
+          method: 'POST',
+          body: formData,
+          signal: abortControllerRef.current.signal,
+        });
 
         console.log('ChatInterface: Response status:', response.status);
         await processStreamResponse(response);

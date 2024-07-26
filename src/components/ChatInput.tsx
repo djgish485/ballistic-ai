@@ -43,7 +43,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend(selectedImages);
+      handleSendMessage();
     }
   }, [handleSend, selectedImages]);
 
@@ -74,8 +74,13 @@ const ChatInput: React.FC<ChatInputProps> = ({
     }
   };
 
+  const handleSendMessage = () => {
+    handleSend(selectedImages);
+    setSelectedImages([]); // Clear selected images after sending
+  };
+
   return (
-    <form onSubmit={(e) => { e.preventDefault(); handleSend(selectedImages); }} className="flex flex-col space-y-2">
+    <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="flex flex-col space-y-2">
       {selectedImages.length > 0 && (
         <div className="flex flex-wrap gap-2 p-2 bg-gray-100 rounded">
           {selectedImages.map((file, index) => (
