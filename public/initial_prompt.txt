@@ -44,4 +44,4 @@ main();
 EOF
 ```
 
-Remember: ALWAYS provide the FULL content of any file you modify. This is ESSENTIAL for the proper functioning of this application.
+Remember: ALWAYS provide the FULL content of any file you modify, inside of an executable command. This is ESSENTIAL for the proper functioning of this application.

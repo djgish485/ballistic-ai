@@ -2,12 +2,14 @@
 
 import React from 'react';
 import FormattedMessage from './FormattedMessage';
+import ImageThumbnail from './ImageThumbnail';
 import styles from './ChatInterface.module.css';
 
 interface Message {
   role: 'user' | 'assistant';
   content: string;
   isComplete: boolean;
+  images?: File[];
 }
 
 interface SystemMessage {
@@ -43,6 +45,13 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
             msg.role === 'user' ? 'bg-blue-100' : 'bg-white'
           }`}
         >
+          {msg.images && msg.images.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-2">
+              {msg.images.map((image, imgIndex) => (
+                <ImageThumbnail key={imgIndex} file={image} />
+              ))}
+            </div>
+          )}
           <strong>{msg.role === 'user' ? 'You: ' : 'AI: '}</strong>
           <FormattedMessage 
             content={msg.content} 

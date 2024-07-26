@@ -47,3 +47,18 @@
   background-color: #f7fafc;
   font-weight: bold;
 }
+
+.imageThumbnailContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.imageThumbnail {
+  width: 4rem;
+  height: 4rem;
+  object-fit: cover;
+  border-radius: 0.25rem;
+  border: 1px solid #e2e8f0;
+}
