@@ -22,6 +22,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   systemMessages 
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const messagesRef = useRef<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isAIResponding, setIsAIResponding] = useState(false);
@@ -35,6 +36,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [showDiff, setShowDiff] = useState(false);
   const [diffCommand, setDiffCommand] = useState('');
   const isAutoScrolling = useRef(false);
+  const messageLogFileNameRef = useRef<string>('');
 
   useEffect(() => {
     console.log('ChatInterface: Props updated', { projectDir, isStarted, hasBackup, systemMessages });
@@ -64,9 +66,37 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     };
   }, []);
 
+  useEffect(() => {
+    // Generate a new file name when the component mounts
+    messageLogFileNameRef.current = `message_log_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+    console.log('New message log file name:', messageLogFileNameRef.current);
+  }, []);
+
+  useEffect(() => {
+    messagesRef.current = messages;
+  }, [messages]);
+
   const getCurrentApiType = (): 'Claude 3.5 Sonnet' | 'GPT-4o' => {
     const selectedAPIKeyType = sessionStorage.getItem('selectedAPIKeyType');
     return selectedAPIKeyType === 'OpenAI' ? 'GPT-4o' : 'Claude 3.5 Sonnet';
+  };
+
+  const saveMessageLog = async () => {
+    try {
+      const response = await fetch('/api/save-message-log', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ projectDir, messages: messagesRef.current, fileName: messageLogFileNameRef.current }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save message log');
+      }
+
+      console.log('Message log saved successfully');
+    } catch (error) {
+      console.error('Error saving message log:', error);
+    }
   };
 
   const initiateChat = async () => {
@@ -173,12 +203,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
     let currentContent = '';
 
-    setMessages((prev) => [...prev, { 
-      role: 'assistant', 
-      content: '', 
-      isComplete: false,
-      apiType: getCurrentApiType()
-    }]);
+    setMessages((prev) => {
+      const newMessages = [...prev, { 
+        role: 'assistant', 
+        content: '', 
+        isComplete: false,
+        apiType: getCurrentApiType()
+      }];
+      messagesRef.current = newMessages;
+      return newMessages;
+    });
 
     while (true) {
       const { done, value } = await reader.read();
@@ -200,14 +234,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   ...newMessages[newMessages.length - 1],
                   content: currentContent,
                 };
+                messagesRef.current = newMessages;
                 return newMessages;
               });
             } else if (data.conversationHistory) {
-              setMessages(data.conversationHistory.map((msg: Message) => ({ 
+              const newMessages = data.conversationHistory.map((msg: Message) => ({ 
                 ...msg, 
                 isComplete: true,
                 apiType: getCurrentApiType()
-              })));
+              }));
+              setMessages(newMessages);
+              messagesRef.current = newMessages;
               return;
             }
           } catch (error) {
@@ -224,8 +261,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         ...newMessages[newMessages.length - 1],
         isComplete: true,
       };
+      messagesRef.current = newMessages;
       return newMessages;
     });
+
+    // Save the message log after the LLM response is complete
+    await saveMessageLog();
   };
 
   const handleSend = async (images: File[]) => {
@@ -243,10 +284,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         isComplete: true,
         apiType: getCurrentApiType()
       };
-      setMessages((prev) => [...prev, userMessage]);
+      setMessages((prev) => {
+        const newMessages = [...prev, userMessage];
+        messagesRef.current = newMessages;
+        return newMessages;
+      });
       setInput('');
       setIsLoading(true);
       setIsAIResponding(true);
+
+      // Save the message log after adding the user message
+      await saveMessageLog();
 
       try {
         abortControllerRef.current = new AbortController();
@@ -255,21 +303,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         formData.append('projectDir', projectDir);
         formData.append('message', input);
         formData.append('isInitial', 'false');
-        formData.append('conversationHistory', JSON.stringify(messages.map(msg => ({
+        formData.append('conversationHistory', JSON.stringify(messagesRef.current.map(msg => ({
           ...msg,
           images: undefined // We'll handle images separately
         }))));
         formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
         
         // Append all images from all messages
-        messages.forEach((msg, msgIndex) => {
+        messagesRef.current.forEach((msg, msgIndex) => {
           msg.images?.forEach((image, imgIndex) => {
             formData.append(`image_${msgIndex}_${imgIndex}`, image);
           });
         });
         // Append new images
         images.forEach((image, index) => {
-          formData.append(`image_${messages.length}_${index}`, image);
+          formData.append(`image_${messagesRef.current.length}_${index}`, image);
         });
 
         console.log('ChatInterface: Sending request to /api/chat-with-images');

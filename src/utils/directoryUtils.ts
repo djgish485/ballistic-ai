@@ -28,6 +28,11 @@ export function getProjectSettingsDir(projectDir: string): string {
   return path.join('.superhero', `${encodedDir}-settings`);
 }
 
+export function getMessageLogPath(projectDir: string): string {
+  const backupsDir = getProjectBackupsDir(projectDir);
+  return path.join(process.cwd(), backupsDir, 'message_log.json');
+}
+
 export function setupDirectories(projectDir: string): void {
   console.log('Setting up directories for project:', projectDir);
   const directories = [
