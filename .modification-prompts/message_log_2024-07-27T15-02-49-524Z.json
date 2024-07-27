@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "When the edit button is clicked on a user message, the message is replaced with a warning:\nWarning: threading not implemented yet and all messages below will be forgotten.\n\nInstead of doing this, show a confirm box that says the same thing. Actions will be identical to that warning. box.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
