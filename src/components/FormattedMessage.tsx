@@ -21,32 +21,10 @@ interface FormattedMessageProps {
 
 const CodeBlock = React.memo(({ node, inline, className, children, ...props }: any) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [editIconPosition, setEditIconPosition] = useState({ top: 0, right: 0 });
-  const codeRef = useRef<HTMLPreElement>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(String(children));
   const [isRestored, setIsRestored] = useState(false);
-
-  useEffect(() => {
-    const updateEditIconPosition = () => {
-      if (codeRef.current) {
-        const rect = codeRef.current.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-        const iconTop = rect.top < 0 ? Math.abs(rect.top) + 10 : 10;
-        const iconRight = 10;
-        setEditIconPosition({ top: iconTop, right: iconRight });
-      }
-    };
-
-    updateEditIconPosition();
-    window.addEventListener('scroll', updateEditIconPosition);
-    window.addEventListener('resize', updateEditIconPosition);
-
-    return () => {
-      window.removeEventListener('scroll', updateEditIconPosition);
-      window.removeEventListener('resize', updateEditIconPosition);
-    };
-  }, []);
+  const codeRef = useRef<HTMLPreElement>(null);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -99,10 +77,9 @@ const CodeBlock = React.memo(({ node, inline, className, children, ...props }: a
             {String(children).replace(/\n$/, '')}
           </code>
         </pre>
-        {!isEditing && (
+        {!isEditing && isHovered && (
           <div
-            className={`absolute transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
-            style={{ top: `${editIconPosition.top}px`, right: `${editIconPosition.right}px` }}
+            className="absolute top-2 right-2"
           >
             <div className="p-1 rounded transition-colors duration-200 group hover:bg-blue-500">
               <PencilIcon
