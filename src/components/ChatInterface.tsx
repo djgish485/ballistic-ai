@@ -39,12 +39,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const messageLogFileNameRef = useRef<string>('');
 
   useEffect(() => {
-    console.log('ChatInterface: Props updated', { projectDir, isStarted, hasBackup, systemMessages });
-  }, [projectDir, isStarted, hasBackup, systemMessages]);
-
-  useEffect(() => {
     if (isStarted && messages.length === 0) {
-      console.log('ChatInterface: Project started, initiating chat');
       initiateChat();
     }
   }, [isStarted, messages.length]);
@@ -67,9 +62,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, []);
 
   useEffect(() => {
-    // Generate a new file name when the component mounts
     messageLogFileNameRef.current = `message_log_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
-    console.log('New message log file name:', messageLogFileNameRef.current);
   }, []);
 
   useEffect(() => {
@@ -92,20 +85,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       if (!response.ok) {
         throw new Error('Failed to save message log');
       }
-
-      console.log('Message log saved successfully');
     } catch (error) {
       console.error('Error saving message log:', error);
     }
   };
 
   const initiateChat = async () => {
-    console.log('ChatInterface: Initiating chat');
     setIsLoading(true);
     setIsAIResponding(true);
 
     try {
-      console.log('ChatInterface: Starting backup process');
       setIsBackupInProgress(true);
       const backupResponse = await fetch('/api/project-backup', {
         method: 'POST',
@@ -113,14 +102,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         body: JSON.stringify({ projectDir }),
       });
       if (backupResponse.ok) {
-        console.log('ChatInterface: Backup process completed');
         setIsBackupInProgress(false);
       } else {
-        console.error('ChatInterface: Failed to initiate backup');
         setIsBackupInProgress(false);
       }
 
-      console.log('ChatInterface: Sending initial chat request');
       abortControllerRef.current = new AbortController();
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -134,13 +120,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         signal: abortControllerRef.current.signal,
       });
 
-      console.log('ChatInterface: Initial chat response received');
       await processStreamResponse(response);
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log('ChatInterface: Request was cancelled');
+        // Request was cancelled
       } else {
-        console.error('ChatInterface: Error starting chat:', error);
+        console.error('Error starting chat:', error);
       }
     } finally {
       setIsLoading(false);
@@ -192,9 +177,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, [messages, systemMessages, userScrolledUp, scrollToBottom]);
 
   const processStreamResponse = async (response: Response) => {
-    console.log('ChatInterface: Processing stream response');
     if (!response.body) {
-      console.error('ChatInterface: No response body');
       throw new Error('No response body');
     }
 
@@ -248,12 +231,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               return;
             }
           } catch (error) {
-            console.error('ChatInterface: Error parsing JSON:', error);
+            console.error('Error parsing JSON:', error);
           }
         }
       }
     }
-    console.log('ChatInterface: Stream processing completed');
     
     setMessages((prev) => {
       const newMessages = [...prev];
@@ -265,7 +247,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       return newMessages;
     });
 
-    // Save the message log after the LLM response is complete
     await saveMessageLog();
   };
 
@@ -279,10 +260,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       apiType: getCurrentApiType(),
     };
 
-    // Make a shallow copy of the current conversation history without new images
     const conversationHistoryCopy = messagesRef.current.map((msg) => ({
       ...msg,
-      images: msg.images ? [...msg.images] : [], // Preserve existing images
+      images: msg.images ? [...msg.images] : [],
     }));
 
     setMessages((prev) => {
@@ -295,7 +275,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setIsLoading(true);
     setIsAIResponding(true);
 
-    // Save the message log after adding the user message
     await saveMessageLog();
 
     try {
@@ -317,7 +296,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         formData.append(`image_${conversationHistoryCopy.length}_${index}`, image);
       });
 
-      console.log('ChatInterface: Sending request to /api/chat-with-images');
       const response = await fetch('/api/chat-with-images', {
         method: 'POST',
         body: formData,
@@ -327,9 +305,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       await processStreamResponse(response);
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        console.log('ChatInterface: Request was cancelled');
+        // Request was cancelled
       } else {
-        console.error('ChatInterface: Error sending message:', error);
+        console.error('Error sending message:', error);
       }
     } finally {
       setIsLoading(false);
