@@ -270,80 +270,74 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const handleSend = async (images: File[]) => {
-    if (input.trim() || images.length > 0) {
-      console.log('ChatInterface: Sending message:', input);
-      console.log('ChatInterface: Number of images:', images.length);
+  if (input.trim() || images.length > 0) {
+    const userMessage: Message = {
+      role: 'user',
+      content: input,
+      images,
+      isComplete: true,
+      apiType: getCurrentApiType(),
+    };
+
+    // Make a shallow copy of the current conversation history without new images
+    const conversationHistoryCopy = messagesRef.current.map((msg) => ({
+      ...msg,
+      images: msg.images ? [...msg.images] : [], // Preserve existing images
+    }));
+
+    setMessages((prev) => {
+      const newMessages = [...prev, userMessage];
+      messagesRef.current = newMessages;
+      return newMessages;
+    });
+
+    setInput('');
+    setIsLoading(true);
+    setIsAIResponding(true);
+
+    // Save the message log after adding the user message
+    await saveMessageLog();
+
+    try {
+      abortControllerRef.current = new AbortController();
+
+      const formData = new FormData();
+      formData.append('projectDir', projectDir);
+      formData.append('message', input);
+      formData.append('isInitial', 'false');
+      formData.append('conversationHistory', JSON.stringify(conversationHistoryCopy));
+      formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
+
+      conversationHistoryCopy.forEach((msg, msgIndex) => {
+        msg.images?.forEach((image, imgIndex) => {
+          formData.append(`image_${msgIndex}_${imgIndex}`, image);
+        });
+      });
       images.forEach((image, index) => {
-        console.log(`ChatInterface: Image ${index + 1}:`, image.name, image.type, image.size);
+        formData.append(`image_${conversationHistoryCopy.length}_${index}`, image);
       });
 
-      const userMessage: Message = { 
-        role: 'user', 
-        content: input, 
-        images,
-        isComplete: true,
-        apiType: getCurrentApiType()
-      };
-      setMessages((prev) => {
-        const newMessages = [...prev, userMessage];
-        messagesRef.current = newMessages;
-        return newMessages;
+      console.log('ChatInterface: Sending request to /api/chat-with-images');
+      const response = await fetch('/api/chat-with-images', {
+        method: 'POST',
+        body: formData,
+        signal: abortControllerRef.current.signal,
       });
-      setInput('');
-      setIsLoading(true);
-      setIsAIResponding(true);
 
-      // Save the message log after adding the user message
-      await saveMessageLog();
-
-      try {
-        abortControllerRef.current = new AbortController();
-
-        const formData = new FormData();
-        formData.append('projectDir', projectDir);
-        formData.append('message', input);
-        formData.append('isInitial', 'false');
-        formData.append('conversationHistory', JSON.stringify(messagesRef.current.map(msg => ({
-          ...msg,
-          images: undefined // We'll handle images separately
-        }))));
-        formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
-        
-        // Append all images from all messages
-        messagesRef.current.forEach((msg, msgIndex) => {
-          msg.images?.forEach((image, imgIndex) => {
-            formData.append(`image_${msgIndex}_${imgIndex}`, image);
-          });
-        });
-        // Append new images
-        images.forEach((image, index) => {
-          formData.append(`image_${messagesRef.current.length}_${index}`, image);
-        });
-
-        console.log('ChatInterface: Sending request to /api/chat-with-images');
-        console.log('ChatInterface: FormData keys:', [...formData.keys()]);
-
-        const response = await fetch('/api/chat-with-images', {
-          method: 'POST',
-          body: formData,
-          signal: abortControllerRef.current.signal,
-        });
-
-        console.log('ChatInterface: Response status:', response.status);
-        await processStreamResponse(response);
-      } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
-          console.log('ChatInterface: Request was cancelled');
-        } else {
-          console.error('ChatInterface: Error sending message:', error);
-        }
-      } finally {
-        setIsLoading(false);
-        setIsAIResponding(false);
-        abortControllerRef.current = null;
+      await processStreamResponse(response);
+    } catch (error) {
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('ChatInterface: Request was cancelled');
+      } else {
+        console.error('ChatInterface: Error sending message:', error);
       }
+    } finally {
+      setIsLoading(false);
+      setIsAIResponding(false);
+      abortControllerRef.current = null;
     }
-  };
+  }
+};
 
   const handleCancel = () => {
     if (abortControllerRef.current) {
