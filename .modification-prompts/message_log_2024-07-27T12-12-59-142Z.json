@@ -1,0 +1,37 @@
+[
+  {
+    "role": "user",
+    "content": "Make the background color of a code block the same light grey background as the page, adding a little padding to it. When the mouse is over a code block, put an edit icon in the top right corner of the code block. If this is out of view in the window, put the icon just below window edge. Remember to show full files.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Looks good but there's a flicker when I mouseover the edit icon. Fix this while still only showing the icon while mouseover. Also, keep the icon the same color, but when mouseover put a blue background on the icon. And can you make the icon a little bigger? ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Great. when hovering, can you change the background to be square , similar to how the Add New Api Key button looks? Only when hovering. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "When the background first appears the icon is grey, then when you put your mouse over the icon itself it turns white. Make the icon white immediately when background appears. Other than that do not change the functionality - the button is grey, the blue background only appears when hovering over the icon. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Good, just add a little padding into the blue background. Keep the icon the same size, increase the size of the background.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

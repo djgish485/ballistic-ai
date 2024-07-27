@@ -1,0 +1,23 @@
+[
+  {
+    "role": "user",
+    "content": "When Execute is clicked, if the command is a \"cat\" command, the original contents of the file to be replaced is saved. This copy is then used to restore the file later. \n\nOnce the original file contents is set the first time for a file, don't replace it again.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Good. After restore is finished, hide the button and hide Execute's output (that gets shown underneath it).",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Great. When saving file contents during execute, index it by filePath WITH the message index. So that if there's multiple messages with the same file to be executed, each message has its own version of the original file contents.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

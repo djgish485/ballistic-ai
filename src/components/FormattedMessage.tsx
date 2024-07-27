@@ -1,7 +1,9 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { parseCommand } from '@/utils/commandParser';
+import { PencilIcon, CheckIcon, XMarkIcon } from '@heroicons/react/24/solid';
+import EditCodePopup from './EditCodePopup';
 
 interface ExecutionResult {
   id: string;
@@ -13,9 +15,53 @@ interface FormattedMessageProps {
   onDiff: (command: string) => void;
   role: 'user' | 'assistant';
   isComplete: boolean;
+  onEditCommand: (oldCommand: string, newCommand: string) => void;
+  messageIndex: number;
 }
 
 const CodeBlock = React.memo(({ node, inline, className, children, ...props }: any) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [editIconPosition, setEditIconPosition] = useState({ top: 0, right: 0 });
+  const codeRef = useRef<HTMLPreElement>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState(String(children));
+  const [isRestored, setIsRestored] = useState(false);
+
+  useEffect(() => {
+    const updateEditIconPosition = () => {
+      if (codeRef.current) {
+        const rect = codeRef.current.getBoundingClientRect();
+        const windowHeight = window.innerHeight;
+        const iconTop = rect.top < 0 ? Math.abs(rect.top) + 10 : 10;
+        const iconRight = 10;
+        setEditIconPosition({ top: iconTop, right: iconRight });
+      }
+    };
+
+    updateEditIconPosition();
+    window.addEventListener('scroll', updateEditIconPosition);
+    window.addEventListener('resize', updateEditIconPosition);
+
+    return () => {
+      window.removeEventListener('scroll', updateEditIconPosition);
+      window.removeEventListener('resize', updateEditIconPosition);
+    };
+  }, []);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveClick = (newContent: string) => {
+    setIsEditing(false);
+    props.onEditCommand(String(children), newContent);
+  };
+
+  const handleCancelClick = () => {
+    setIsEditing(false);
+    setEditedContent(String(children));
+  };
+
   if (inline) {
     return (
       <code className={className} {...props}>
@@ -32,18 +78,54 @@ const CodeBlock = React.memo(({ node, inline, className, children, ...props }: a
 
     const { filePath, newContent } = useMemo(() => parseCommand(String(children)), [children]);
 
+    const handleRestore = async () => {
+      const key = `${props.messageIndex}-${filePath}`;
+      await props.handleRestore(filePath, props.originalFileContents[key]);
+      setIsRestored(true);
+    };
+
     return (
-      <div>
-        <pre {...props}>
+      <div 
+        className="relative"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <pre
+          ref={codeRef}
+          className="bg-gray-100 p-4 rounded-lg"
+          {...props}
+        >
           <code>
             {String(children).replace(/\n$/, '')}
           </code>
         </pre>
-        {props.isComplete && (
+        {!isEditing && (
+          <div
+            className={`absolute transition-opacity duration-200 ${isHovered ? 'opacity-100' : 'opacity-0'}`}
+            style={{ top: `${editIconPosition.top}px`, right: `${editIconPosition.right}px` }}
+          >
+            <div className="p-1 rounded transition-colors duration-200 group hover:bg-blue-500">
+              <PencilIcon
+                className="h-6 w-6 text-gray-500 group-hover:text-white cursor-pointer"
+                onClick={handleEditClick}
+              />
+            </div>
+          </div>
+        )}
+        <EditCodePopup
+          isOpen={isEditing}
+          onClose={handleCancelClick}
+          initialContent={String(children)}
+          onSave={handleSaveClick}
+        />
+        {props.isComplete && !isEditing && (
           <>
             <div className="mt-2 space-x-2">
               <button
-                onClick={() => props.handleExecute(String(children), id)}
+                onClick={() => {
+                  props.handleExecute(String(children), id);
+                  setIsRestored(false);
+                }}
                 className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
               >
                 Execute
@@ -54,18 +136,20 @@ const CodeBlock = React.memo(({ node, inline, className, children, ...props }: a
               >
                 Diff
               </button>
-              {filePath && props.originalFileContents[filePath] && (
+              {filePath && props.originalFileContents[`${props.messageIndex}-${filePath}`] && !isRestored && (
                 <button
-                  onClick={() => props.handleRestore(filePath, props.originalFileContents[filePath])}
+                  onClick={handleRestore}
                   className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                 >
                   Restore
                 </button>
               )}
             </div>
-            <div className="mt-2 bg-gray-100 p-2 rounded">
-              {props.executionResults.find((res) => res.id === id)?.output}
-            </div>
+            {!isRestored && (
+              <div className="mt-2 bg-gray-100 p-2 rounded">
+                {props.executionResults.find((res) => res.id === id)?.output}
+              </div>
+            )}
           </>
         )}
       </div>
@@ -73,7 +157,7 @@ const CodeBlock = React.memo(({ node, inline, className, children, ...props }: a
   }
 });
 
-const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content, onDiff, role, isComplete }) => {
+const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content, onDiff, role, isComplete, onEditCommand, messageIndex }) => {
   const [executionResults, setExecutionResults] = useState<ExecutionResult[]>([]);
   const [codeBlockIds] = useState<Record<number, string>>({});
   const [originalFileContents, setOriginalFileContents] = useState<Record<string, string>>({});
@@ -101,11 +185,12 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
     try {
       const { filePath, newContent } = parseCommand(code);
 
-      if (filePath) {
+      const key = `${messageIndex}-${filePath}`;
+      if (filePath && !originalFileContents[key]) {
         const originalContent = await fetchFileContent(filePath);
         setOriginalFileContents(prevContents => ({
           ...prevContents,
-          [filePath]: originalContent,
+          [key]: originalContent,
         }));
       }
 
@@ -127,7 +212,7 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
         return [...prevResults.filter((res) => res.id !== id), newResult];
       });
     }
-  }, [fetchFileContent]);
+  }, [fetchFileContent, originalFileContents, messageIndex]);
 
   const handleRestore = useCallback(async (filePath: string, originalContent: string) => {
     try {
@@ -142,11 +227,6 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
       }
 
       alert('File restored successfully');
-      setOriginalFileContents(prev => {
-        const newContents = { ...prev };
-        delete newContents[filePath];
-        return newContents;
-      });
     } catch (error) {
       alert('Failed to restore file content');
     }
@@ -168,9 +248,11 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
         originalFileContents={originalFileContents}
         generateId={generateId}
         codeBlockIds={codeBlockIds}
+        onEditCommand={onEditCommand}
+        messageIndex={messageIndex}
       />
     );
-  }, [isComplete, handleExecute, handleDiffClick, handleRestore, executionResults, originalFileContents, generateId, codeBlockIds]);
+  }, [isComplete, handleExecute, handleDiffClick, handleRestore, executionResults, originalFileContents, generateId, codeBlockIds, onEditCommand, messageIndex]);
 
   if (role === 'user') {
     return <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
@@ -192,7 +274,8 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
   // Custom comparison function for React.memo
   return prevProps.content === nextProps.content &&
          prevProps.role === nextProps.role &&
-         prevProps.isComplete === nextProps.isComplete;
+         prevProps.isComplete === nextProps.isComplete &&
+         prevProps.messageIndex === nextProps.messageIndex;
 });
 
 FormattedMessage.displayName = 'FormattedMessage';

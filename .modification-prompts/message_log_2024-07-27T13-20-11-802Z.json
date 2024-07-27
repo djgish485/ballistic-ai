@@ -1,0 +1,30 @@
+[
+  {
+    "role": "user",
+    "content": "When the edit code block button is clicked, pop up a box with the edit code form shown instead of showing the form inline. Make the pop up work like the Context Settings pop up box works.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full FormattedMessage as an executable command",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full EditCodePopup as an executable command",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "The title of the popup is hidden - get rid of the sticky attribute. Make sure it's on top and titled \"Edit Command\". Remove some of the vertical margin in the header.  Make the editable textbox containing the code a taller.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

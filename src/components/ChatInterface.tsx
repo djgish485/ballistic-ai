@@ -330,6 +330,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setShowDiff(true);
   };
 
+  const handleEditCommand = useCallback((oldCommand: string, newCommand: string) => {
+    setMessages(prevMessages => {
+      const newMessages = prevMessages.map(message => {
+        if (message.role === 'assistant') {
+          const updatedContent = message.content.replace(oldCommand, newCommand);
+          return { ...message, content: updatedContent };
+        }
+        return message;
+      });
+      messagesRef.current = newMessages;
+      return newMessages;
+    });
+  }, []);
+
   return (
     <div className="flex flex-col h-full" ref={chatContainerRef}>
       <div className="flex-grow overflow-y-auto space-y-4 pb-24">
@@ -343,6 +357,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           messages={messages} 
           onDiff={handleDiff}
           onEditMessage={handleEditMessage}
+          onEditCommand={handleEditCommand}
         />
         <div ref={chatEndRef} />
       </div>

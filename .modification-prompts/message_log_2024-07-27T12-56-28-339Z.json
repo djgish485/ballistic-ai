@@ -1,0 +1,37 @@
+[
+  {
+    "role": "user",
+    "content": "When the Edit button is clicked in a code block, replace the text inside the code block with a textbox to edit it. Remember to show full files and executable commands.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "The Edit Command form is not functional yet. Let's make it functional. When the edited command is submitted, find its message in the messages array and replace the command with the new one. Be sure to update the messages array with the new message. Remember to show me full files and editable commands.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show me the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "[Error] TypeError: props.onEditCommand is not a function. (In 'props.onEditCommand(String(children), editedContent)', 'props.onEditCommand' is undefined)",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

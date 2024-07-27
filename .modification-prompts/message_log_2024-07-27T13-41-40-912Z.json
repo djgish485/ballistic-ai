@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "When Execute is clicked, if the command is a \"cat\" command, a copy of the file to be replaced is saved. This copy is then used to restore the file later. \n\nIf Execute is clicked multiple times, keep the original copy of the file. Don't replace it for the second and subsequent clicks of Execute. So that when Restore is clicked it ALWAYS restores to the original file contents.\n\nBe sure to give me full file contents and executable commands.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

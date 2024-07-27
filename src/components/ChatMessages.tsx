@@ -24,9 +24,10 @@ interface ChatMessagesProps {
   messages: Message[];
   onDiff: (filePath: string) => void;
   onEditMessage: (index: number, newContent: string) => void;
+  onEditCommand: (oldCommand: string, newCommand: string) => void;
 }
 
-const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, onDiff, onEditMessage }) => {
+const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, onDiff, onEditMessage, onEditCommand }) => {
   const [hoveredMessageIndex, setHoveredMessageIndex] = useState<number | null>(null);
   const [editingMessageIndex, setEditingMessageIndex] = useState<number | null>(null);
 
@@ -100,6 +101,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
               onDiff={onDiff} 
               role={msg.role}
               isComplete={msg.isComplete}
+              onEditCommand={onEditCommand}
             />
           )}
           {msg.role === 'user' && hoveredMessageIndex === index && editingMessageIndex !== index && (
