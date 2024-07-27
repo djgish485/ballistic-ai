@@ -8,6 +8,7 @@ import { useProjectDir } from '../hooks/useProjectDir';
 const ChatInterface = dynamic(() => import('../components/ChatInterface'), { ssr: false });
 const FileList = dynamic(() => import('../components/FileList'), { ssr: false });
 const APIKeyManager = dynamic(() => import('../components/APIKeyManager'), { ssr: false });
+const History = dynamic(() => import('../components/History'), { ssr: false });
 
 export default function Home() {
   const { projectDir, loading, error } = useProjectDir();
@@ -179,6 +180,7 @@ export default function Home() {
                   />
                 )}
                 <APIKeyManager />
+                {projectDir && <History projectDir={projectDir} />}
               </div>
             </div>
           </>
