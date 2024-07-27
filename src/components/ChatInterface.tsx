@@ -251,71 +251,71 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const handleSend = async (images: File[]) => {
-  if (input.trim() || images.length > 0) {
-    const userMessage: Message = {
-      role: 'user',
-      content: input,
-      images,
-      isComplete: true,
-      apiType: getCurrentApiType(),
-    };
+    if (input.trim() || images.length > 0) {
+      const userMessage: Message = {
+        role: 'user',
+        content: input,
+        images,
+        isComplete: true,
+        apiType: getCurrentApiType(),
+      };
 
-    const conversationHistoryCopy = messagesRef.current.map((msg) => ({
-      ...msg,
-      images: msg.images ? [...msg.images] : [],
-    }));
+      // Immediately add the user message to the chat interface
+      setMessages(prev => [...prev, userMessage]);
+      messagesRef.current = [...messagesRef.current, userMessage];
 
-    setMessages((prev) => {
-      const newMessages = [...prev, userMessage];
+      setInput('');
+      setIsLoading(true);
+      setIsAIResponding(true);
+
+      try {
+        abortControllerRef.current = new AbortController();
+
+        const formData = new FormData();
+        formData.append('projectDir', projectDir);
+        formData.append('message', userMessage.content);
+        formData.append('isInitial', 'false');
+        formData.append('conversationHistory', JSON.stringify(messagesRef.current));
+        formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
+
+        messagesRef.current.forEach((msg, msgIndex) => {
+          msg.images?.forEach((image, imgIndex) => {
+            formData.append(`image_${msgIndex}_${imgIndex}`, image);
+          });
+        });
+
+        const response = await fetch('/api/chat-with-images', {
+          method: 'POST',
+          body: formData,
+          signal: abortControllerRef.current.signal,
+        });
+
+        await processStreamResponse(response);
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          // Request was cancelled
+        } else {
+          console.error('Error sending message:', error);
+        }
+      } finally {
+        setIsLoading(false);
+        setIsAIResponding(false);
+        abortControllerRef.current = null;
+      }
+    }
+  };
+
+  const handleEditMessage = (index: number, newContent: string) => {
+    setMessages((prevMessages) => {
+      // Remove all messages from the edited message onwards
+      const newMessages = prevMessages.slice(0, index);
       messagesRef.current = newMessages;
       return newMessages;
     });
 
-    setInput('');
-    setIsLoading(true);
-    setIsAIResponding(true);
-
-    await saveMessageLog();
-
-    try {
-      abortControllerRef.current = new AbortController();
-
-      const formData = new FormData();
-      formData.append('projectDir', projectDir);
-      formData.append('message', input);
-      formData.append('isInitial', 'false');
-      formData.append('conversationHistory', JSON.stringify(conversationHistoryCopy));
-      formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
-
-      conversationHistoryCopy.forEach((msg, msgIndex) => {
-        msg.images?.forEach((image, imgIndex) => {
-          formData.append(`image_${msgIndex}_${imgIndex}`, image);
-        });
-      });
-      images.forEach((image, index) => {
-        formData.append(`image_${conversationHistoryCopy.length}_${index}`, image);
-      });
-
-      const response = await fetch('/api/chat-with-images', {
-        method: 'POST',
-        body: formData,
-        signal: abortControllerRef.current.signal,
-      });
-
-      await processStreamResponse(response);
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        // Request was cancelled
-      } else {
-        console.error('Error sending message:', error);
-      }
-    } finally {
-      setIsLoading(false);
-      setIsAIResponding(false);
-      abortControllerRef.current = null;
-    }
-  }
-};
+    // Set the input to the edited message content
+    setInput(newContent);
+  };
 
   const handleCancel = () => {
     if (abortControllerRef.current) {
@@ -342,6 +342,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           systemMessages={systemMessages} 
           messages={messages} 
           onDiff={handleDiff}
+          onEditMessage={handleEditMessage}
         />
         <div ref={chatEndRef} />
       </div>

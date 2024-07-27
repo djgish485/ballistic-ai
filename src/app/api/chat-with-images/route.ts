@@ -13,12 +13,11 @@ export async function POST(req: NextRequest) {
     console.log('chat-with-images: FormData keys:', [...formData.keys()]);
 
     const projectDir = formData.get('projectDir');
-    const message = formData.get('message') as string;
     const isInitial = formData.get('isInitial') === 'true';
     const conversationHistory = JSON.parse(formData.get('conversationHistory') as string) as Message[];
     const selectedAPIKeyIndex = formData.get('selectedAPIKeyIndex') as string;
 
-    console.log('chat-with-images: Parsed form data:', { projectDir, message, isInitial, selectedAPIKeyIndex });
+    console.log('chat-with-images: Parsed form data:', { projectDir, isInitial, selectedAPIKeyIndex });
     console.log('chat-with-images: Conversation history length:', conversationHistory.length);
 
     if (!projectDir || typeof projectDir !== 'string') {
@@ -55,13 +54,6 @@ export async function POST(req: NextRequest) {
         return { ...msg, images: messageImages[index.toString()] };
       }
       return msg;
-    });
-
-    // Add the new message with images
-    updatedConversationHistory.push({
-      role: 'user',
-      content: message,
-      images: messageImages[conversationHistory.length.toString()] || []
     });
 
     const initialPrompt = getInitialPrompt();

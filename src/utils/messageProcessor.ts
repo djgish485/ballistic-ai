@@ -10,18 +10,17 @@ export function constructInitialMessage(projectFiles: string): string {
   return `Please provide a SHORT, CONCISE overview of the project based on the following information. Limit your response to 2-3 sentences focusing on the main purpose and key features. After the overview, invite the user to ask questions about the project or request specific changes and improvements.\n\nHere are the project files:\n\n${projectFiles}`;
 }
 
-export function constructServerMessages(isInitial: boolean, initialMessage: string, conversationHistory: Message[], message?: string): Message[] {
-  let serverMessages: Message[] = [];
+export function constructServerMessages(
+  isInitial: boolean, 
+  initialMessage: string, 
+  conversationHistory: Message[]
+): Message[] {
   if (isInitial) {
-    serverMessages = [{ role: 'user', content: initialMessage }];
+    return [{ role: 'user', content: initialMessage }];
   } else {
-    serverMessages = [
+    return [
       { role: 'user', content: initialMessage },
       ...conversationHistory
     ];
-    if (message) {
-      serverMessages.push({ role: 'user', content: message });
-    }
   }
-  return serverMessages;
 }
