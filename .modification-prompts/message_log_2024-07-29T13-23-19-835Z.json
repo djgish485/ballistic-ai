@@ -1,9 +1,0 @@
-[
-  {
-    "role": "user",
-    "content": "can we get special formatting for the lines returned by the LLM that start with \"# FULL file contents of \" ? I'd like it to be in small text and just say the /full/path/to/file stuff after that, removing the \"FULL file contents of \". ",
-    "images": [],
-    "isComplete": true,
-    "apiType": "Claude 3.5 Sonnet"
-  }
-]
