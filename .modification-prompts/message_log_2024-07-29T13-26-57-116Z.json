@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "On the server, when sending a message, append this to the final message ONLY for Claude: \"\\n\\nRemember to return full files.\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

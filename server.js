@@ -10,6 +10,8 @@ const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const projectDir = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();
+const portArgIndex = process.argv.indexOf('--port');
+let specifiedPort = portArgIndex !== -1 ? parseInt(process.argv[portArgIndex + 1], 10) : null;
 
 // Make projectDir available to all routes
 global.projectDir = projectDir;
@@ -33,19 +35,6 @@ function findAvailablePort(startPort) {
   });
 }
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-function promptUser(question) {
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      resolve(answer.toLowerCase());
-    });
-  });
-}
-
 app.prepare().then(async () => {
   const server = express();
   const httpServer = http.createServer(server);
@@ -60,20 +49,15 @@ app.prepare().then(async () => {
     return handle(req, res);
   });
 
-  const defaultPort = 3000;
+  const defaultPort = specifiedPort || 3000;
   let port = defaultPort;
 
   try {
     port = await findAvailablePort(defaultPort);
     
     if (port !== defaultPort) {
-      console.log(`Port ${defaultPort} is not available. Suggested port: ${port}`);
-      const answer = await promptUser(`Do you want to use port ${port}? (y/n) `);
-      
-      if (answer !== 'y') {
-        console.log('Server startup cancelled by user.');
-        process.exit(0);
-      }
+      console.error(`Port ${defaultPort} is not available. Please use the command with: --port ${port}`);
+      return process.exit(1);
     }
 
     httpServer.listen(port, (err) => {
@@ -84,7 +68,5 @@ app.prepare().then(async () => {
   } catch (err) {
     console.error('Error starting server:', err);
     process.exit(1);
-  } finally {
-    rl.close();
   }
 });

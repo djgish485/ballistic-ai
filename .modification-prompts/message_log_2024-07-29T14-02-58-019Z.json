@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Modify the app so that instead of printing \"# FULL file contents of /absolute/path/to/file\" in the line before a file, just print \"\"# /absolute/path/to/file\". Look for this pattern instead in the line before a code block to decide if it's a file.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

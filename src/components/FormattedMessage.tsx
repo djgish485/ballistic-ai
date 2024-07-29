@@ -264,6 +264,7 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
+          h1: ({ children }) => <h4>{children}</h4>,  // Convert h1 to h4
           code: memoizedCodeBlock,
         }}
       >

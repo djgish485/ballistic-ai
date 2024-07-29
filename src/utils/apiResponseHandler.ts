@@ -83,6 +83,21 @@ export async function fetchAPIResponse(apiKey: { type: string; key: string }, sy
     headers['anthropic-version'] = '2023-06-01';
     headers["anthropic-beta"] = "max-tokens-3-5-sonnet-2024-07-15";
     
+    // Append the reminder to the last message for Claude
+    const lastMessage = filteredMessages[filteredMessages.length - 1];
+    if (lastMessage.role === 'user') {
+      if (typeof lastMessage.content === 'string') {
+        lastMessage.content += "\n\nRemember to return full files when making modifications.";
+      } else if (Array.isArray(lastMessage.content)) {
+        const lastContentItem = lastMessage.content[lastMessage.content.length - 1];
+        if (lastContentItem.type === 'text') {
+          lastContentItem.text += "\n\nRemember to return full files when making modifications.";
+        } else {
+          lastMessage.content.push({ type: 'text', text: "\n\nRemember to ALWAYS show FULL files when making modifications." });
+        }
+      }
+    }
+    
     body = {
       model: 'claude-3-5-sonnet-20240620',
       max_tokens: 8192,
@@ -101,6 +116,22 @@ export async function fetchAPIResponse(apiKey: { type: string; key: string }, sy
 
   } else if (apiKey.type === 'OpenAI') {
     headers['Authorization'] = `Bearer ${apiKey.key}`;
+
+    // Append the reminder to the last message for Claude
+    const lastMessage = filteredMessages[filteredMessages.length - 1];
+    if (lastMessage.role === 'user') {
+      if (typeof lastMessage.content === 'string') {
+        lastMessage.content += "\n\nRemember to use PRECISE absolute paths.";
+      } else if (Array.isArray(lastMessage.content)) {
+        const lastContentItem = lastMessage.content[lastMessage.content.length - 1];
+        if (lastContentItem.type === 'text') {
+          lastContentItem.text += "\n\nRemember to use PRECISE absolute paths.";
+        } else {
+          lastMessage.content.push({ type: 'text', text: "\n\nRemember to use PRECISE absolute paths." });
+        }
+      }
+    }
+
     body = {
       model: 'gpt-4o',
       messages: [{ role: 'system', content: systemPrompt }, ...filteredMessages],

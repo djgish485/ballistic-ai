@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "Make port an optional argument on the command to start the app. If port is alrady taken show an error message with a recommendation of adding port xxx to the command.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  },
+  {
+    "role": "user",
+    "content": "Can you change the prod server file too",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  }
+]

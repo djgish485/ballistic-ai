@@ -2,17 +2,39 @@ const express = require('express');
 const http = require('http');
 const next = require('next');
 const path = require('path');
+const net = require('net');
 
 const dev = false;
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const projectDir = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();
+const portArgIndex = process.argv.indexOf('--port');
+let specifiedPort = portArgIndex !== -1 ? parseInt(process.argv[portArgIndex + 1], 10) : null;
 
 // Make projectDir available to all routes
 global.projectDir = projectDir;
 
-app.prepare().then(() => {
+function findAvailablePort(startPort) {
+  return new Promise((resolve, reject) => {
+    const server = net.createServer();
+    server.unref();
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        resolve(findAvailablePort(startPort + 1));
+      } else {
+        reject(err);
+      }
+    });
+    server.listen(startPort, () => {
+      server.close(() => {
+        resolve(startPort);
+      });
+    });
+  });
+}
+
+app.prepare().then(async () => {
   const server = express();
   const httpServer = http.createServer(server);
 
@@ -29,10 +51,24 @@ app.prepare().then(() => {
     return handle(req, res);
   });
 
-  const port = process.env.PORT || 3000;
-  httpServer.listen(port, (err) => {
-    if (err) throw err;
-    console.log(`> Ready on http://localhost:${port}`);
-    console.log('> Project directory:', projectDir);
-  });
+  const defaultPort = specifiedPort || 3000;
+  let port = defaultPort;
+
+  try {
+    port = await findAvailablePort(defaultPort);
+    
+    if (port !== defaultPort) {
+      console.error(`Port ${defaultPort} is not available. Please use the command with: --port ${port}`);
+      return process.exit(1);
+    }
+
+    httpServer.listen(port, (err) => {
+      if (err) throw err;
+      console.log(`> Ready on http://localhost:${port}`);
+      console.log('> Project directory:', projectDir);
+    });
+  } catch (err) {
+    console.error('Error starting server:', err);
+    process.exit(1);
+  }
 });
