@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "The initial prompt is now changed to output \"Full contents of /absolute/path/to/file\" before the contents of a file, instead of making it a command like \"cat << 'EOF' >\"\n\nSo when a command block is started, pass in the previous line of text to the command parser. If that line has \"contents of /absolute/path/to/file\" then yes that is a command and you can parse out the common d path from it.\n\nJust change the command parsing for now.\n\nReturn full files and executable commands.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Modify the components that call parseCommand. \n\nReturn full files and executable commands.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

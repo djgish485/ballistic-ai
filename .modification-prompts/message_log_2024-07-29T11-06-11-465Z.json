@@ -1,0 +1,79 @@
+[
+  {
+    "role": "user",
+    "content": "When the LLM returns a file to modify now, it will no longer be as a command. if filePath is returned by parse command, then when execute is clicked the app should write those contents to filePath instead of exec'ing the contents.\n\nSo there are two cases when clicking Execute:\n- when filePath is set, that file is replaced with the command contents.\n- when filePath is not set, the contents are executed like normal.\n\nIn your response give me executable commands.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Give the full FormattedMessage",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Ok, now get the Diff button to work correctly with this new scheme. The Diff button should only show up if filePath is set for this command. Then, if should diff only the contents with the existing file at filePath. Get rid of anything in the diff process that looks for \"cat\" or EOF or whatever.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Now get the Restore button working correctly with the new scheme. If Execute happens with filePath and the file contents are replaced, save the contents (if not saved already) (indexed by message number and code block number if not already) and show the Restore button.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "I'm getting \"File /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme.md updated successfully.\" but the restore button isn't showing",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the entire file",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "In write-file:\ncheck if projectDir is in filePath. (projectDir is the argument passed into the app command. This should be available on the server somewhere. Can it be made available directly to write-file without having to be passed by the client?)\n--- If not, the filePath has been corrupted, so display an error message to the user. \n\nThen, check if the file exists. If not, create any missing directories the file is in, and then create an empty file that can be written to.\n\noutput full files to me.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full server.js. Also update server.prod",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "can we get special formatting for the lines that start with \"# Full contents of\" ? I'd like it to be in small text and just say the /full/path/to/file stuff after that, removing the \"Full contents of\". ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full FormattedMessage",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

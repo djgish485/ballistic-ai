@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "The edit button is shown when hovering over a code block. But it's also being shown when hovering over the Execute/Diff/Restore buttons, and the Execute results. Make it only show up when hovering over the code block itself. Also, don't move the button when it goes out of view. Beyond that, keep everything with how the button looks and functions the same.\n\nRemember to show me full files and executable commands.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
