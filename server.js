@@ -11,6 +11,9 @@ const handle = app.getRequestHandler();
 
 const projectDir = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();
 
+// Make projectDir available to all routes
+global.projectDir = projectDir;
+
 function findAvailablePort(startPort) {
   return new Promise((resolve, reject) => {
     const server = net.createServer();

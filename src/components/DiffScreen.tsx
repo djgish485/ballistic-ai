@@ -1,33 +1,21 @@
-'use client';
-
 import React, { useEffect, useState, useRef } from 'react';
 import { diffLines, Change } from 'diff';
-import { parseCommand } from '@/utils/commandParser';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 
 interface DiffScreenProps {
-  command: string;
+  filePath: string;
+  newContent: string;
   onClose: () => void;
 }
 
-const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
+const DiffScreen: React.FC<DiffScreenProps> = ({ filePath, newContent, onClose }) => {
   const [diff, setDiff] = useState<Change[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [fileName, setFileName] = useState<string>('');
   const popupRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchFileContentAndGenerateDiff = async () => {
       try {
-        const { filePath, newContent } = parseCommand(command);
-
-        if (!filePath || !newContent) {
-          setError('Invalid command format');
-          return;
-        }
-
-        setFileName(filePath.split('/').pop() || '');
-
         const response = await fetch('/api/read-file', {
           method: 'POST',
           headers: {
@@ -51,7 +39,7 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
     };
 
     fetchFileContentAndGenerateDiff();
-  }, [command]);
+  }, [filePath, newContent]);
 
   const renderDiff = () => {
     return diff.map((part, index) => {
@@ -86,7 +74,7 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ command, onClose }) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 bg-white p-4 rounded-t-lg border-b flex justify-between items-center">
-          <h2 className="text-xl font-bold">File Diff: {fileName}</h2>
+          <h2 className="text-xl font-bold">File Diff: {filePath}</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 focus:outline-none"

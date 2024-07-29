@@ -34,7 +34,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const abortControllerRef = useRef<AbortController | null>(null);
   const lastScrollTop = useRef(0);
   const [showDiff, setShowDiff] = useState(false);
-  const [diffCommand, setDiffCommand] = useState('');
+  const [diffFilePath, setDiffFilePath] = useState('');
+  const [diffNewContent, setDiffNewContent] = useState('');
   const isAutoScrolling = useRef(false);
   const messageLogFileNameRef = useRef<string>('');
 
@@ -325,8 +326,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
-  const handleDiff = (command: string) => {
-    setDiffCommand(command);
+  const handleDiff = (filePath: string, newContent: string) => {
+    setDiffFilePath(filePath);
+    setDiffNewContent(newContent);
     setShowDiff(true);
   };
 
@@ -377,7 +379,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
       {showDiff && (
         <DiffScreen
-          command={diffCommand}
+          filePath={diffFilePath}
+          newContent={diffNewContent}
           onClose={() => setShowDiff(false)}
         />
       )}

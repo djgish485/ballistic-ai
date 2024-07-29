@@ -9,6 +9,9 @@ const handle = app.getRequestHandler();
 
 const projectDir = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();
 
+// Make projectDir available to all routes
+global.projectDir = projectDir;
+
 app.prepare().then(() => {
   const server = express();
   const httpServer = http.createServer(server);
