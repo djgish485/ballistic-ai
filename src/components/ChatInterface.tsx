@@ -11,6 +11,13 @@ interface ChatInterfaceProps {
   onStart: () => void;
   onRestore: () => void;
   systemMessages: SystemMessage[];
+  setIsStarted: (isStarted: boolean) => void;
+}
+
+interface ErrorDetails {
+  message: string;
+  type?: string;
+  details?: string;
 }
 
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
@@ -19,7 +26,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   hasBackup, 
   onStart, 
   onRestore, 
-  systemMessages 
+  systemMessages,
+  setIsStarted
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesRef = useRef<Message[]>([]);
@@ -38,6 +46,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [diffNewContent, setDiffNewContent] = useState('');
   const isAutoScrolling = useRef(false);
   const messageLogFileNameRef = useRef<string>('');
+  const [errorDetails, setErrorDetails] = useState<ErrorDetails | null>(null);
 
   useEffect(() => {
     if (isStarted && messages.length === 0) {
@@ -94,6 +103,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const initiateChat = async () => {
     setIsLoading(true);
     setIsAIResponding(true);
+    setErrorDetails(null);
 
     try {
       setIsBackupInProgress(true);
@@ -127,6 +137,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         // Request was cancelled
       } else {
         console.error('Error starting chat:', error);
+        setErrorDetails({
+          message: 'An error occurred while initiating the chat',
+          details: error instanceof Error ? error.message : 'Unknown error'
+        });
+        setIsStarted(false);  // Reset to show the "Start" button again
       }
     } finally {
       setIsLoading(false);
@@ -178,6 +193,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, [messages, systemMessages, userScrolledUp, scrollToBottom]);
 
   const processStreamResponse = async (response: Response) => {
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Unknown error occurred');
+    }
+
     if (!response.body) {
       throw new Error('No response body');
     }
@@ -268,6 +288,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       setInput('');
       setIsLoading(true);
       setIsAIResponding(true);
+      setErrorDetails(null);
 
       try {
         abortControllerRef.current = new AbortController();
@@ -297,6 +318,33 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           // Request was cancelled
         } else {
           console.error('Error sending message:', error);
+          let errorMessage = 'An error occurred while processing the chat with images';
+          let errorType = '';
+          let errorDetails = '';
+
+          if (error instanceof Error) {
+            errorMessage = error.message;
+            if (error.message.includes('Claude API request failed')) {
+              const match = error.message.match(/\{.*\}/);
+              if (match) {
+                try {
+                  const errorObj = JSON.parse(match[0]);
+                  errorType = errorObj.error?.type || '';
+                  errorDetails = errorObj.error?.message || '';
+                } catch (parseError) {
+                  console.error('Error parsing error message:', parseError);
+                }
+              }
+            }
+          }
+
+          setErrorDetails({
+            message: errorMessage,
+            type: errorType,
+            details: errorDetails
+          });
+          // Simulate edit message action
+          handleEditMessage(messagesRef.current.length - 1, userMessage.content);
         }
       } finally {
         setIsLoading(false);
@@ -383,6 +431,29 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           newContent={diffNewContent}
           onClose={() => setShowDiff(false)}
         />
+      )}
+      {errorDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
+            <h2 className="text-xl font-bold mb-4">Error</h2>
+            <p className="mb-2"><strong>Message:</strong> {errorDetails.message}</p>
+            {errorDetails.type && <p className="mb-2"><strong>Type:</strong> {errorDetails.type}</p>}
+            {errorDetails.details && (
+              <div className="mb-2">
+                <strong>Details:</strong>
+                <pre className="bg-gray-100 p-2 rounded mt-1 overflow-x-auto">
+                  {errorDetails.details}
+                </pre>
+              </div>
+            )}
+            <button 
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              onClick={() => setErrorDetails(null)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

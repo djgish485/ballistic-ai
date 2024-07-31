@@ -44,9 +44,21 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error in chat API:', error);
+    let errorMessage = 'An error occurred while processing the chat';
+    let errorDetails = '';
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      if (error.message.includes('rate_limit_error')) {
+        errorDetails = 'Rate limit exceeded. Please try again later or reduce the length of your request.';
+      } else if (error.message.includes('insufficient_quota')) {
+        errorDetails = 'API quota exceeded. Please check your plan and billing details.';
+      }
+    }
+
     return NextResponse.json({ 
-      error: 'An error occurred while processing the chat',
-      details: error instanceof Error ? error.message : String(error)
+      error: errorMessage,
+      details: errorDetails
     }, { status: 500 });
   }
 }

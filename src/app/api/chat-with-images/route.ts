@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     if (!apiKey) {
       console.error('chat-with-images: No API key selected');
-      throw new Error('No API key selected');
+      return NextResponse.json({ error: 'No API key selected' }, { status: 400 });
     }
 
     // Collect received images for all messages
@@ -82,9 +82,27 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Error in chat with images API:', error);
+    let errorMessage = 'An error occurred while processing the chat with images';
+    let errorDetails = '';
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      if (error.message.includes('API request failed')) {
+        const match = error.message.match(/\{.*\}/);
+        if (match) {
+          try {
+            const errorObj = JSON.parse(match[0]);
+            errorDetails = JSON.stringify(errorObj, null, 2);
+          } catch (parseError) {
+            console.error('Error parsing error message:', parseError);
+          }
+        }
+      }
+    }
+
     return NextResponse.json({ 
-      error: 'An error occurred while processing the chat with images',
-      details: error instanceof Error ? error.message : String(error)
+      error: errorMessage,
+      details: errorDetails
     }, { status: 500 });
   }
 }

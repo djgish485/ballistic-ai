@@ -166,6 +166,7 @@ export default function Home() {
                     onStart={handleStart}
                     onRestore={handleRestore}
                     systemMessages={systemMessages}
+                    setIsStarted={setIsStarted}
                   />
                 )}
               </div>
