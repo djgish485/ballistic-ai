@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "In FormattedMessage, after Restore is clicked and is successful, hide the Restore button",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

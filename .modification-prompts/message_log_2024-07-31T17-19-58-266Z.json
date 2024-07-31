@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "If a file doesn't exist yet, when clicking Diff, getting this:\nvalue.split is not a function. (In 'value.split(/(\\n|\\r\\n)/)', 'value.split' is undefined)\n\nInstead, say \"File does not exist.\" in this case.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

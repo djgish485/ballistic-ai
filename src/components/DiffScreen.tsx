@@ -25,11 +25,20 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ filePath, newContent, onClose }
         });
 
         if (!response.ok) {
+          if (response.status === 404) {
+            setError('File does not exist.');
+            return;
+          }
           throw new Error('Failed to fetch file content');
         }
 
         const data = await response.json();
         const existingContent = data.content;
+
+        if (existingContent === false) {
+          setError('File does not exist.');
+          return;
+        }
 
         const diffResult = diffLines(existingContent, newContent);
         setDiff(diffResult);

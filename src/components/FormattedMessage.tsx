@@ -23,7 +23,19 @@ interface CodeBlockProps {
   setIsNewFile: (isNew: boolean) => void;
   isRestored: boolean;
   setIsRestored: (isRestored: boolean) => void;
-  [key: string]: any;
+  isComplete: boolean;
+  setExecutionResult: (id: string, result: string) => void;
+  handleDiffClick: (filePath: string, newContent: string) => void;
+  handleRestore: (filePath: string, originalContent: string) => Promise<void>;
+  executionResults: Record<string, string>;
+  originalFileContents: Record<string, string>;
+  setOriginalFileContent: (key: string, content: string) => void;
+  generateId: () => string;
+  codeBlockIds: Record<number, string>;
+  onEditCommand: (oldCommand: string, newCommand: string) => void;
+  messageIndex: number;
+  getPreviousLine: (nodeIndex: number) => string;
+  fetchFileContent: (filePath: string) => Promise<string | false>;
 }
 
 const CodeBlock: React.FC<CodeBlockProps> = React.memo(({ 
@@ -35,6 +47,19 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
   setIsNewFile,
   isRestored,
   setIsRestored,
+  isComplete,
+  setExecutionResult,
+  handleDiffClick,
+  handleRestore,
+  executionResults,
+  originalFileContents,
+  setOriginalFileContent,
+  generateId,
+  codeBlockIds,
+  onEditCommand,
+  messageIndex,
+  getPreviousLine,
+  fetchFileContent,
   ...props 
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -49,7 +74,7 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
 
   const handleSaveClick = (newContent: string) => {
     setIsEditing(false);
-    props.onEditCommand(String(children), newContent);
+    onEditCommand(String(children), newContent);
   };
 
   const handleCancelClick = () => {
@@ -64,21 +89,21 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
     );
   } else {
     const nodeIndex = node.position?.start.line ?? Math.random();
-    let id = props.codeBlockIds[nodeIndex];
+    let id = codeBlockIds[nodeIndex];
     if (!id) {
-      id = props.generateId();
-      props.codeBlockIds[nodeIndex] = id;
+      id = generateId();
+      codeBlockIds[nodeIndex] = id;
     }
 
-    const previousLine = props.getPreviousLine(nodeIndex);
+    const previousLine = getPreviousLine(nodeIndex);
     const { filePath, newContent } = useMemo(() => parseCommand(String(children), previousLine), [children, previousLine]);
 
-    const handleRestore = async () => {
+    const handleRestoreClick = async () => {
       if (filePath) {
-        const key = `${props.messageIndex}-${id}`;
-        const originalContent = props.originalFileContents[key];
+        const key = `${messageIndex}-${id}`;
+        const originalContent = originalFileContents[key];
         if (originalContent) {
-          await props.handleRestore(filePath, originalContent);
+          await handleRestore(filePath, originalContent);
           setIsRestored(true);
           setCanRestore(false);
         }
@@ -88,15 +113,15 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
     const handleWrite = async () => {
       if (filePath) {
         try {
-          const key = `${props.messageIndex}-${id}`;
+          const key = `${messageIndex}-${id}`;
           let isNewlyCreated = false;
-          if (!props.originalFileContents[key]) {
-            const originalContent = await props.fetchFileContent(filePath);
+          if (!originalFileContents[key]) {
+            const originalContent = await fetchFileContent(filePath);
             if (originalContent === false) {
               isNewlyCreated = true;
               setIsNewFile(true);
             } else {
-              props.setOriginalFileContent(key, originalContent);
+              setOriginalFileContent(key, originalContent);
             }
           }
 
@@ -124,14 +149,14 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
             body: JSON.stringify({ filePath, content: newContent }),
           });
           if (!response.ok) throw new Error('Failed to write file');
-          props.setExecutionResult(id, `File ${filePath} ${isNewlyCreated ? 'created' : 'updated'} successfully.`);
+          setExecutionResult(id, `File ${filePath} ${isNewlyCreated ? 'created' : 'updated'} successfully.`);
           setCanRestore(true);
           
           if (isNewlyCreated) {
             setIsNewFile(true);
           }
         } catch (error) {
-          props.setExecutionResult(id, `Error updating file: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          setExecutionResult(id, `Error updating file: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       }
       setIsRestored(false);
@@ -165,19 +190,19 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
           body: JSON.stringify({ code: String(children) }),
         });
         const result = await response.json();
-        props.setExecutionResult(id, result.output);
+        setExecutionResult(id, result.output);
       } catch (error) {
-        props.setExecutionResult(id, `Error executing code: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        setExecutionResult(id, `Error executing code: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
       setIsRestored(false);
     };
 
     useEffect(() => {
-      const key = `${props.messageIndex}-${id}`;
-      if (props.originalFileContents[key]) {
+      const key = `${messageIndex}-${id}`;
+      if (originalFileContents[key]) {
         setCanRestore(true);
       }
-    }, [props.originalFileContents, props.messageIndex, id]);
+    }, [originalFileContents, messageIndex, id]);
 
     return (
       <div 
@@ -188,7 +213,6 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
         <pre
           ref={codeRef}
           className="bg-gray-100 p-4 rounded-lg"
-          {...props}
         >
           <code>
             {String(children).replace(/\n$/, '')}
@@ -210,7 +234,7 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
           initialContent={String(children)}
           onSave={handleSaveClick}
         />
-        {props.isComplete && !isEditing && (
+        {isComplete && !isEditing && (
           <>
             <div className="mt-2 space-x-2">
               {filePath ? (
@@ -222,7 +246,7 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
                     Write
                   </button>
                   <button
-                    onClick={() => props.handleDiffClick(filePath, newContent)}
+                    onClick={() => handleDiffClick(filePath, newContent)}
                     className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
                   >
                     Diff
@@ -235,6 +259,14 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
                       Undo (Delete File)
                     </button>
                   )}
+                  {canRestore && !isRestored && (
+                    <button
+                      onClick={handleRestoreClick}
+                      className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                    >
+                      Restore
+                    </button>
+                  )}
                 </>
               ) : (
                 <button
@@ -244,18 +276,10 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
                   Execute
                 </button>
               )}
-              {canRestore && (
-                <button
-                  onClick={handleRestore}
-                  className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                >
-                  Restore
-                </button>
-              )}
             </div>
-            {!isRestored && props.executionResults[id] && (
+            {!isRestored && executionResults[id] && (
               <div className="mt-2 bg-gray-100 p-2 rounded">
-                {props.executionResults[id]}
+                {executionResults[id]}
               </div>
             )}
           </>
