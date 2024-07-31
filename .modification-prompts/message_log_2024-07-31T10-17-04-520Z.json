@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "After clicking Execute, if writing to a file, first check if the code returned by the LLM seems truncated. Common patterns I've seen are:\n\n* Rest of the file remains unchanged...\n# Rest of the script contents...\n// Rest of the function...\n// ... (previous code remains unchanged)\n// ... (rest of the function remains unchanged)\n// ... (rest of the file remains unchanged)\n\nIf so, put up a confirm box saying that the code appears to be truncated, would you like to proceed. Also a note to remind LLL in prompt to show the full <filename>.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show me the full FormattedMessage",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

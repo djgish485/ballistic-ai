@@ -72,6 +72,25 @@ const CodeBlock = React.memo(({ node, inline, className, children, ...props }: a
             props.setOriginalFileContent(key, originalContent);
           }
 
+          // Check if the code appears to be truncated
+          const truncationPatterns = [
+            /Rest of the file remains unchanged\.\.\./i,
+            /# Rest of the script contents\.\.\./i,
+            /\/\/ Rest of the function\.\.\./i,
+            /\/\/ \.\.\. \(previous code remains unchanged\)/i,
+            /\/\/ \.\.\. \(rest of the function remains unchanged\)/i,
+            /\/\/ \.\.\. \(rest of the file remains unchanged\)/i
+          ];
+
+          const isTruncated = truncationPatterns.some(pattern => pattern.test(newContent));
+
+          if (isTruncated) {
+            const confirmMessage = `The code appears to be truncated. Would you like to proceed?\n\nRemind the AI to show the full file when making modifications.`;
+            if (!window.confirm(confirmMessage)) {
+              return;
+            }
+          }
+
           const response = await fetch('/api/write-file', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

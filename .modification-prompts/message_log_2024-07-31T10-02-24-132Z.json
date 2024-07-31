@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "What's a good grep command I can run from the project root to look for strings in the project code? I don't want to search node files or anything",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  },
+  {
+    "role": "user",
+    "content": "I want to search for \"...\" - how do I escape that?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  }
+]

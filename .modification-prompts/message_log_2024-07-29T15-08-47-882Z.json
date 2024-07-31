@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "During the streaming of the LLM response, show a log message when a code block fully ends. The LLM could still be streaming and output more code blocks - print a console message each time the code block fully completes.\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Nope it's showing the log message right away because it's streaming, and after each token comes in you think the code block is complete, which it hasn't. Maybe only print the message once other tokens come in that are not in the code block?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

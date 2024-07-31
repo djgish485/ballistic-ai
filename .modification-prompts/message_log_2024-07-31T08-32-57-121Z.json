@@ -1,0 +1,30 @@
+[
+  {
+    "role": "user",
+    "content": "If an error happens during initial messages, the app works correctly. But, If an error happens during the LLM response to a user's reply, make it as if the user clicked the edit message next to their reply instead. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Can you pop up the error \"Error: An error occurred while processing the chat with images\" instead of showing it as a message in the chat.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Can you show more information in the popup message? Here's some of the data included:\nError in chat with images API: Error: Claude API request failed with status 400: {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"messages.11: all messages must have non-empty content except for the optional final assistant message\"}}",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "I think error details aren't being sent in chat-with-images. make it return error messages similar to the /chat endpoint.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

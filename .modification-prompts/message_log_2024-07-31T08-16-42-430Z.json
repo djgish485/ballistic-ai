@@ -1,0 +1,44 @@
+[
+  {
+    "role": "user",
+    "content": "Show LLM error info to user.\n\nFor example:\nClaude API error response: {\"type\":\"error\",\"error\":{\"type\":\"rate_limit_error\",\"message\":\"Number of request tokens has exceeded your daily rate limit (https://docs.anthropic.com/en/api/rate-limits); see the response headers for current usage. Please reduce the prompt length or the maximum tokens requested, or try again later. You may also contact sales at https://www.anthropic.com/contact-sales to discuss your options for a rate limit increase.\"}}\n\nError in chat API: Error: OpenAI API request failed with status 429: {\n    \"error\": {\n        \"message\": \"You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.\",\n        \"type\": \"insufficient_quota\",\n        \"param\": null,\n        \"code\": \"insufficient_quota\"\n    }\n}\n\nright now am only seeing this in the client console:\n[Error] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (chat, line 0)",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "If an LLM error happens in the initial messages, replace the \"Next Feature/fix\" button with the \"Start\" button again. If an error happens during the LLM response to a user's reply, make it as if the user clicked the edit message next to their reply. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "TypeError: setIsStarted is not a function. (In 'setIsStarted(false)', 'setIsStarted' is undefined)",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "If an error happens during the LLM response to a user's reply, make it as if the user clicked the edit message next to their reply. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "If an error happens during the LLM response to a user's reply, make it as if the user clicked the edit message next to their reply. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
