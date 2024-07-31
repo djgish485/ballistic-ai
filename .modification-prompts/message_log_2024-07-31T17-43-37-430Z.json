@@ -1,0 +1,25 @@
+[
+  {
+    "role": "user",
+    "content": "Put a link in very small text that says \"Tips >\" underneath the send message button. Like this screenshot. The link will be outside of the input box and underneath it. Clicking on the link will slide out any empty box into the right column of the page.",
+    "images": [
+      {}
+    ],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Make the box only as tall as the content in it. Have it sit on the bottom of the screen and expand upwards with the content. Below the title say \"Helpful text to add to your prompts:\", and then these blurbs underneath it:\n\n- List a couple hypothesis of why and then add in log messages to help figure it out.\n- Analyze the project closely and only propose minimal changes to make this functional. Let me know what files it involves, but don't create any code yet.\n- Provide full contents for <filename>",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Make those blurbs clickable. When you click on the blurb it appends that text to the message the user is typing.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

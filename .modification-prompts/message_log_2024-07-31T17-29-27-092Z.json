@@ -1,0 +1,11 @@
+[
+  {
+    "role": "user",
+    "content": "Put a link in very small text that says \"Tips >\" underneath the send message button. Like this screenshot.",
+    "images": [
+      {}
+    ],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
