@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "Have the \"Execute\" button be titled \"Write\" instead of \"Execute\" when it's a file and not commands.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "After writing a file, if its a new file, put in the \"Restore\" button - the Restore button will remove the file in this case. Beyond that make minimal changes.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

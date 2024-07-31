@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "When Write is clicked, if fetchFileContent is empty (file doesn't already exist), show an Undo button that deletes the file.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

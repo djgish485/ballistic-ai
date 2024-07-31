@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "After writing a file, if its a new file, the Restore button wasn't shown. Change that - put in the \"Restore\" button when writing to a new file (being careful to not put in Restore button in other cases, like after Execute).\n\nOnly make this change for now, we'll make it functional later.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Now the restore is always showing up. It should only show up after \"Write\" is clicked.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

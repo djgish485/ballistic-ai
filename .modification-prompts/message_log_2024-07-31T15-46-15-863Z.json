@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "In handleUndo, after calling setIsRestored(true), isRestored is staying false and the results box is not disappearing.\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  },
+  {
+    "role": "user",
+    "content": "After clicking undo:\n[Log] isRestored set to true: false\n[Log] Initial isRestored: false\n[Log] Initial isRestored: false",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  }
+]

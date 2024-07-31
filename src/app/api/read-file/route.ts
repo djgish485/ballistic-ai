@@ -29,8 +29,8 @@ export async function POST(request: NextRequest) {
       await fs.access(normalizedPath, fs.constants.F_OK);
     } catch (error) {
       console.log('File does not exist:', normalizedPath);
-      // If the file doesn't exist, return an empty content
-      return NextResponse.json({ content: '' });
+      // If the file doesn't exist, return false
+      return NextResponse.json({ content: false });
     }
 
     console.log('File exists. Attempting to read file:', normalizedPath);

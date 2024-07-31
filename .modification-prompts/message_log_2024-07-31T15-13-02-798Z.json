@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": " FormattedMessage seems overly complicated. Can you make it simpler? Also add in logging to help debug any problems along the way.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "role": "user",
+    "content": "After writing a file, if its a new file, the Restore button wasn't shown. Change that - put in the \"Restore\" button when writing to a new file (being careful to not put in Restore button in other cases, like after Execute). The Restore button will remove the file in this case. Beyond that make minimal changes. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "It didn't seem to catch a new file:\nFile /Users/dgish/code-git/superhero-ai/superhero-python/example_project/.prettierrc updated successfully.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "It's now showing the correct \"created successfully\" message, but the Restore button immediately disappears. \n\nAlso got this warning:\nWarning: React does not recognize the `checkFileExists` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `checkfileexists` instead. If you accidentally passed it from a parent component, remove it from the DOM element.\nWarning: React does not recognize the `handleDeleteFile` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `handledeletefile` instead. If you accidentally passed it from a parent component, remove it from the DOM element.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "No more warnings but the Restore button still immediately disappears after it shows for a new file. Add in some logging to help debug.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Here's the console logs when the button immediately disappeared:\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] handleExecute called\n[Log] Checking if file exists: – \"/Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md\"\n[Log] Checking if file exists: – \"/Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md\"\n[Log] File exists check result: – false\n[Log] File exists result: – {exists: false, error: undefined}\n[Log] isNewFile set to: – true\n[Log] Writing file: – \"/Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md\"\n[Log] Rendering CodeBlock. State: – {isNewFile: true, canRestore: false, isRestored: false}\n[Log] Rendering CodeBlock. State: – {isNewFile: true, canRestore: false, isRestored: false}\n[Log] Setting execution result for id: – \"code-hznt15yk3\" – \"Result:\" – \"File /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md created successfully.\"\n[Log] File written successfully. canRestore set to true\n[Log] handleExecute completed\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full FormattedMessage.tsx",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Still the same problem. Here's the logs around when the restore button quickly disappeared:\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] handleExecute called\n[Log] Checking if file exists: – \"/Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md\"\n[Log] Checking if file exists: – \"/Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md\"\n[Log] File exists check result: – false\n[Log] File exists result: – {exists: false, error: undefined}\n[Log] isNewFile set to: – true\n[Log] Writing file: – \"/Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md\"\n[Log] Rendering CodeBlock. State: – {isNewFile: true, canRestore: false, isRestored: false}\n[Log] Rendering CodeBlock. State: – {isNewFile: true, canRestore: false, isRestored: false}\n[Log] CodeBlock effect. State: – {isNewFile: true, canRestore: false, isRestored: false}\n[Log] Setting execution result for id: – \"code-vpww3z0p4\" – \"Result:\" – \"File /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md created successfully.\"\n[Log] File written successfully. canRestore set to true\n[Log] handleExecute completed\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the entire file",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Now it doesn't show at all:\n\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] handleExecute called\n[Log] Checking if file exists: – \"/Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md\"\n[Log] Checking if file exists: – \"/Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md\"\n[Log] File exists check result: – false\n[Log] File exists result: – {exists: false, error: undefined}\n[Log] isNewFile set to: – true\n[Log] Writing file: – \"/Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md\"\n[Log] Setting execution result for id: – \"code-ueqmbexmq\" – \"Result:\" – \"File /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme_no.md created successfully.\"\n[Log] File written successfully. canRestore set to true\n[Log] handleExecute completed\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] CodeBlock effect. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] CodeBlock effect. State: – {isNewFile: false, canRestore: false, isRestored: false}\n[Log] Rendering CodeBlock. State: – {isNewFile: false, canRestore: false, isRestored: false}",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

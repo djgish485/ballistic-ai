@@ -14,12 +14,34 @@ interface FormattedMessageProps {
   messageIndex: number;
 }
 
-const CodeBlock = React.memo(({ node, inline, className, children, ...props }: any) => {
+interface CodeBlockProps {
+  node: any;
+  inline: boolean;
+  className: string;
+  children: React.ReactNode;
+  isNewFile: boolean;
+  setIsNewFile: (isNew: boolean) => void;
+  isRestored: boolean;
+  setIsRestored: (isRestored: boolean) => void;
+  [key: string]: any;
+}
+
+const CodeBlock: React.FC<CodeBlockProps> = React.memo(({ 
+  node, 
+  inline, 
+  className, 
+  children, 
+  isNewFile,
+  setIsNewFile,
+  isRestored,
+  setIsRestored,
+  ...props 
+}) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [isRestored, setIsRestored] = useState(false);
   const [canRestore, setCanRestore] = useState(false);
   const codeRef = useRef<HTMLPreElement>(null);
+  const componentId = useRef(`CodeBlock-${Math.random().toString(36).substr(2, 9)}`);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -63,16 +85,21 @@ const CodeBlock = React.memo(({ node, inline, className, children, ...props }: a
       }
     };
 
-    const handleExecute = async () => {
+    const handleWrite = async () => {
       if (filePath) {
         try {
           const key = `${props.messageIndex}-${id}`;
+          let isNewlyCreated = false;
           if (!props.originalFileContents[key]) {
             const originalContent = await props.fetchFileContent(filePath);
-            props.setOriginalFileContent(key, originalContent);
+            if (originalContent === false) {
+              isNewlyCreated = true;
+              setIsNewFile(true);
+            } else {
+              props.setOriginalFileContent(key, originalContent);
+            }
           }
 
-          // Check if the code appears to be truncated
           const truncationPatterns = [
             /Rest of the file remains unchanged\.\.\./i,
             /# Rest of the script contents\.\.\./i,
@@ -97,23 +124,50 @@ const CodeBlock = React.memo(({ node, inline, className, children, ...props }: a
             body: JSON.stringify({ filePath, content: newContent }),
           });
           if (!response.ok) throw new Error('Failed to write file');
-          props.setExecutionResult(id, `File ${filePath} updated successfully.`);
+          props.setExecutionResult(id, `File ${filePath} ${isNewlyCreated ? 'created' : 'updated'} successfully.`);
           setCanRestore(true);
+          
+          if (isNewlyCreated) {
+            setIsNewFile(true);
+          }
         } catch (error) {
           props.setExecutionResult(id, `Error updating file: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
-      } else {
+      }
+      setIsRestored(false);
+    };
+
+    const handleUndo = async () => {
+      if (filePath) {
         try {
-          const response = await fetch('/api/execute-code', {
+          const response = await fetch('/api/delete-file', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code: String(children) }),
+            body: JSON.stringify({ filePath }),
           });
-          const result = await response.json();
-          props.setExecutionResult(id, result.output);
+          if (!response.ok) throw new Error('Failed to delete file');
+          
+          alert(`File ${filePath} deleted successfully.`);
+
+          setIsNewFile(false);
+          setIsRestored(true);
         } catch (error) {
-          props.setExecutionResult(id, `Error executing code: ${error instanceof Error ? error.message : 'Unknown error'}`);
+          alert(`Error deleting file: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
+      }
+    };
+
+    const handleExecute = async () => {
+      try {
+        const response = await fetch('/api/execute-code', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: String(children) }),
+        });
+        const result = await response.json();
+        props.setExecutionResult(id, result.output);
+      } catch (error) {
+        props.setExecutionResult(id, `Error executing code: ${error instanceof Error ? error.message : 'Unknown error'}`);
       }
       setIsRestored(false);
     };
@@ -159,18 +213,35 @@ const CodeBlock = React.memo(({ node, inline, className, children, ...props }: a
         {props.isComplete && !isEditing && (
           <>
             <div className="mt-2 space-x-2">
-              <button
-                onClick={handleExecute}
-                className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-              >
-                Execute
-              </button>
-              {filePath && (
+              {filePath ? (
+                <>
+                  <button
+                    onClick={handleWrite}
+                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                  >
+                    Write
+                  </button>
+                  <button
+                    onClick={() => props.handleDiffClick(filePath, newContent)}
+                    className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Diff
+                  </button>
+                  {isNewFile && (
+                    <button
+                      onClick={handleUndo}
+                      className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                    >
+                      Undo (Delete File)
+                    </button>
+                  )}
+                </>
+              ) : (
                 <button
-                  onClick={() => props.handleDiffClick(filePath, newContent)}
-                  className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  onClick={handleExecute}
+                  className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
                 >
-                  Diff
+                  Execute
                 </button>
               )}
               {canRestore && (
@@ -198,10 +269,12 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
   const [executionResults, setExecutionResults] = useState<Record<string, string>>({});
   const [codeBlockIds] = useState<Record<number, string>>({});
   const [originalFileContents, setOriginalFileContents] = useState<Record<string, string>>({});
+  const [newFiles, setNewFiles] = useState<Record<string, boolean>>({});
+  const [restoredBlocks, setRestoredBlocks] = useState<Record<string, boolean>>({});
 
   const generateId = useCallback(() => `code-${Math.random().toString(36).substr(2, 9)}`, []);
 
-  const fetchFileContent = useCallback(async (filePath: string): Promise<string> => {
+  const fetchFileContent = useCallback(async (filePath: string): Promise<string | false> => {
     const response = await fetch('/api/read-file', {
       method: 'POST',
       headers: {
@@ -211,6 +284,9 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
     });
 
     if (!response.ok) {
+      if (response.status === 404) {
+        return false;
+      }
       throw new Error('Failed to fetch file content');
     }
 
@@ -253,26 +329,39 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
     return lines[nodeIndex - 2] || '';
   }, [content]);
 
+  const setIsNewFile = useCallback((filePath: string, isNew: boolean) => {
+    setNewFiles(prev => ({ ...prev, [filePath]: isNew }));
+  }, []);
+
   const memoizedCodeBlock = useMemo(() => {
-    return (props: any) => (
-      <CodeBlock
-        {...props}
-        isComplete={isComplete}
-        setExecutionResult={setExecutionResult}
-        handleDiffClick={handleDiffClick}
-        handleRestore={handleRestore}
-        executionResults={executionResults}
-        originalFileContents={originalFileContents}
-        setOriginalFileContent={setOriginalFileContent}
-        generateId={generateId}
-        codeBlockIds={codeBlockIds}
-        onEditCommand={onEditCommand}
-        messageIndex={messageIndex}
-        getPreviousLine={getPreviousLine}
-        fetchFileContent={fetchFileContent}
-      />
-    );
-  }, [isComplete, setExecutionResult, handleDiffClick, handleRestore, executionResults, originalFileContents, setOriginalFileContent, generateId, codeBlockIds, onEditCommand, messageIndex, getPreviousLine, fetchFileContent]);
+    return (props: any) => {
+      const { filePath } = parseCommand(String(props.children), getPreviousLine(props.node.position?.start.line));
+      const isNewFile = newFiles[filePath] || false;
+      const blockId = `${messageIndex}-${props.node.position?.start.line}`;
+      return (
+        <CodeBlock
+          {...props}
+          isComplete={isComplete}
+          setExecutionResult={setExecutionResult}
+          handleDiffClick={handleDiffClick}
+          handleRestore={handleRestore}
+          executionResults={executionResults}
+          originalFileContents={originalFileContents}
+          setOriginalFileContent={setOriginalFileContent}
+          generateId={generateId}
+          codeBlockIds={codeBlockIds}
+          onEditCommand={onEditCommand}
+          messageIndex={messageIndex}
+          getPreviousLine={getPreviousLine}
+          fetchFileContent={fetchFileContent}
+          isNewFile={isNewFile}
+          setIsNewFile={(isNew: boolean) => setIsNewFile(filePath, isNew)}
+          isRestored={restoredBlocks[blockId] || false}
+          setIsRestored={(isRestored: boolean) => setRestoredBlocks(prev => ({ ...prev, [blockId]: isRestored }))}
+        />
+      );
+    };
+  }, [isComplete, setExecutionResult, handleDiffClick, handleRestore, executionResults, originalFileContents, setOriginalFileContent, generateId, codeBlockIds, onEditCommand, messageIndex, getPreviousLine, fetchFileContent, newFiles, setIsNewFile, restoredBlocks]);
 
   if (role === 'user') {
     return <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
@@ -283,7 +372,7 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
-          h1: ({ children }) => <h4>{children}</h4>,  // Convert h1 to h4
+          h1: ({ children }) => <h4>{children}</h4>,
           code: memoizedCodeBlock,
         }}
       >

@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Currently the same logic is being used to display a button that either says \"Execute\" or \"Write\". Break that out into separate logic and buttons for Execute and Write to simplify things.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

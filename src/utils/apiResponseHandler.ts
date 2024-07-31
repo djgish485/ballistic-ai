@@ -87,13 +87,13 @@ export async function fetchAPIResponse(apiKey: { type: string; key: string }, sy
     const lastMessage = filteredMessages[filteredMessages.length - 1];
     if (lastMessage.role === 'user') {
       if (typeof lastMessage.content === 'string') {
-        lastMessage.content += "\n\nRemember to ALWAYS show FULL files when making modifications.";
+        lastMessage.content += "\n\nRemember to ALWAYS show FULL files when making modifications. No need to apologize.";
       } else if (Array.isArray(lastMessage.content)) {
         const lastContentItem = lastMessage.content[lastMessage.content.length - 1];
         if (lastContentItem.type === 'text') {
-          lastContentItem.text += "\n\nRemember to ALWAYS show FULL files when making modifications.";
+          lastContentItem.text += "\n\nRemember to ALWAYS show FULL files when making modifications. No need to apologize.";
         } else {
-          lastMessage.content.push({ type: 'text', text: "\n\nRemember to ALWAYS show FULL files when making modifications." });
+          lastMessage.content.push({ type: 'text', text: "\n\nRemember to ALWAYS show FULL files when making modifications. No need to apologize." });
         }
       }
     }
