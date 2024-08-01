@@ -4,6 +4,8 @@ import remarkGfm from 'remark-gfm';
 import { parseCommand } from '@/utils/commandParser';
 import { PencilIcon } from '@heroicons/react/24/solid';
 import EditCodePopup from './EditCodePopup';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vs } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 interface FormattedMessageProps {
   content: string;
@@ -36,6 +38,7 @@ interface CodeBlockProps {
   messageIndex: number;
   getPreviousLine: (nodeIndex: number) => string;
   fetchFileContent: (filePath: string) => Promise<string | false>;
+  maxWidth: number;
 }
 
 const CodeBlock: React.FC<CodeBlockProps> = React.memo(({ 
@@ -60,6 +63,7 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
   messageIndex,
   getPreviousLine,
   fetchFileContent,
+  maxWidth,
   ...props 
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -204,20 +208,28 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
       }
     }, [originalFileContents, messageIndex, id]);
 
+    const language = className ? className.replace(/language-/, '') : 'text';
+
     return (
       <div 
         className="relative"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <pre
-          ref={codeRef}
-          className="bg-gray-100 p-4 rounded-lg"
-        >
-          <code>
+        <div className="overflow-x-auto" style={{ maxWidth: `${maxWidth}px` }}>
+          <SyntaxHighlighter
+            language={language}
+            style={vs}
+            customStyle={{
+              backgroundColor: 'transparent',
+              padding: '1rem',
+              borderRadius: '0.5rem',
+              width: `${maxWidth}px`,
+            }}
+          >
             {String(children).replace(/\n$/, '')}
-          </code>
-        </pre>
+          </SyntaxHighlighter>
+        </div>
         {!isEditing && isHovered && (
           <div className="absolute top-2 right-2">
             <div className="p-1 rounded transition-colors duration-200 group hover:bg-blue-500">
@@ -295,6 +307,9 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
   const [originalFileContents, setOriginalFileContents] = useState<Record<string, string>>({});
   const [newFiles, setNewFiles] = useState<Record<string, boolean>>({});
   const [restoredBlocks, setRestoredBlocks] = useState<Record<string, boolean>>({});
+  const [maxWidth, setMaxWidth] = useState(0);
+  const [, forceUpdate] = useState({});
+  const mainColumnRef = useRef<HTMLDivElement>(null);
 
   const generateId = useCallback(() => `code-${Math.random().toString(36).substr(2, 9)}`, []);
 
@@ -357,6 +372,23 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
     setNewFiles(prev => ({ ...prev, [filePath]: isNew }));
   }, []);
 
+  const updateMaxWidth = useCallback(() => {
+    const windowWidth = window.innerWidth;
+    const mainColumnWidth = mainColumnRef.current?.offsetWidth || 0;
+    const newMaxWidth = Math.min(windowWidth * 0.9, mainColumnWidth);
+    setMaxWidth(newMaxWidth);
+    forceUpdate({});
+  }, []);
+
+  useEffect(() => {
+    updateMaxWidth();
+    window.addEventListener('resize', updateMaxWidth);
+
+    return () => {
+      window.removeEventListener('resize', updateMaxWidth);
+    };
+  }, [updateMaxWidth]);
+
   const memoizedCodeBlock = useMemo(() => {
     return (props: any) => {
       const { filePath } = parseCommand(String(props.children), getPreviousLine(props.node.position?.start.line));
@@ -382,17 +414,18 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
           setIsNewFile={(isNew: boolean) => setIsNewFile(filePath, isNew)}
           isRestored={restoredBlocks[blockId] || false}
           setIsRestored={(isRestored: boolean) => setRestoredBlocks(prev => ({ ...prev, [blockId]: isRestored }))}
+          maxWidth={maxWidth}
         />
       );
     };
-  }, [isComplete, setExecutionResult, handleDiffClick, handleRestore, executionResults, originalFileContents, setOriginalFileContent, generateId, codeBlockIds, onEditCommand, messageIndex, getPreviousLine, fetchFileContent, newFiles, setIsNewFile, restoredBlocks]);
+  }, [isComplete, setExecutionResult, handleDiffClick, handleRestore, executionResults, originalFileContents, setOriginalFileContent, generateId, codeBlockIds, onEditCommand, messageIndex, getPreviousLine, fetchFileContent, newFiles, setIsNewFile, restoredBlocks, maxWidth]);
 
   if (role === 'user') {
     return <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
   }
 
   return (
-    <div>
+    <div ref={mainColumnRef}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{

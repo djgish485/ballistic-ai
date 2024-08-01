@@ -1,0 +1,86 @@
+[
+  {
+    "role": "user",
+    "content": "Add lightweight code formatting to code blocks. I want to keep the background the same, just add in font coloring. \n\nAnalyze the project closely and only propose minimal changes to make this functional. Let me know what files it involves, but don't create any code yet.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "yes",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "make the code blocks be horizontally scrollable. Currently they're forcing the page very wide.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "It's still expanding the main left column wider. I think the problem is partly caused by the responsive layout whose width is flexible. What about using javascript to sense the width of the main column dynamically and using that to set a fixed width on the code blocks (similar to how the input box on the bottom of the page works).",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "It works pretty well. It will correctly get wider if I make the window wider, but it incorrectly won't get narrower if I make the window narrower. \n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Here, you can see it get wider as I widen the window but it stays the same width when I narrow the window:\n\n[Log] CodeBlock CodeBlock-hozbb1syz received mainColumnWidth: – 656\n[Log] Resize observed: – 656 (x2)\n[Log] Main column width updated: – 656 (x120)\n[Log] Main column width updated: – 912 (x2)\n[Log] CodeBlock CodeBlock-zyrdwdkuy received mainColumnWidth: – 912\n[Log] CodeBlock CodeBlock-lpbd1lvue received mainColumnWidth: – 912\n[Log] CodeBlock CodeBlock-zyrdwdkuy received mainColumnWidth: – 912\n[Log] CodeBlock CodeBlock-lpbd1lvue received mainColumnWidth: – 912\n[Log] Resize observed: – 912 (x2)\n[Log] Main column width updated: – 912 (x252)",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Still the same problem. When the hot reload happens it does resize to be smaller. But normal resizing of the window smaller doesn't trigger it.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Still only getting triggered when window gets wider:\n\n[Log] CodeBlock CodeBlock-4tq4fa5lv received mainColumnWidth: – 1168\n[Log] CodeBlock CodeBlock-tvp4oevi9 received mainColumnWidth: – 1168\n[Log] CodeBlock CodeBlock-4tq4fa5lv received mainColumnWidth: – 1168\n[Log] CodeBlock CodeBlock-tvp4oevi9 received mainColumnWidth: – 1168",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Nope. only getting triggered when window getting larger:\n\n[Log] Main column width updated: – 912 (x106)\n[Log] Main column width updated: – 1168 (x2)\n[Log] CodeBlock CodeBlock-dd38l8cgl received mainColumnWidth: – 1168\n[Log] CodeBlock CodeBlock-krm16rpgw received mainColumnWidth: – 1168\n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "No log messages happened when window got narrower.\n\n[Log] Resize event triggered. Old width: – 656 – \"New width:\" – 656\n[Log] Width unchanged. Skipping update\n[Log] Resize event triggered. Old width: – 656 – \"New width:\" – 656\n[Log] Width unchanged. Skipping update\n[Log] Resize event triggered. Old width: – 656 – \"New width:\" – 912\n[Log] Width changed. Updating mainColumnWidth\n[Log] Recreating memoizedCodeBlock with mainColumnWidth: – 912\n[Log] Recreating memoizedCodeBlock with mainColumnWidth: – 912\n[Log] FormattedMessage render. Current mainColumnWidth: – 912\n[Log] FormattedMessage render. Current mainColumnWidth: – 912\n[Log] Resize event triggered. Old width: – 656 – \"New width:\" – 912\n[Log] Width changed. Updating mainColumnWidth\n[Log] Recreating memoizedCodeBlock with mainColumnWidth: – 912\n[Log] Recreating memoizedCodeBlock with mainColumnWidth: – 912\n\n\n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Ok the resize event is getting triggered when it gets narrower, but it's not finding the new width:\n\n[Log] Resize event triggered. Old width: – 1168 – \"New width:\" – 1168\n[Log] Width unchanged. Skipping update\n\nRE-examine your assumptions. Talk me through it. The window gets widened and the parent component gets wider so the javascript catches that and resizes the code block. But when the window gets narrower the parent component won't get narrower because the code block inside of it is already wider. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "That worked. Now remove the debug logging.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
