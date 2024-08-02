@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "when a streaming LLM response is stopped & cancelled it still seems to be streaming in (even though server stops sending response to client). These messages continue to stream in on server:\n Error parsing JSON: TypeError [ERR_INVALID_STATE]: Invalid state: Controller is already closed\n\nCan you do this while making minimal changes? Everything works well on the client side. Just want to clean up things on server.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "This is mainly applicable to chat-with-images endpoint",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

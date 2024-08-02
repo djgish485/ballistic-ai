@@ -73,7 +73,34 @@ export async function POST(req: NextRequest) {
     });
 
     console.log('chat-with-images: Returning stream response');
-    return new NextResponse(stream, {
+
+    let isCancelled = false;
+    req.signal.addEventListener('abort', () => {
+      isCancelled = true;
+      console.log('chat-with-images: Request aborted');
+    });
+
+    return new NextResponse(new ReadableStream({
+      async start(controller) {
+        const reader = stream.getReader();
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done || isCancelled) {
+              console.log('chat-with-images: Stream ended or cancelled');
+              break;
+            }
+            controller.enqueue(value);
+          }
+        } catch (error) {
+          console.error('chat-with-images: Stream reading error:', error);
+        } finally {
+          console.log('chat-with-images: Closing stream controller');
+          controller.close();
+          reader.releaseLock();
+        }
+      }
+    }), {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',

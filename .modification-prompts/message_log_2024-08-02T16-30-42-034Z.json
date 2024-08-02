@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "If the app is launched without the project directory as an argument, for example: \"$  npm run dev\", print a message notifying user how the command should look.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Great. Now do the same with server.prod.js ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

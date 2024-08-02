@@ -9,7 +9,7 @@ const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
-const projectDir = process.argv[2] ? path.resolve(process.argv[2]) : process.cwd();
+const projectDir = process.argv[2] ? path.resolve(process.argv[2]) : null;
 const portArgIndex = process.argv.indexOf('--port');
 let specifiedPort = portArgIndex !== -1 ? parseInt(process.argv[portArgIndex + 1], 10) : null;
 
@@ -33,6 +33,13 @@ function findAvailablePort(startPort) {
       });
     });
   });
+}
+
+if (!projectDir) {
+  console.error('Error: Project directory not provided.');
+  console.error('Usage: npm run dev -- <project_directory> [--port <port_number>]');
+  console.error('Example: npm run dev -- /path/to/your/project --port 3000');
+  process.exit(1);
 }
 
 app.prepare().then(async () => {

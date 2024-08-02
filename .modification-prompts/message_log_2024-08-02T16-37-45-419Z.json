@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "if user clicks Edit on a message then confirms while still LLM responding, stop the LLM response.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

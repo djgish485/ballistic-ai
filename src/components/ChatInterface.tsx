@@ -369,6 +369,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   const handleEditMessage = (index: number, newContent: string) => {
+    // If LLM is still responding, stop the response
+    if (isAIResponding) {
+      handleCancel();
+    }
+
     setMessages((prevMessages) => {
       // Remove all messages from the edited message onwards
       const newMessages = prevMessages.slice(0, index);

@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "replace \"File does not exist.\" with \"This is a new file.\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  }
+]

@@ -26,7 +26,7 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ filePath, newContent, onClose }
 
         if (!response.ok) {
           if (response.status === 404) {
-            setError('File does not exist.');
+            setError('This is a new file.');
             return;
           }
           throw new Error('Failed to fetch file content');
@@ -36,7 +36,7 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ filePath, newContent, onClose }
         const existingContent = data.content;
 
         if (existingContent === false) {
-          setError('File does not exist.');
+          setError('This is a new file.');
           return;
         }
 
@@ -73,11 +73,11 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ filePath, newContent, onClose }
   };
 
   return (
-    <div 
+    <div
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
       onClick={handleOverlayClick}
     >
-      <div 
+      <div
         ref={popupRef}
         className="bg-white rounded-lg max-w-3xl w-full max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}

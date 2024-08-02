@@ -135,7 +135,11 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
             /\/\/ Rest of the function\.\.\./i,
             /\/\/ \.\.\. \(previous code remains unchanged\)/i,
             /\/\/ \.\.\. \(rest of the function remains unchanged\)/i,
-            /\/\/ \.\.\. \(rest of the file remains unchanged\)/i
+            /\/\/ \.\.\. \(rest of the file remains unchanged\)/i,
+            /\/\/ \.\.\. \(rest of the \w+ function remains unchanged\)/i,
+            /\/\/ \.\.\. \(rest of the component code remains unchanged\)/i,
+            /# Rest of the file content remains unchanged/i,
+            /# \.\.\. \(rest of the file content remains unchanged\)/i
           ];
 
           const isTruncated = truncationPatterns.some(pattern => pattern.test(newContent));

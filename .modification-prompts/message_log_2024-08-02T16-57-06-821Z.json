@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Here's some more patterns to catch when deciding if a file to write has been truncated:\n// ... (rest of the [any_function_name] function remains unchanged)\n// ... (rest of the component code remains unchanged)\n# Rest of the file content remains unchanged\n# ... (rest of the file content remains unchanged)",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

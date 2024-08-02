@@ -1,7 +1,7 @@
 Quick Start Guide:
 1. Click 'Start' to begin
-   - Project backup automatically created
-   - Crucial project files automatically added to AI context
+   - Project backup will be automatically created
+   - Crucial project files will be automatically added to AI context
 2. Enhance context by adding extra files (eg. requirements doc)
    - Optimize large contexts (>150 KB) via context settings
 3. Expect full file outputs from the AI
