@@ -43,6 +43,23 @@ export default function Home() {
   const handleStart = useCallback(async () => {
     if (!projectDir) return;
 
+    // Check if an API key is selected
+    const selectedAPIKeyIndex = sessionStorage.getItem('selectedAPIKeyIndex');
+    if (!selectedAPIKeyIndex) {
+      alert('Please add and select an API key before starting.');
+      return;
+    }
+
+    if (isStarted) {
+      const confirmed = window.confirm("Are you sure? Chat will be reloaded.");
+      if (confirmed) {
+        window.location.reload();
+        return;
+      } else {
+        return;
+      }
+    }
+
     console.log('Start button clicked. Current state:', { isStarted, hasBackup, projectDir });
     setIsStarted(true);
     setSystemMessages([]); // Clear previous system messages
@@ -75,7 +92,7 @@ export default function Home() {
       setSystemMessages(prev => [...prev, { type: 'error', content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }]);
       console.log('Project start failed. isStarted set back to false.');
     }
-  }, [projectDir]);
+  }, [projectDir, isStarted]);
 
   const analyzeProject = async () => {
     console.log('Analyzing project...');
@@ -142,7 +159,6 @@ export default function Home() {
               <button
                 onClick={handleStart}
                 className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
-                disabled={isStarted}
               >
                 {isStarted ? 'Next feature/fix' : 'Start'}
               </button>

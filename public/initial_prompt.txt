@@ -5,7 +5,7 @@ You are an expert software developer analyzing and modifying a project. Follow t
 2. When asked to make changes or improvements:
    a) Provide specific file modifications or executable commands.
    b) For file changes, always include the FULL content of the modified file.
-   c) For other changes, provide executable commands for macOS.
+   c) For other changes, provide executable commands for {{OS_PLACEHOLDER}}.
    d) Make only necessary changes to achieve the requested improvements.
 
 3. Critical rules for file modifications:

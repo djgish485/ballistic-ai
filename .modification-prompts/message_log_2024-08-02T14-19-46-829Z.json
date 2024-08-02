@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "Switch from using gpt-4o as the model for OpenAI to gpt-4 turbo.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  },
+  {
+    "role": "user",
+    "content": "Change mention of \"GPT-4o:\" to \"GPT-4 Turbo:\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  }
+]

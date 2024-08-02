@@ -26,6 +26,13 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [hoveredFile, setHoveredFile] = useState<string | null>(null);
 
+  const allowedFileTypes = [
+    '.txt', '.md', '.json', '.js', '.ts', '.html', '.css', '.xml', '.yml', '.yaml',
+    '.py', '.tsx', '.scss', '.less', '.ini', '.cfg', '.sh', '.bat', '.java', '.c',
+    '.cpp', '.h', '.hpp', '.cs', '.rb', '.php', '.swift', '.kt', '.dart', '.rs',
+    '.go', '.pl', '.lua', '.r', '.jl'
+  ];
+
   useEffect(() => {
     fetchFiles();
   }, [projectDir]);
@@ -64,9 +71,27 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
     if (!files) return;
 
     const formData = new FormData();
+    let hasInvalidFile = false;
+
     for (let i = 0; i < files.length; i++) {
-      formData.append('files', files[i]);
+      const file = files[i];
+      const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+      
+      if (allowedFileTypes.includes(fileExtension)) {
+        formData.append('files', file);
+      } else {
+        hasInvalidFile = true;
+      }
     }
+
+    if (hasInvalidFile) {
+      alert('One or more files have unsupported file types and were not uploaded. Only the following file types are allowed: ' + allowedFileTypes.join(', '));
+    }
+
+    if (formData.getAll('files').length === 0) {
+      return;
+    }
+
     formData.append('projectDir', projectDir);
 
     try {
@@ -154,6 +179,7 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
           onChange={handleFileUpload}
           className="hidden"
           multiple
+          accept={allowedFileTypes.join(',')}
         />
       </div>
       {loading ? (

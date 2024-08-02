@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Clicking \"Next feature/fix\" shows a confirm box - \"Are you sure? Chat will be reloaded.\". On confirm reload window.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

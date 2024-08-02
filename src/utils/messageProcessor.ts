@@ -1,9 +1,32 @@
 import fs from 'fs';
 import path from 'path';
 import { Message } from '@/types/chat';
+import os from 'os';
 
 export function getInitialPrompt(): string {
-  return fs.readFileSync(path.join(process.cwd(), 'public', 'initial_prompt.txt'), 'utf-8');
+  const promptPath = path.join(process.cwd(), 'public', 'initial_prompt.txt');
+  let prompt = fs.readFileSync(promptPath, 'utf-8');
+
+  // Determine the current operating system
+  let currentOS: string;
+  switch (os.platform()) {
+    case 'darwin':
+      currentOS = 'macOS';
+      break;
+    case 'win32':
+      currentOS = 'Windows';
+      break;
+    case 'linux':
+      currentOS = 'Linux';
+      break;
+    default:
+      currentOS = 'the current operating system';
+  }
+
+  // Replace the placeholder with the actual operating system
+  prompt = prompt.replace('{{OS_PLACEHOLDER}}', currentOS);
+
+  return prompt;
 }
 
 export function constructInitialMessage(projectFiles: string): string {

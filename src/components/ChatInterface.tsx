@@ -47,6 +47,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const isAutoScrolling = useRef(false);
   const messageLogFileNameRef = useRef<string>('');
   const [errorDetails, setErrorDetails] = useState<ErrorDetails | null>(null);
+  const [initialMessage, setInitialMessage] = useState<string>('');
+
+  useEffect(() => {
+    const fetchInitialMessage = async () => {
+      try {
+        const response = await fetch('/initial_welcome_message.txt');
+        const text = await response.text();
+        setInitialMessage(text);
+      } catch (error) {
+        console.error('Error fetching initial message:', error);
+      }
+    };
+    fetchInitialMessage();
+  }, []);
 
   useEffect(() => {
     if (isStarted && messages.length === 0) {
@@ -402,6 +416,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             Backup in progress...
           </div>
         )}
+        {!isStarted && initialMessage && (
+          <div className="bg-blue-100 p-4 rounded">
+            <div className="whitespace-pre-wrap">{initialMessage}</div>
+          </div>
+        )}
         <ChatMessages 
           systemMessages={systemMessages} 
           messages={messages} 
@@ -423,6 +442,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           handleCancel={handleCancel}
           isLoading={isLoading}
           isAIResponding={isAIResponding}
+          disabled={!isStarted}
         />
       </div>
       {showDiff && (

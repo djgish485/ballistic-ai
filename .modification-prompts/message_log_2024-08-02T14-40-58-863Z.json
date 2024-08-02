@@ -1,0 +1,23 @@
+[
+  {
+    "role": "user",
+    "content": "Disable input box on bottom of page when page is first loaded. Enable it when start is clicked.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Can you make the blue image button look disabled when the input box next to it is disabled?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

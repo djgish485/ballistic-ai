@@ -10,6 +10,7 @@ interface ChatInputProps {
   handleCancel: () => void;
   isLoading: boolean;
   isAIResponding: boolean;
+  disabled: boolean;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -19,6 +20,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   handleCancel,
   isLoading,
   isAIResponding,
+  disabled,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -128,7 +130,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
           <button
             type="button"
             onClick={handleImageUpload}
-            className="p-2 text-blue-500 hover:text-blue-600 focus:outline-none self-end"
+            className={`p-2 ${disabled ? 'text-gray-400' : 'text-blue-500 hover:text-blue-600'} focus:outline-none self-end`}
+            disabled={disabled}
           >
             <PhotoIcon className="h-8 w-8" />
           </button>
@@ -140,7 +143,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
               onKeyDown={handleKeyDown}
               className="w-full px-2 py-2 resize-none overflow-y-auto focus:outline-none"
               placeholder="Type your message..."
-              disabled={isLoading}
+              disabled={isLoading || disabled}
               rows={1}
               style={{ minHeight: '44px', maxHeight: '216px' }}
             />
@@ -148,8 +151,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
           <button
             type="button"
             onClick={isAIResponding ? handleCancel : handleSendMessage}
-            className="p-2 text-blue-500 hover:text-blue-600 focus:outline-none disabled:text-gray-400 self-end"
-            disabled={!isAIResponding && (isLoading || (!input.trim() && selectedImages.length === 0))}
+            className={`p-2 ${
+              isAIResponding || (!input.trim() && selectedImages.length === 0) || disabled
+                ? 'text-gray-400'
+                : 'text-blue-500 hover:text-blue-600'
+            } focus:outline-none self-end`}
+            disabled={!isAIResponding && (isLoading || (!input.trim() && selectedImages.length === 0) || disabled)}
           >
             {isAIResponding ? (
               <StopIcon className="h-8 w-8" />
@@ -166,6 +173,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
         accept="image/*"
         multiple
         className="hidden"
+        disabled={disabled}
       />
       <div className="absolute bottom-0 right-0 transform translate-y-full mt-1">
         <button

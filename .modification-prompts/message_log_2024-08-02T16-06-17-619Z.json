@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "In the initial prompt system instructions file, replace \"macOS\" with a placeholder. Then when those instructions are getting ready to be sent the LLM, replace the placeholder with the current system the app is running on.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Can you repeat messageProcessor.ts please",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

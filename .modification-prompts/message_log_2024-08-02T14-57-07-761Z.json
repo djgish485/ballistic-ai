@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "When clicking start, if no API key is selected, put up an alert to add an API key first, then don't proceed.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

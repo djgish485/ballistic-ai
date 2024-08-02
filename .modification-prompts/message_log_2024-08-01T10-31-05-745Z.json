@@ -1,0 +1,23 @@
+[
+  {
+    "role": "user",
+    "content": "Put up an initial message when the app is first loaded that goes away when Start is clicked. The message should be in the main chat area, looking similar to the other system messages like \"Project backup created successfully.\" It should welcome user, give a short overview of the app, tell them to click Start to begin.\n\nAlso include stuff like:\n- inform user how Context works - it automatically adds the crucial files from your project to LLM context. Keep size down by playing with Context Settings. You can also add your own files to the context - project requirements, etc. (But, what, anything over 150 KB is getting too big?) .\n- \"editing context settings will rebuild  context on the fly.\"\n- This project was created with Claude 3.5 in mind. GPT-4o works ok for simpler tasks, but Claude 3.5 is the first LLM that seems good enough for real software development.\n-- Anthropic Claude 3.5 - smartest, 8192 context length, a lil slower, lower rate limits. Tends to concatenate files, so you made need to ask it for full file contents.\n-- OpenAI gpt-4o - 4096 context limit, a little faster, higher rate limits. Tends to mangle file paths, so you may need to resend some prompts.\n\nPut message itself in its own file.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full ChatInterface.tsx",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Good. but get rid of the <pre> in the message (but still format the text in initial message for the web). The font should match the rest of the app.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

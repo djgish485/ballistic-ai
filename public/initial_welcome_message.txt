@@ -1,0 +1,14 @@
+Quick Start Guide:
+1. Click 'Start' to begin
+   - Project backup automatically created
+   - Crucial project files automatically added to AI context
+2. Enhance context by adding extra files (eg. requirements doc)
+   - Optimize large contexts (>150 KB) via context settings
+3. Expect full file outputs from the AI
+   - Execute/Write/Diff/Undo buttons will appear underneath files & commands
+   - If AI truncates a file just prompt it for the full file.
+4. Click "Next Feature" or reload page to keep chat manageable 
+
+Choose Your API:
+- Anthropic Claude 3.5 (Recommended): 8192 token output, highly capable
+- OpenAI GPT-4 Turbo: 4096 token output, faster with higher rate limits

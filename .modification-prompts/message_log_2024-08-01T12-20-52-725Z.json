@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Use the following as a template for the initial welcome message. It's a quick-start guide. Give 5 different versions, formatted as files to replace initial welcome message file. Make some versions adhere closely and some be more creative.\n==========\nWelcome to Superhero\n\nSuperhero streamlines development using LLM chats, making it trustable and easy to use without ever touching an editor.\n\n- Click Start to begin\n-- automatically creates a project backup \n-- automatically adds important project files to context\n- You can add additional files to the context, ie. requirements doc\n- If context is too big (over 150 KB gets unweildy), edit the context settings to target specific areas of the project\n- LLM is encouraged to output whole files. \n- When its response finishes, Execute/Write/Diff/Undo buttons will appear below code blocks. \n\nAPI Choices\n- Anthropic Claude 3.5 (recommended): 8192 token output, highly capable\n- OpenAI GPT-4o: 4096 token output, faster with higher rate limits\n\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -4,17 +4,23 @@ import { getProjectFilesDir } from './directoryUtils';
 
 export async function getProjectFiles(projectDir: string): Promise<string> {
   const superheroFilesDir = getProjectFilesDir(projectDir);
-  const structureFile = path.join(superheroFilesDir, 'project-structure.txt');
-  const contentFile = path.join(superheroFilesDir, 'project-content.txt');
-
   let projectFiles = '';
 
-  if (fs.existsSync(structureFile)) {
-    projectFiles += `${fs.readFileSync(structureFile, 'utf-8')}\n\n`;
-  }
+  // Read all files in the superhero files directory
+  const files = fs.readdirSync(superheroFilesDir);
 
-  if (fs.existsSync(contentFile)) {
-    projectFiles += `${fs.readFileSync(contentFile, 'utf-8')}`;
+  for (const file of files) {
+    const filePath = path.join(superheroFilesDir, file);
+    const stats = fs.statSync(filePath);
+
+    if (stats.isFile()) {
+      // Check if the file is a text file (you can expand this list if needed)
+      const textFileExtensions = ['.txt', '.md', '.json', '.js', '.ts', '.html', '.css', '.xml', '.yml', '.yaml'];
+      if (textFileExtensions.includes(path.extname(file).toLowerCase())) {
+        projectFiles += `File: ${file}\n${'='.repeat(file.length + 6)}\n`;
+        projectFiles += `${fs.readFileSync(filePath, 'utf-8')}\n\n`;
+      }
+    }
   }
 
   return projectFiles;

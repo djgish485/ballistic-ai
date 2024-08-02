@@ -1,0 +1,30 @@
+[
+  {
+    "role": "user",
+    "content": "In the initial prompt system instructions, replace \"macOS\" with a placeholder. Then when those instructions are getting ready to be sent the LLM, replace the placeholder with the current system the app is running on.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  },
+  {
+    "role": "user",
+    "content": "Can you repeat messageProcessor.ts",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  },
+  {
+    "role": "user",
+    "content": "On my MacBook Air it put in \"Darwin\" for system type. Is that right? Shouldn't it say like \"MacOS\" or something?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  },
+  {
+    "role": "user",
+    "content": "It's replacing \"[SYSTEM_TYPE]\" for the initial messages sent to the LLM (\"chat\" endpoint), but not when sending user replies (chat-with-images endpoint).",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  }
+]

@@ -1,0 +1,30 @@
+[
+  {
+    "role": "user",
+    "content": "Are all the files in .superhero/[project name]-files/ getting added to the initial message? I just added a big file to the directory and doesn't look like it was added.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "After analyze content, how are those two files added to the initial message to the LLM?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Yes, so modify getProjectFiles to find *any* text files in that directory, not just those two specific ones.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "When uploading files to project context, either only allow those file types or put up an alert when any other file type was attempted.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
