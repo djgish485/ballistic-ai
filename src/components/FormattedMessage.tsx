@@ -89,8 +89,6 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
 
   const isExecuting = executingBlockId === id;
 
-  console.log(`CodeBlock render - id: ${id}, isExecuting: ${isExecuting}`);
-
   const handleEditClick = () => {
     setIsEditing(true);
   };
@@ -203,7 +201,6 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
     };
 
     const handleExecute = async () => {
-      console.log(`handleExecute called for block ${id}`);
       setExecutingBlockId(id);
       setExecutionResult(id, 'Waiting on response...');
 
@@ -236,14 +233,11 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
         }
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
-          console.log(`Execution cancelled for block ${id}`);
           setExecutionResult(id, 'Execution cancelled');
         } else {
-          console.error(`Error executing code for block ${id}:`, error);
           setExecutionResult(id, `Error executing code: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
       } finally {
-        console.log(`Execution finished for block ${id}`);
         setExecutingBlockId(null);
         abortControllerRef.current = null;
       }
@@ -251,14 +245,10 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
     };
 
     const handleCancelExecution = useCallback(() => {
-      console.log(`handleCancelExecution called for block ${id}`);
       if (abortControllerRef.current) {
-        console.log(`Aborting execution for block ${id}`);
         abortControllerRef.current.abort();
-      } else {
-        console.log(`AbortController not found for block ${id}`);
       }
-    }, [id, abortControllerRef]);
+    }, [abortControllerRef]);
 
     useEffect(() => {
       const key = `${messageIndex}-${id}`;

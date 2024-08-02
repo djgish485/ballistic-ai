@@ -75,5 +75,33 @@
     "images": [],
     "isComplete": true,
     "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "It works. Now remove all those log messages",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Somewhere along the way we're now cd'ing to the project directory in places we don't want to. cd should only happen when clicking execute. I'm seeing it happen when running commands from the app, like when clicking Start:\n\nMessage: An error occurred while initiating the chat\n\nDetails:\nENOENT: no such file or directory, open '/Users/dgish/code-git/superhero-ai/superhero-python/example_project/public/initial_prompt.txt'\n\nThe problem is likely in the execute-code route, where we're changing the working directory for all operations.\n\nIs it possible to spawn a child process to execute with instead, that won't interfere with the main process?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Commands run in the spawn don't seem to be getting the arguments.\n\nRscript -e 'install.packages(\"ggplot2\", repos=\"https://cran.rstudio.com/\")'\nRscript -e 'install.packages(\"gridExtra\", repos=\"https://cran.rstudio.com/\")'\n\nSTDOUT: Usage: Rscript [options] file [args]\n   or: Rscript [options] -e expr [-e expr2 ...] [args]\nA binary front-end to R, for use in scripting applications.\n\nOptions:\n  --help              Print usage and exit",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "What if there's multiple lines of commands?\n\nRscript -e 'install.packages(\"ggplot2\", repos=\"https://cran.rstudio.com/\")'\nRscript -e 'install.packages(\"gridExtra\", repos=\"https://cran.rstudio.com/\")'\n\nGetting this error:\n\nSTDERR: /bin/sh: -c: line 0: syntax error near unexpected token `('\n/bin/sh: -c: line 0: `Rscript -e install.packages(\"ggplot2\", repos=\"https://cran.rstudio.com/\") Rscript -e install.packages(\"gridExtra\", repos=\"https://cran.rstudio.com/\") '\nProcess exited with code 2",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
   }
 ]

@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
-import { exec } from 'child_process';
+import { spawn } from 'child_process';
 import path from 'path';
-import { Readable } from 'stream';
 
 export async function POST(request: Request) {
   const encoder = new TextEncoder();
@@ -9,9 +8,7 @@ export async function POST(request: Request) {
   const stream = new ReadableStream({
     async start(controller) {
       try {
-        console.log('Received request to execute code.');
         const requestBody = await request.json();
-        console.log('Request body:', requestBody);
         
         const { code, projectDir } = requestBody;
 
@@ -23,70 +20,15 @@ export async function POST(request: Request) {
           throw new Error('No project directory provided');
         }
 
-        console.log('Executing code:');
-        console.log(code);
+        // Split the code into separate commands
+        const commands = code.split('\n').filter(cmd => cmd.trim() !== '');
 
-        // Change the working directory to the project directory
-        const originalCwd = process.cwd();
-        process.chdir(projectDir);
-
-        try {
-          const childProcess = exec(code);
-
-          let stdoutBuffer = '';
-          let stderrBuffer = '';
-
-          childProcess.stdout?.on('data', (data) => {
-            stdoutBuffer += data;
-            if (stdoutBuffer.includes('\n')) {
-              const lines = stdoutBuffer.split('\n');
-              stdoutBuffer = lines.pop() || '';
-              lines.forEach(line => {
-                controller.enqueue(encoder.encode(`STDOUT: ${line}\n`));
-              });
-            }
-          });
-
-          childProcess.stderr?.on('data', (data) => {
-            stderrBuffer += data;
-            if (stderrBuffer.includes('\n')) {
-              const lines = stderrBuffer.split('\n');
-              stderrBuffer = lines.pop() || '';
-              lines.forEach(line => {
-                controller.enqueue(encoder.encode(`STDERR: ${line}\n`));
-              });
-            }
-          });
-
-          childProcess.on('close', (code) => {
-            if (stdoutBuffer) {
-              controller.enqueue(encoder.encode(`STDOUT: ${stdoutBuffer}\n`));
-            }
-            if (stderrBuffer) {
-              controller.enqueue(encoder.encode(`STDERR: ${stderrBuffer}\n`));
-            }
-            controller.enqueue(encoder.encode(`Process exited with code ${code}\n`));
-            controller.close();
-          });
-
-          childProcess.on('error', (error) => {
-            controller.enqueue(encoder.encode(`Error: ${error.message}\n`));
-            controller.close();
-          });
-
-          // Handle cancellation
-          request.signal.addEventListener('abort', () => {
-            console.log('Received abort signal, terminating child process');
-            childProcess.kill();
-            controller.enqueue(encoder.encode('Execution cancelled\n'));
-            controller.close();
-          });
-        } finally {
-          // Change back to the original working directory
-          process.chdir(originalCwd);
+        for (const command of commands) {
+          await executeCommand(command, projectDir, controller, encoder, request.signal);
         }
+
+        controller.close();
       } catch (error) {
-        console.error('Error during code execution:', error);
         controller.enqueue(encoder.encode(`Error: ${error instanceof Error ? error.message : 'An unknown error occurred'}\n`));
         controller.close();
       }
@@ -98,5 +40,38 @@ export async function POST(request: Request) {
       'Content-Type': 'text/plain',
       'Transfer-Encoding': 'chunked',
     },
+  });
+}
+
+async function executeCommand(command: string, projectDir: string, controller: ReadableStreamDefaultController, encoder: TextEncoder, signal: AbortSignal): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const childProcess = spawn(command, [], {
+      cwd: projectDir,
+      shell: true,
+    });
+
+    childProcess.stdout?.on('data', (data) => {
+      controller.enqueue(encoder.encode(`STDOUT: ${data}`));
+    });
+
+    childProcess.stderr?.on('data', (data) => {
+      controller.enqueue(encoder.encode(`STDERR: ${data}`));
+    });
+
+    childProcess.on('close', (code) => {
+      controller.enqueue(encoder.encode(`Command "${command}" exited with code ${code}\n`));
+      resolve();
+    });
+
+    childProcess.on('error', (error) => {
+      controller.enqueue(encoder.encode(`Error executing "${command}": ${error.message}\n`));
+      reject(error);
+    });
+
+    signal.addEventListener('abort', () => {
+      childProcess.kill();
+      controller.enqueue(encoder.encode(`Command "${command}" cancelled\n`));
+      resolve();
+    });
   });
 }
