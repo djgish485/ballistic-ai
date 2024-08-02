@@ -14,6 +14,7 @@ interface FormattedMessageProps {
   isComplete: boolean;
   onEditCommand: (oldCommand: string, newCommand: string) => void;
   messageIndex: number;
+  projectDir: string;
 }
 
 interface CodeBlockProps {
@@ -39,6 +40,10 @@ interface CodeBlockProps {
   getPreviousLine: (nodeIndex: number) => string;
   fetchFileContent: (filePath: string) => Promise<string | false>;
   maxWidth: number;
+  projectDir: string;
+  executingBlockId: string | null;
+  setExecutingBlockId: React.Dispatch<React.SetStateAction<string | null>>;
+  abortControllerRef: React.MutableRefObject<AbortController | null>;
 }
 
 const CodeBlock: React.FC<CodeBlockProps> = React.memo(({ 
@@ -64,6 +69,10 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
   getPreviousLine,
   fetchFileContent,
   maxWidth,
+  projectDir,
+  executingBlockId,
+  setExecutingBlockId,
+  abortControllerRef,
   ...props 
 }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -71,6 +80,16 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
   const [canRestore, setCanRestore] = useState(false);
   const codeRef = useRef<HTMLPreElement>(null);
   const componentId = useRef(`CodeBlock-${Math.random().toString(36).substr(2, 9)}`);
+
+  const nodeIndex = node.position?.start.line ?? Math.random();
+  const id = codeBlockIds[nodeIndex] || generateId();
+  if (!codeBlockIds[nodeIndex]) {
+    codeBlockIds[nodeIndex] = id;
+  }
+
+  const isExecuting = executingBlockId === id;
+
+  console.log(`CodeBlock render - id: ${id}, isExecuting: ${isExecuting}`);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -92,13 +111,6 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
       </code>
     );
   } else {
-    const nodeIndex = node.position?.start.line ?? Math.random();
-    let id = codeBlockIds[nodeIndex];
-    if (!id) {
-      id = generateId();
-      codeBlockIds[nodeIndex] = id;
-    }
-
     const previousLine = getPreviousLine(nodeIndex);
     const { filePath, newContent } = useMemo(() => parseCommand(String(children), previousLine), [children, previousLine]);
 
@@ -191,19 +203,62 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
     };
 
     const handleExecute = async () => {
+      console.log(`handleExecute called for block ${id}`);
+      setExecutingBlockId(id);
+      setExecutionResult(id, 'Waiting on response...');
+
+      abortControllerRef.current = new AbortController();
+
       try {
         const response = await fetch('/api/execute-code', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code: String(children) }),
+          body: JSON.stringify({ code: String(children), projectDir }),
+          signal: abortControllerRef.current.signal,
         });
-        const result = await response.json();
-        setExecutionResult(id, result.output);
+
+        if (!response.ok) {
+          throw new Error('Failed to execute code');
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) {
+          throw new Error('Failed to get response reader');
+        }
+
+        let result = '';
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = new TextDecoder().decode(value);
+          result += chunk;
+          setExecutionResult(id, result);
+        }
       } catch (error) {
-        setExecutionResult(id, `Error executing code: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        if (error instanceof Error && error.name === 'AbortError') {
+          console.log(`Execution cancelled for block ${id}`);
+          setExecutionResult(id, 'Execution cancelled');
+        } else {
+          console.error(`Error executing code for block ${id}:`, error);
+          setExecutionResult(id, `Error executing code: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
+      } finally {
+        console.log(`Execution finished for block ${id}`);
+        setExecutingBlockId(null);
+        abortControllerRef.current = null;
       }
       setIsRestored(false);
     };
+
+    const handleCancelExecution = useCallback(() => {
+      console.log(`handleCancelExecution called for block ${id}`);
+      if (abortControllerRef.current) {
+        console.log(`Aborting execution for block ${id}`);
+        abortControllerRef.current.abort();
+      } else {
+        console.log(`AbortController not found for block ${id}`);
+      }
+    }, [id, abortControllerRef]);
 
     useEffect(() => {
       const key = `${messageIndex}-${id}`;
@@ -285,17 +340,30 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
                   )}
                 </>
               ) : (
-                <button
-                  onClick={handleExecute}
-                  className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-                >
-                  Execute
-                </button>
+                <>
+                  <button
+                    onClick={handleExecute}
+                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                    disabled={isExecuting}
+                  >
+                    {isExecuting ? 'Executing...' : 'Execute'}
+                  </button>
+                  {isExecuting && (
+                    <button
+                      onClick={handleCancelExecution}
+                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </>
               )}
             </div>
             {!isRestored && executionResults[id] && (
               <div className="mt-2 bg-gray-100 p-2 rounded">
-                {executionResults[id]}
+                <pre className="whitespace-pre-wrap overflow-x-auto">
+                  {executionResults[id]}
+                </pre>
               </div>
             )}
           </>
@@ -305,15 +373,17 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
   }
 });
 
-const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content, onDiff, role, isComplete, onEditCommand, messageIndex }) => {
+const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content, onDiff, role, isComplete, onEditCommand, messageIndex, projectDir }) => {
   const [executionResults, setExecutionResults] = useState<Record<string, string>>({});
   const [codeBlockIds] = useState<Record<number, string>>({});
   const [originalFileContents, setOriginalFileContents] = useState<Record<string, string>>({});
   const [newFiles, setNewFiles] = useState<Record<string, boolean>>({});
   const [restoredBlocks, setRestoredBlocks] = useState<Record<string, boolean>>({});
   const [maxWidth, setMaxWidth] = useState(0);
+  const [executingBlockId, setExecutingBlockId] = useState<string | null>(null);
   const [, forceUpdate] = useState({});
   const mainColumnRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const generateId = useCallback(() => `code-${Math.random().toString(36).substr(2, 9)}`, []);
 
@@ -419,10 +489,14 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
           isRestored={restoredBlocks[blockId] || false}
           setIsRestored={(isRestored: boolean) => setRestoredBlocks(prev => ({ ...prev, [blockId]: isRestored }))}
           maxWidth={maxWidth}
+          projectDir={projectDir}
+          executingBlockId={executingBlockId}
+          setExecutingBlockId={setExecutingBlockId}
+          abortControllerRef={abortControllerRef}
         />
       );
     };
-  }, [isComplete, setExecutionResult, handleDiffClick, handleRestore, executionResults, originalFileContents, setOriginalFileContent, generateId, codeBlockIds, onEditCommand, messageIndex, getPreviousLine, fetchFileContent, newFiles, setIsNewFile, restoredBlocks, maxWidth]);
+  }, [isComplete, setExecutionResult, handleDiffClick, handleRestore, executionResults, originalFileContents, setOriginalFileContent, generateId, codeBlockIds, onEditCommand, messageIndex, getPreviousLine, fetchFileContent, newFiles, setIsNewFile, restoredBlocks, maxWidth, projectDir, executingBlockId, setExecutingBlockId]);
 
   if (role === 'user') {
     return <div style={{ whiteSpace: 'pre-wrap' }}>{content}</div>;
@@ -445,7 +519,8 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
   return prevProps.content === nextProps.content &&
          prevProps.role === nextProps.role &&
          prevProps.isComplete === nextProps.isComplete &&
-         prevProps.messageIndex === nextProps.messageIndex;
+         prevProps.messageIndex === nextProps.messageIndex &&
+         prevProps.projectDir === nextProps.projectDir;
 });
 
 FormattedMessage.displayName = 'FormattedMessage';

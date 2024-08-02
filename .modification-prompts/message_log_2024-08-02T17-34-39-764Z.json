@@ -1,0 +1,79 @@
+[
+  {
+    "role": "user",
+    "content": "When you click Execute and system runs commands, should it cd to the project directory first so the commands are run from there?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "When Execute is clicked and app is waiting for output to be returned from server, let user know. Maybe put \"Waiting on response...\" in the box below. Also, can the execute response be streamed in when it begins? ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Sometimes the output looks good. Sometimes it looks like:\nSTDERR: Installing packages into ‘/usr/local/lib/R/4.4/site-library’\n(as ‘lib’ is unspecified)\nSTDERR: also installing the dependencies ‘pbkrtest’, ‘nloptr’, ‘units’, ‘car’, ‘dynlm’, ‘AER’, ‘lme4’, ‘sf’, ‘drc’, ‘epiR’, ‘joineRML’, ‘mediation’, ‘spdep’, ‘spatialreg’, ‘systemfit’, ‘RcppTOML’, ‘here’, ‘png’\n\nSTDERR: trying URL 'https://cran.rstudio.com/src/contrib/pbkrtest_0.5.3.tar.gz'\nSTDERR: Content type 'application/x-gzip' length 59013 bytes (57 KB)\n=============STDERR: ============STDERR: ==STDERR: ==============STDERR: =========STDERR: \ndownloaded 57 KB\n\nSTDERR: trying URL 'https://cran.rstudio.com/src/contrib/nloptr_2.1.1.tar.gz'\nSTDERR: Content type 'application/x-gzip' length 2236635 bytes (2.1 MB)\n====STDERR: ====STDERR: ====STDERR: ====STDERR: =STDERR: =======STDERR: ====STDERR: ===STDERR: ====STDERR: ====STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: ==STDERR: =STDERR: \ndownloaded 2.1 MB\n\nSTDERR: trying URL 'https://cran.rstudio.com/src/contrib/units_0.8-5.tar.gz'\nSTDERR: Content type 'application/x-gzip' length 247974 bytes (242 KB)\n===STDERR: ===STDERR: ===STDERR: ==STDERR: ==STDERR: ===STDERR: ==STDERR: ====STDERR: ===STDERR: =STDERR: ===STDERR: =======STDERR: ===STDERR: ===STDERR: =====STDERR: ===STDERR: \ndownloaded 242 KB\n\nSTDERR: trying URL 'https://cran.rstudio.com/src/contrib/car_3.1-2.tar.gz'\nSTDERR: Content type 'application/x-gzip' length 579829 bytes (566 KB)\n=STDERR: =STDERR: ==STDERR: =STDERR: ==STDERR: =STDERR: =STDERR: ==STDERR: =STDERR: ==STDERR: =STDERR: =STDERR: ==STDERR: =STDERR: ==STDERR: =STDERR: =STDERR: ==STDERR: =STDERR: ==STDERR: =STDERR: =STDERR: ==STDERR: =STDERR: =======STDERR: ==STDERR: =STDERR: ==STDERR: =STDERR: =STDERR: ==STDERR: =STDERR: \ndownloaded 566 KB\n\nSTDERR: trying URL 'https://cran.rstudio.com/src/contrib/dynlm_0.3-6.tar.gz'\nSTDERR: Content type 'application/x-gzip' length 17874 bytes (17 KB)\n=======================STDERR: ================STDERR: ===========STDERR: \ndownloaded 17 KB\n\nSTDERR: trying URL 'https://cran.rstudio.com/src/contrib/AER_1.2-12.tar.gz'\nSTDERR: Content type 'application/x-gzip' length 2232830 bytes (2.1 MB)\nSTDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: ====STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: \ndownloaded 2.1 MB\n\nSTDERR: trying URL 'https://cran.rstudio.com/src/contrib/lme4_1.1-35.5.tar.gz'\nSTDERR: Content type 'application/x-gzip' length 3300116 bytes (3.1 MB)\nSTDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: ==STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: ===STDERR: =STDERR: =STDERR: =STDERR: \ndownloaded 3.1 MB\n\nSTDERR: trying URL 'https://cran.rstudio.com/src/contrib/sf_1.0-16.tar.gz'\nSTDERR: Content type 'application/x-gzip' length 3493756 bytes (3.3 MB)\nSTDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: =STDERR: ==STDERR: =STDERR: ===STDERR: =STDERR: ===STDERR: =STDERR: =STDERR: ==STDERR: =STDERR: ==STDERR: \ndownloaded 3.3 MB",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full FormattedMessage",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Great. Create a way to cancel the execution while its in process.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "The cancel button is not showing up during execution\n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "It looks like isExecuting is never set to true when I click Execute.\n\n[Log] CodeBlock render - isExecuting: false\n[Log] CodeBlock render - isExecuting: false\n[Log] CodeBlock render - isExecuting: false\n[Log] CodeBlock render - isExecuting: false\n[Log] CodeBlock render - isExecuting: false\n[Log] CodeBlock render - isExecuting: false\n[Log] CodeBlock render - isExecuting: false\n[Log] CodeBlock render - isExecuting: false\n[Log] CodeBlock render - isExecuting: false\n[Log] Execution finished, setting isExecuting to false\n[Log] CodeBlock render - isExecuting: false\n[Log] CodeBlock render - isExecuting: false\n[Log] CodeBlock render - isExecuting: false",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full FormattedMessage with these changes",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "The cancel button is showing up next to every code block when I click Execute. It should only show up next to the code block I'm executing. \n\nAlso, the button isn't working. Execution continues.\n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "The button is showing up properly now. But not working when I click it. Maybe it's because it's constantly re-rendering? No logs are showing up on server and the browser logs are going back & forth like this during execution:\n\n[Log] CodeBlock render - id: code-hppl0cvd4, isExecuting: true\n[Log] CodeBlock render - id: code-hppl0cvd4, isExecuting: true\n[Log] CodeBlock render - id: code-0heyxekmk, isExecuting: false\n[Log] CodeBlock render - id: code-0heyxekmk, isExecuting: false\n[Log] CodeBlock render - id: code-soxhrgbif, isExecuting: false\n[Log] CodeBlock render - id: code-soxhrgbif, isExecuting: false\n[Log] CodeBlock render - id: code-af4qg7v0t, isExecuting: false\n[Log] CodeBlock render - id: code-af4qg7v0t, isExecuting: false\n[Log] CodeBlock render - id: code-6c2fax701, isExecuting: false\n[Log] CodeBlock render - id: code-6c2fax701, isExecuting: false\n[Log] CodeBlock render - id: code-cfdog0nq4, isExecuting: false\n[Log] CodeBlock render - id: code-cfdog0nq4, isExecuting: false\n[Log] CodeBlock render - id: code-rzc41wsci, isExecuting: false\n[Log] CodeBlock render - id: code-rzc41wsci, isExecuting: false\n[Log] CodeBlock render - id: code-hppl0cvd4, isExecuting: true\n[Log] CodeBlock render - id: code-hppl0cvd4, isExecuting: true\n[Log] CodeBlock render - id: code-0heyxekmk, isExecuting: false\n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -25,9 +25,10 @@ interface ChatMessagesProps {
   onDiff: (filePath: string) => void;
   onEditMessage: (index: number, newContent: string) => void;
   onEditCommand: (oldCommand: string, newCommand: string) => void;
+  projectDir: string;
 }
 
-const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, onDiff, onEditMessage, onEditCommand }) => {
+const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, onDiff, onEditMessage, onEditCommand, projectDir }) => {
   const [hoveredMessageIndex, setHoveredMessageIndex] = useState<number | null>(null);
 
   const handleEditClick = (index: number) => {
@@ -74,6 +75,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
             role={msg.role}
             isComplete={msg.isComplete}
             onEditCommand={onEditCommand}
+            messageIndex={index}
+            projectDir={projectDir}
           />
           {msg.role === 'user' && hoveredMessageIndex === index && (
             <PencilIcon

@@ -432,6 +432,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           onDiff={handleDiff}
           onEditMessage={handleEditMessage}
           onEditCommand={handleEditCommand}
+          projectDir={projectDir}
         />
         <div ref={chatEndRef} />
       </div>
