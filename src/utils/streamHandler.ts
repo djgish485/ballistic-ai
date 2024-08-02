@@ -20,10 +20,7 @@ export function createResponseStream(apiKey: { type: string; key: string }, apiR
           const lines = chunk.split('\n');
 
           for (const line of lines) {
-            if (line.trim() === 'data: [DONE]') {
-              console.log('Stream completed');
-              continue;
-            }
+            if (line.trim() === 'data: [DONE]') continue;
             if (line.startsWith('data: ')) {
               try {
                 const data = JSON.parse(line.slice(6));
@@ -39,7 +36,7 @@ export function createResponseStream(apiKey: { type: string; key: string }, apiR
                   controller.enqueue(`data: ${JSON.stringify({ content })}\n\n`);
                 }
               } catch (error) {
-                console.error('Error parsing JSON:', error);
+                // Error parsing JSON, but we'll silently ignore it
               }
             }
           }

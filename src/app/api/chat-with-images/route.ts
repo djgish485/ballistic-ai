@@ -7,21 +7,15 @@ import { createResponseStream } from '@/utils/streamHandler';
 import { Message } from '@/types/chat';
 
 export async function POST(req: NextRequest) {
-  console.log('chat-with-images: Received POST request');
   try {
     const formData = await req.formData();
-    console.log('chat-with-images: FormData keys:', [...formData.keys()]);
 
     const projectDir = formData.get('projectDir');
     const isInitial = formData.get('isInitial') === 'true';
     const conversationHistory = JSON.parse(formData.get('conversationHistory') as string) as Message[];
     const selectedAPIKeyIndex = formData.get('selectedAPIKeyIndex') as string;
 
-    console.log('chat-with-images: Parsed form data:', { projectDir, isInitial, selectedAPIKeyIndex });
-    console.log('chat-with-images: Conversation history length:', conversationHistory.length);
-
     if (!projectDir || typeof projectDir !== 'string') {
-      console.error('chat-with-images: Invalid project directory:', projectDir);
       return NextResponse.json({ error: 'Invalid project directory' }, { status: 400 });
     }
 
@@ -30,7 +24,6 @@ export async function POST(req: NextRequest) {
       : getSelectedAPIKey();
 
     if (!apiKey) {
-      console.error('chat-with-images: No API key selected');
       return NextResponse.json({ error: 'No API key selected' }, { status: 400 });
     }
 
@@ -46,8 +39,6 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.log('chat-with-images: Collected images for messages:', Object.keys(messageImages).length);
-
     // Attach images to the correct messages in the conversation history
     const updatedConversationHistory = conversationHistory.map((msg, index) => {
       if (messageImages[index.toString()]) {
@@ -62,22 +53,16 @@ export async function POST(req: NextRequest) {
     const initialMessage = constructInitialMessage(projectFiles);
 
     const serverMessages = constructServerMessages(isInitial, initialMessage, updatedConversationHistory);
-    console.log('chat-with-images: Server messages constructed:', serverMessages.length);
 
-    console.log('chat-with-images: Fetching API response');
     const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages, projectDir);
 
-    console.log('chat-with-images: Creating response stream');
     const stream = createResponseStream(apiKey, apiResponse, (messages: Message[]) => {
-      console.log('chat-with-images: Messages updated:', messages.length);
+      // Messages updated callback
     });
-
-    console.log('chat-with-images: Returning stream response');
 
     let isCancelled = false;
     req.signal.addEventListener('abort', () => {
       isCancelled = true;
-      console.log('chat-with-images: Request aborted');
     });
 
     return new NextResponse(new ReadableStream({
@@ -87,15 +72,13 @@ export async function POST(req: NextRequest) {
           while (true) {
             const { done, value } = await reader.read();
             if (done || isCancelled) {
-              console.log('chat-with-images: Stream ended or cancelled');
               break;
             }
             controller.enqueue(value);
           }
         } catch (error) {
-          console.error('chat-with-images: Stream reading error:', error);
+          // Error handling
         } finally {
-          console.log('chat-with-images: Closing stream controller');
           controller.close();
           reader.releaseLock();
         }
@@ -108,7 +91,6 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Error in chat with images API:', error);
     let errorMessage = 'An error occurred while processing the chat with images';
     let errorDetails = '';
 
@@ -121,7 +103,7 @@ export async function POST(req: NextRequest) {
             const errorObj = JSON.parse(match[0]);
             errorDetails = JSON.stringify(errorObj, null, 2);
           } catch (parseError) {
-            console.error('Error parsing error message:', parseError);
+            // Error parsing error message
           }
         }
       }
