@@ -34,7 +34,6 @@ export function getMessageLogPath(projectDir: string): string {
 }
 
 export function setupDirectories(projectDir: string): void {
-  console.log('Setting up directories for project:', projectDir);
   const directories = [
     INTERNALS_DIR,
     getProjectFilesDir(projectDir),
@@ -44,19 +43,14 @@ export function setupDirectories(projectDir: string): void {
 
   directories.forEach(dir => {
     const fullPath = path.join(process.cwd(), dir);
-    console.log('Attempting to create directory:', fullPath);
     if (!fs.existsSync(fullPath)) {
       try {
         fs.mkdirSync(fullPath, { recursive: true });
-        console.log(`Created directory: ${fullPath}`);
       } catch (error) {
         console.error(`Error creating directory ${fullPath}:`, error);
       }
-    } else {
-      console.log(`Directory already exists: ${fullPath}`);
     }
   });
-  console.log('Directory setup complete');
 }
 
 export function createProjectBackupAsync(projectDir: string): Promise<string> {
@@ -86,11 +80,9 @@ export function createProjectBackupAsync(projectDir: string): Promise<string> {
 }
 
 export function restoreProjectBackup(projectDir: string, backupDir: string): void {
-  // Clear the project directory
   fs.rmSync(projectDir, { recursive: true, force: true });
   fs.mkdirSync(projectDir, { recursive: true });
 
-  // Copy the backup to the project directory
   const copyRecursive = (src: string, dest: string) => {
     if (fs.statSync(src).isDirectory()) {
       fs.mkdirSync(dest, { recursive: true });
@@ -104,6 +96,5 @@ export function restoreProjectBackup(projectDir: string, backupDir: string): voi
 
   copyRecursive(backupDir, projectDir);
 
-  // Recreate .ballistic directory if it doesn't exist after restoration
   setupDirectories(projectDir);
 }

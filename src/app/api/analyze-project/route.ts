@@ -57,9 +57,7 @@ function shouldExcludeContent(basename: string, fullPath: string, projectDir: st
 }
 
 export async function POST(request: Request) {
-  console.log('Analyze project API route called');
   const { projectDir } = await request.json();
-  console.log('Received project directory:', projectDir);
   
   const settings = getSettings(projectDir);
   
@@ -67,13 +65,9 @@ export async function POST(request: Request) {
   const structureFile = path.join(ballisticFilesDir, 'project-structure.txt');
   const contentFile = path.join(ballisticFilesDir, 'project-content.txt');
 
-  console.log('Structure file path:', structureFile);
-  console.log('Content file path:', contentFile);
-
   // Analyze project structure
   let structureContent = `Project Structure:\n=================\n\nRoot: ${projectDir}\n\n`;
   function analyzeStructure(dir: string, level: number = 0) {
-    console.log(`Analyzing structure of: ${dir}`);
     const items = fs.readdirSync(dir);
     for (const item of items) {
       const fullPath = path.join(dir, item);
@@ -90,14 +84,12 @@ export async function POST(request: Request) {
   }
   analyzeStructure(projectDir);
   
-  console.log('Writing structure file');
   fs.writeFileSync(structureFile, structureContent);
 
   // Analyze project content
   let contentContent = `Project Content:\n================\n\n`;
   let fileCount = 0;
   function analyzeContent(dir: string) {
-    console.log(`Analyzing content of: ${dir}`);
     const items = fs.readdirSync(dir);
     for (const item of items) {
       const fullPath = path.join(dir, item);
@@ -117,7 +109,6 @@ export async function POST(request: Request) {
   }
   analyzeContent(projectDir);
   
-  console.log('Writing content file');
   fs.writeFileSync(contentFile, contentContent);
 
   return NextResponse.json({ message: `${fileCount} files added to project context` });
