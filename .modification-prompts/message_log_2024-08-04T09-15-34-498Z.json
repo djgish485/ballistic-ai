@@ -1,0 +1,30 @@
+[
+  {
+    "role": "user",
+    "content": "Can you fix these errors without changing the structure of the memo'ization? It took a lot of work to get the page performant.\n\n$ npx eslint . --ext .js,.jsx,.ts,.tsx\n=============\n\nWARNING: You are currently running a version of TypeScript which is not officially supported by @typescript-eslint/typescript-estree.\n\nYou may find that it works just fine, or you may not.\n\nSUPPORTED TYPESCRIPT VERSIONS: >=4.7.4 <5.5.0\n\nYOUR TYPESCRIPT VERSION: 5.5.3\n\nPlease only submit bug reports when using the officially supported version.\n\n=============\n\n/Users/dgish/code-git/superhero-ai/superhero-nextjs/src/components/FormattedMessage.tsx\n   49:45  error  Component definition is missing display name                                                                                    react/display-name\n  113:38  error  React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render      react-hooks/rules-of-hooks\n  247:35  error  React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render  react-hooks/rules-of-hooks\n  253:5   error  React Hook \"useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render    react-hooks/rules-of-hooks\n  459:12  error  Component definition is missing display name                                                                                    react/display-name\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Nope, that slowed down the app dramatically. Analyze why it ran well previously and why your changes slowed it down. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Still getting these errors. Knowing everything you know now, how can you fix them without affecting memo performance?\n\n/Users/dgish/code-git/superhero-ai/superhero-nextjs/src/components/FormattedMessage.tsx\n  113:38  error  React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render      react-hooks/rules-of-hooks\n  247:35  error  React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render  react-hooks/rules-of-hooks\n  253:5   error  React Hook \"useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render    react-hooks/rules-of-hooks\n  459:12  error  Component definition is missing display name                                                                                    react/display-name\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Nope, that failed. The project gets very slow. \n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

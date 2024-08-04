@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import Layout from '../components/Layout';
 import { useProjectDir } from '../hooks/useProjectDir';
+import { SystemMessage } from '@/types/chat';
 
 const ChatInterface = dynamic(() => import('../components/ChatInterface'), { ssr: false });
 const FileList = dynamic(() => import('../components/FileList'), { ssr: false });
@@ -15,7 +16,7 @@ export default function Home() {
   const [includePaths, setIncludePaths] = useState<string[]>([]);
   const [isStarted, setIsStarted] = useState(false);
   const [hasBackup, setHasBackup] = useState(false);
-  const [systemMessages, setSystemMessages] = useState<{ type: string; content: string }[]>([]);
+  const [systemMessages, setSystemMessages] = useState<SystemMessage[]>([]);
   const [fileListKey, setFileListKey] = useState(0);
 
   useEffect(() => {
@@ -26,10 +27,12 @@ export default function Home() {
 
   const fetchIncludePaths = async () => {
     try {
-      const response = await fetch(`/api/context-settings?projectDir=${encodeURIComponent(projectDir)}`);
-      if (response.ok) {
-        const settings = await response.json();
-        setIncludePaths(settings.includePaths);
+      if (projectDir) {
+        const response = await fetch(`/api/context-settings?projectDir=${encodeURIComponent(projectDir)}`);
+        if (response.ok) {
+          const settings = await response.json();
+          setIncludePaths(settings.includePaths);
+        }
       }
     } catch (error) {
       console.error('Error fetching include paths:', error);
@@ -144,7 +147,7 @@ export default function Home() {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8 h-screen flex flex-col">
-        <h1 className="text-2xl font-bold mb-4">Superhero</h1>
+        <h1 className="text-2xl font-bold mb-4">Propellant</h1>
         {loading ? (
           <p>Loading project directory...</p>
         ) : error ? (

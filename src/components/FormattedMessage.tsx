@@ -125,7 +125,7 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
     };
 
     const handleWrite = async () => {
-      if (filePath) {
+      if (filePath && newContent !== null) {
         try {
           const key = `${messageIndex}-${id}`;
           let isNewlyCreated = false;
@@ -306,12 +306,14 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
                   >
                     Write
                   </button>
-                  <button
-                    onClick={() => handleDiffClick(filePath, newContent)}
-                    className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                  >
-                    Diff
-                  </button>
+                  {newContent !== null && (
+                    <button
+                      onClick={() => handleDiffClick(filePath, newContent)}
+                      className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    >
+                      Diff
+                    </button>
+                  )}
                   {isNewFile && (
                     <button
                       onClick={handleUndo}
@@ -456,7 +458,7 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
   const memoizedCodeBlock = useMemo(() => {
     return (props: any) => {
       const { filePath } = parseCommand(String(props.children), getPreviousLine(props.node.position?.start.line));
-      const isNewFile = newFiles[filePath] || false;
+      const isNewFile = filePath ? newFiles[filePath] || false : false;
       const blockId = `${messageIndex}-${props.node.position?.start.line}`;
       return (
         <CodeBlock
@@ -475,7 +477,7 @@ const FormattedMessage: React.FC<FormattedMessageProps> = React.memo(({ content,
           getPreviousLine={getPreviousLine}
           fetchFileContent={fetchFileContent}
           isNewFile={isNewFile}
-          setIsNewFile={(isNew: boolean) => setIsNewFile(filePath, isNew)}
+          setIsNewFile={(isNew: boolean) => filePath && setIsNewFile(filePath, isNew)}
           isRestored={restoredBlocks[blockId] || false}
           setIsRestored={(isRestored: boolean) => setRestoredBlocks(prev => ({ ...prev, [blockId]: isRestored }))}
           maxWidth={maxWidth}

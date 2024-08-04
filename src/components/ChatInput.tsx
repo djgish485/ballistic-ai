@@ -5,7 +5,7 @@ import { PhotoIcon, PaperAirplaneIcon, StopIcon } from '@heroicons/react/24/soli
 
 interface ChatInputProps {
   input: string;
-  setInput: (input: string) => void;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
   handleSend: (images: File[]) => void;
   handleCancel: () => void;
   isLoading: boolean;

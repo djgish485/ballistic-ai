@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "$ npm run build\n\n> superhero-nextjs@0.1.0 build\n> next build\n\n  ▲ Next.js 14.2.5\n\n   Creating an optimized production build ...\n ✓ Compiled successfully\n\nFailed to compile.\n\n./src/app/layout.tsx\n15:9  Error: Synchronous scripts should not be used. See: https://nextjs.org/docs/messages/no-sync-scripts  @next/next/no-sync-scripts\n\n\n./src/components/FormattedMessage.tsx\n49:45  Error: Component definition is missing display name  react/display-name\n113:38  Error: React Hook \"useMemo\" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks\n247:35  Error: React Hook \"useCallback\" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks\n253:5  Error: React Hook \"useEffect\" is called conditionally. React Hooks must be called in the exact same order in every component render.  react-hooks/rules-of-hooks\n459:12  Error: Component definition is missing display name  react/display-name\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Your fix to FormattedMessage dramatically slowed down the app. \n\nIs there a way to fix the errors without changing the memo'izing much?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

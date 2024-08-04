@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "src/utils/messageProcessor.ts:42:13 - error TS2741: Property 'isComplete' is missing in type '{ role: \"user\"; content: string; }' but required in type 'Message'.\n\n42     return [{ role: 'user', content: initialMessage }];\n               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  src/types/chat.ts:5:3\n    5   isComplete: boolean;\n        ~~~~~~~~~~\n    'isComplete' is declared here.\n\nsrc/utils/messageProcessor.ts:45:7 - error TS2741: Property 'isComplete' is missing in type '{ role: \"user\"; content: string; }' but required in type 'Message'.\n\n45       { role: 'user', content: initialMessage },\n         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n  src/types/chat.ts:5:3\n    5   isComplete: boolean;\n        ~~~~~~~~~~\n    'isComplete' is declared here.\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

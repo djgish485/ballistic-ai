@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "$ npx tsc --noEmit\nsrc/app/api/chat-with-images/route.ts:32:32 - error TS2802: Type 'IterableIterator<[string, FormDataEntryValue]>' can only be iterated through when using the '--downlevelIteration' flag or with a '--target' of 'es2015' or higher.\n\n32     for (const [key, value] of formData.entries()) {\n                                  ~~~~~~~~~~~~~~~~~~\n\nsrc/app/api/chat/route.ts:30:100 - error TS2554: Expected 3 arguments, but got 4.\n\n30     const serverMessages = constructServerMessages(isInitial, initialMessage, conversationHistory, message);\n                                                                                                      ~~~~~~~\n\nsrc/app/api/chat/route.ts:38:29 - error TS2345: Argument of type 'ReadableStream<any>' is not assignable to parameter of type 'BodyInit | null | undefined'.\n  Type 'import(\"stream/web\").ReadableStream<any>' is not assignable to type 'ReadableStream<any>'.\n    Types of property 'pipeThrough' are incompatible.\n      Type '<T>(transform: import(\"stream/web\").ReadableWritablePair<T, any>, options?: import(\"stream/web\").StreamPipeOptions | undefined) => import(\"stream/web\").ReadableStream<T>' is not assignable to type '<T>(transform: ReadableWritablePair<T, any>, options?: StreamPipeOptions | undefined) => ReadableStream<T>'.\n        Types of parameters 'transform' and 'transform' are incompatible.\n          Type 'ReadableWritablePair<T, any>' is not assignable to type 'ReadableWritablePair<T | undefined, any>'.\n            Types of property 'readable' are incompatible.\n              Type 'ReadableStream<T>' is missing the following properties from type 'ReadableStream<T | undefined>': values, [Symbol.asyncIterator]\n\n38     return new NextResponse(stream, {\n                               ~~~~~~\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "$ npx tsc --noEmit\nsrc/app/api/execute-code/route.ts:24:50 - error TS7006: Parameter 'cmd' implicitly has an 'any' type.\n\n24         const commands = code.split('\\n').filter(cmd => cmd.trim() !== '');\n                                                    ~~~\n\nsrc/app/page.tsx:29:91 - error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string | number | boolean'.\n  Type 'null' is not assignable to type 'string | number | boolean'.\n\n29       const response = await fetch(`/api/context-settings?projectDir=${encodeURIComponent(projectDir)}`);\n                                                                                             ~~~~~~~~~~\n\nsrc/app/page.tsx:184:21 - error TS2322: Type '{ type: string; content: string; }[]' is not assignable to type 'SystemMessage[]'.\n  Type '{ type: string; content: string; }' is not assignable to type 'SystemMessage'.\n    Types of property 'type' are incompatible.\n      Type 'string' is not assignable to type '\"backup\" | \"restore\"'.\n\n184                     systemMessages={systemMessages}\n                        ~~~~~~~~~~~~~~\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

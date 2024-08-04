@@ -1,0 +1,30 @@
+[
+  {
+    "role": "user",
+    "content": "Remove most logging on the server. I do want to keep these messages:\nAPI Type: OpenAI\nTotal tokens: 5763\nTotal response size: 1074957 bytes\nDuration: 68.60 seconds\nTokens per second: 84.01\n\nAnd the messages like:\n POST /api/restore-file 200 in 11ms",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "remove logging from chat-with-images except the messages above that I want to keep",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Where are these messages coming from? Remove them.\n\nMessages being sent to the API:\nMessage 0:\n  role: user\n  content: Please provide a SHORT, CONCIS...\nMessage 1:\n  role: assistant\n  content: The **Generative AI Enhances C...\nMessage 2:\n  role: user\n  content: Increase project logging\nOpenAI API request body:\n{\n  \"model\": \"gpt-4o\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are an expert software dev...\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Please provide a SHORT, CONCIS...\"\n    },\n    {\n      \"role\": \"assistant\",\n      \"content\": \"The **Generative AI Enhances C...\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": \"Increase project logging\\n\\nReme...\"\n    }\n  ],\n  \"max_tokens\": 4096,\n  \"stream\": true\n}\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Comment out the part that writes the file api_request_log_... I want to keep the functionality but not write to it for now.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

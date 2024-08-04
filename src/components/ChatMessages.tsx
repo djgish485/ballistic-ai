@@ -5,24 +5,12 @@ import FormattedMessage from './FormattedMessage';
 import ImageThumbnail from './ImageThumbnail';
 import styles from './ChatInterface.module.css';
 import { PencilIcon } from '@heroicons/react/24/solid';
-
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  isComplete: boolean;
-  images?: File[];
-  apiType?: 'Claude 3.5 Sonnet' | 'GPT-4o';
-}
-
-interface SystemMessage {
-  type: 'backup' | 'restore' | 'analysis';
-  content: string;
-}
+import { Message, SystemMessage } from '@/types/chat';
 
 interface ChatMessagesProps {
   systemMessages: SystemMessage[];
   messages: Message[];
-  onDiff: (filePath: string) => void;
+  onDiff: (filePath: string, newContent: string) => void;
   onEditMessage: (index: number, newContent: string) => void;
   onEditCommand: (oldCommand: string, newCommand: string) => void;
   projectDir: string;

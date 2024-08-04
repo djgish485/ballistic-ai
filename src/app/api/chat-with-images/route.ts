@@ -29,7 +29,8 @@ export async function POST(req: NextRequest) {
 
     // Collect received images for all messages
     const messageImages: { [key: string]: File[] } = {};
-    for (const [key, value] of formData.entries()) {
+    const entries = Array.from(formData.entries());
+    for (const [key, value] of entries) {
       if (key.startsWith('image_') && value instanceof File) {
         const [_, msgIndex, imgIndex] = key.split('_');
         if (!messageImages[msgIndex]) {

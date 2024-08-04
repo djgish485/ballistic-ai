@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "I want to rename the Github project from \"superhero-ai\" to \"propellant-ai\". How do I do it? It's currently a private repository that only I've been using. Here's the current url:\nhttps://github.com/djgish485/superhero-ai",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  }
+]

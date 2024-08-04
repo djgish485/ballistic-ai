@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "$ npx tsc --noEmit\nsrc/components/ChatInput.tsx:95:14 - error TS7006: Parameter 'prevInput' implicitly has an 'any' type.\n\n95     setInput(prevInput => {\n                ~~~~~~~~~\n\nsrc/components/ChatInput.tsx:95:14 - error TS2345: Argument of type '(prevInput: any) => string' is not assignable to parameter of type 'string'.\n\n95     setInput(prevInput => {\n                ~~~~~~~~~~~~~~\n\n  src/components/ChatInput.tsx:95:14\n    95     setInput(prevInput => {\n                    ~~~~~~~~~~~~~~\n    Did you mean to call this expression?\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

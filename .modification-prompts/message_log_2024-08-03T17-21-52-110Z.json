@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "$ npx tsc --noEmit\nnode:internal/modules/cjs/loader:1222\n  throw err;\n  ^\n\nError: Cannot find module '../lib/tsc.js'\nRequire stack:\n- /Users/dgish/code-git/superhero-ai/prod_superhero/node_modules/.bin/tsc\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1219:15)\n    at Module._load (node:internal/modules/cjs/loader:1045:27)\n    at TracingChannel.traceSync (node:diagnostics_channel:315:14)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:215:24)\n    at Module.require (node:internal/modules/cjs/loader:1304:12)\n    at require (node:internal/modules/helpers:123:16)\n    at Object.<anonymous> (/Users/dgish/code-git/superhero-ai/prod_superhero/node_modules/.bin/tsc:2:1)\n    at Module._compile (node:internal/modules/cjs/loader:1504:14)\n    at Module._extensions..js (node:internal/modules/cjs/loader:1588:10)\n    at Module.load (node:internal/modules/cjs/loader:1282:32) {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: [\n    '/Users/dgish/code-git/superhero-ai/prod_superhero/node_modules/.bin/tsc'\n  ]\n}\n\nNode.js v22.5.1\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

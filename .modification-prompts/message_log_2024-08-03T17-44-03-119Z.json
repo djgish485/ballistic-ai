@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "$ npx tsc --noEmit\nsrc/components/FormattedMessage.tsx:155:79 - error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.\n  Type 'null' is not assignable to type 'string'.\n\n155           const isTruncated = truncationPatterns.some(pattern => pattern.test(newContent));\n                                                                                  ~~~~~~~~~~\n\nsrc/components/FormattedMessage.tsx:310:62 - error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.\n  Type 'null' is not assignable to type 'string'.\n\n310                     onClick={() => handleDiffClick(filePath, newContent)}\n                                                                 ~~~~~~~~~~\n\nsrc/components/FormattedMessage.tsx:459:34 - error TS2538: Type 'null' cannot be used as an index type.\n\n459       const isNewFile = newFiles[filePath] || false;\n                                     ~~~~~~~~\n\nsrc/components/FormattedMessage.tsx:478:58 - error TS2345: Argument of type 'string | null' is not assignable to parameter of type 'string'.\n  Type 'null' is not assignable to type 'string'.\n\n478           setIsNewFile={(isNew: boolean) => setIsNewFile(filePath, isNew)}\n                                                             ~~~~~~~~\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

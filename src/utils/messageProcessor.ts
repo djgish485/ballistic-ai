@@ -39,10 +39,10 @@ export function constructServerMessages(
   conversationHistory: Message[]
 ): Message[] {
   if (isInitial) {
-    return [{ role: 'user', content: initialMessage }];
+    return [{ role: 'user', content: initialMessage, isComplete: true }];
   } else {
     return [
-      { role: 'user', content: initialMessage },
+      { role: 'user', content: initialMessage, isComplete: true },
       ...conversationHistory
     ];
   }

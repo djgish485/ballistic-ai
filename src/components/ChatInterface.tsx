@@ -222,7 +222,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     let currentContent = '';
 
     setMessages((prev) => {
-      const newMessages = [...prev, { 
+      const newMessages: Message[] = [...prev, { 
         role: 'assistant', 
         content: '', 
         isComplete: false,

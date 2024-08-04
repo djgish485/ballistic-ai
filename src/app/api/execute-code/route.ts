@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         }
 
         // Split the code into separate commands
-        const commands = code.split('\n').filter(cmd => cmd.trim() !== '');
+        const commands = code.split('\n').filter((cmd: string) => cmd.trim() !== '');
 
         for (const command of commands) {
           await executeCommand(command, projectDir, controller, encoder, request.signal);

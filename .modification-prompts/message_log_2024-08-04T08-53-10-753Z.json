@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "This error is showing on the server logs:\nInvalid file path: File is outside the project directory\n\nBut the client only shows:\nError updating file: Failed to write file\n\nShow that server error in the client instead of that message",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full FormattedMessage.tsx",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const systemPrompt = initialPrompt;
     const initialMessage = constructInitialMessage(projectFiles);
 
-    const serverMessages = constructServerMessages(isInitial, initialMessage, conversationHistory, message);
+    const serverMessages = constructServerMessages(isInitial, initialMessage, conversationHistory);
 
     const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages, projectDir);
 
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       console.log('Messages updated:', messages);
     });
 
-    return new NextResponse(stream, {
+    return new NextResponse(stream as unknown as ReadableStream<Uint8Array>, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
