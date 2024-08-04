@@ -187,7 +187,7 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
       ) : error ? (
         <p className="text-red-500">{error}</p>
       ) : files.length === 0 ? (
-        <p className="text-gray-600">No files found.</p>
+        <p className="text-gray-600"><i>Project files will be added when you click Start.</i></p>
       ) : (
         <>
           <ul className="space-y-1 mb-4">
