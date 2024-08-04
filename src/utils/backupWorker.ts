@@ -5,7 +5,7 @@ const path = require('path');
 async function copyRecursive(src, dest) {
   const stats = await fs.stat(src);
   if (stats.isDirectory()) {
-    if (path.basename(src) !== '.superhero') {
+    if (path.basename(src) !== '.ballistic') {
       await fs.mkdir(dest, { recursive: true });
       const entries = await fs.readdir(src);
       await Promise.all(entries.map(entry => copyRecursive(path.join(src, entry), path.join(dest, entry))));

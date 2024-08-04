@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "The app is running well under \"npm run dev\". Can you ignore linting errors when \"npm run build\" ?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "$ npm run build\n\n> superhero-nextjs@0.1.0 build\n> next build\n\n  ▲ Next.js 14.2.5\n\n   Creating an optimized production build ...\n(node:23064) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.\n(Use `node --trace-deprecation ...` to show where the warning was created)\n ✓ Compiled successfully\n   Skipping linting\n   Checking validity of types  ..Failed to compile.\n\n./src/utils/backupWorker.ts:5:30\nType error: Parameter 'src' implicitly has an 'any' type.\n\n  3 | const path = require('path');\n  4 |\n> 5 | async function copyRecursive(src, dest) {\n    |                              ^\n  6 |   const stats = await fs.stat(src);\n  7 |   if (stats.isDirectory()) {\n  8 |     if (path.basename(src) !== '.superhero') {\n\nCan tsconfig be less strict?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

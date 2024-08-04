@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const API_KEYS_FILE = path.join(process.cwd(), '.superhero', 'internals', 'api_keys.json');
+const API_KEYS_FILE = path.join(process.cwd(), '.ballistic', 'internals', 'api_keys.json');
 
 interface APIKey {
   type: 'Claude' | 'OpenAI';

@@ -1,0 +1,23 @@
+[
+  {
+    "role": "user",
+    "content": "Add \"mjs\" to the file extensions included by default when analyzing project",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Any other config extensions we're missing?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Format excludeDirs on one line so I can compare files.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

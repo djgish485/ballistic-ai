@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "The app is running well under \"npm run dev\". Can you ignore linting errors when \"npm run build\" ?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Why did you get rid of webpack:",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { Worker } from 'worker_threads';
 
-export const INTERNALS_DIR = '.superhero/internals';
+export const INTERNALS_DIR = '.ballistic/internals';
 
 export function encodeProjectDir(projectDir: string): string {
   const basename = path.basename(projectDir);
@@ -15,17 +15,17 @@ export function encodeProjectDir(projectDir: string): string {
 
 export function getProjectFilesDir(projectDir: string): string {
   const encodedDir = encodeProjectDir(projectDir);
-  return path.join('.superhero', `${encodedDir}-files`);
+  return path.join('.ballistic', `${encodedDir}-files`);
 }
 
 export function getProjectBackupsDir(projectDir: string): string {
   const encodedDir = encodeProjectDir(projectDir);
-  return path.join('.superhero', `${encodedDir}-backups`);
+  return path.join('.ballistic', `${encodedDir}-backups`);
 }
 
 export function getProjectSettingsDir(projectDir: string): string {
   const encodedDir = encodeProjectDir(projectDir);
-  return path.join('.superhero', `${encodedDir}-settings`);
+  return path.join('.ballistic', `${encodedDir}-settings`);
 }
 
 export function getMessageLogPath(projectDir: string): string {
@@ -104,6 +104,6 @@ export function restoreProjectBackup(projectDir: string, backupDir: string): voi
 
   copyRecursive(backupDir, projectDir);
 
-  // Recreate .superhero directory if it doesn't exist after restoration
+  // Recreate .ballistic directory if it doesn't exist after restoration
   setupDirectories(projectDir);
 }

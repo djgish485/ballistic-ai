@@ -147,7 +147,7 @@ export default function Home() {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8 h-screen flex flex-col">
-        <h1 className="text-2xl font-bold mb-4">Propellant</h1>
+        <h1 className="text-2xl font-bold mb-4">Ballistic</h1>
         {loading ? (
           <p>Loading project directory...</p>
         ) : error ? (

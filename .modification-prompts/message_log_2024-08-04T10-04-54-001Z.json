@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "the autoscroll stuff that keeps the page scrolled down as the LLM response streams in. It works well when the page isn't very long - I can scroll up and it stops forcing the scroll of the page down. But as the page gets taller (or streaming comes in very quickly) it becomes increasingly difficult to \"break\" the auto scrolling by scrolling up. \n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show full file",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -166,7 +166,12 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ filePath, content: newContent }),
           });
-          if (!response.ok) throw new Error('Failed to write file');
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to write file');
+          }
+          
           setExecutionResult(id, `File ${filePath} ${isNewlyCreated ? 'created' : 'updated'} successfully.`);
           setCanRestore(true);
           

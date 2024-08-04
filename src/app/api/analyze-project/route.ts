@@ -63,9 +63,9 @@ export async function POST(request: Request) {
   
   const settings = getSettings(projectDir);
   
-  const superheroFilesDir = path.join(process.cwd(), getProjectFilesDir(projectDir));
-  const structureFile = path.join(superheroFilesDir, 'project-structure.txt');
-  const contentFile = path.join(superheroFilesDir, 'project-content.txt');
+  const ballisticFilesDir = path.join(process.cwd(), getProjectFilesDir(projectDir));
+  const structureFile = path.join(ballisticFilesDir, 'project-structure.txt');
+  const contentFile = path.join(ballisticFilesDir, 'project-content.txt');
 
   console.log('Structure file path:', structureFile);
   console.log('Content file path:', contentFile);

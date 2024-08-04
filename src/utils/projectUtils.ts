@@ -3,14 +3,14 @@ import path from 'path';
 import { getProjectFilesDir } from './directoryUtils';
 
 export async function getProjectFiles(projectDir: string): Promise<string> {
-  const superheroFilesDir = getProjectFilesDir(projectDir);
+  const ballisticFilesDir = getProjectFilesDir(projectDir);
   let projectFiles = '';
 
-  // Read all files in the superhero files directory
-  const files = fs.readdirSync(superheroFilesDir);
+  // Read all files in the ballistic files directory
+  const files = fs.readdirSync(ballisticFilesDir);
 
   for (const file of files) {
-    const filePath = path.join(superheroFilesDir, file);
+    const filePath = path.join(ballisticFilesDir, file);
     const stats = fs.statSync(filePath);
 
     if (stats.isFile()) {

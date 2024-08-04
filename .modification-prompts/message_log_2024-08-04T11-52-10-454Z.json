@@ -1,0 +1,37 @@
+[
+  {
+    "role": "user",
+    "content": "Change the title of the app to \"Ballistic\".",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "rename the .superhero directory to .ballistic and update all references to it",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "There is currently a .superhero directory already created. Give the command to rename it.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Any other references to .superhero? The API keys aren't loading.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Here's a deploy script, update it to handle the changes above. \nThe dev_dir is now /Users/dgish/code-git/superhero-ai/ballistic-nextjs\nThe prod dir has already been renamed to /Users/dgish/code-git/superhero-ai/prod_ballistic and .ballistic inside of it.\n\n$ cat deploy.sh \n#!/bin/bash\n\n# Define directories\nDEV_DIR=\"/Users/dgish/code-git/superhero-ai/superhero-nextjs\"\nPROD_DIR=\"/Users/dgish/code-git/superhero-ai/prod_superhero\"\nOLD_PROD_DIR=\"/Users/dgish/code-git/superhero-ai/_old_prod_superhero\"\nBACKUP_DIR=\"$DEV_DIR/.superhero/superhero-nextjs-backups\"\n\n# Move existing prod_superhero to _old_prod_superhero, deleting _old_prod_superhero first if it exists\nif [ -d \"$OLD_PROD_DIR\" ]; then\n  rm -rf \"$OLD_PROD_DIR\"\nfi\n\nif [ -d \"$PROD_DIR\" ]; then\n  mv \"$PROD_DIR\" \"$OLD_PROD_DIR\"\nfi\n\n# Copy the entire development directory to the production directory, excluding the backup directory\nrsync -av --exclude=\"$BACKUP_DIR\" \"$DEV_DIR/\" \"$PROD_DIR/\"\n\n# Delete the new .superhero directory in the production directory\nif [ -d \"$PROD_DIR/.superhero\" ]; then\n  rm -rf \"$PROD_DIR/.superhero\"\nfi\n\n# Copy the old .superhero directory back into the new production directory\nif [ -d \"$OLD_PROD_DIR/.superhero\" ]; then\n  cp -r \"$OLD_PROD_DIR/.superhero\" \"$PROD_DIR/.superhero\"\nfi\n\necho \"Deployment completed successfully.\"\necho \"NOW: cd prod_superhero\"\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

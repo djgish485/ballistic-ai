@@ -5,7 +5,7 @@ import Script from 'next/script'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Superhero App',
+  title: 'Ballistic',
   description: 'AI-powered code analysis assistant',
 }
 
