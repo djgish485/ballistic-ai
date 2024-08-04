@@ -1,14 +1,12 @@
-# Ballistic: Revolutionizing Software Development with AI 🚀
+# Ballistic: A Radical New Method for Software Development 🚀
 
-Ballistic introduces a transformative approach to software development, harnessing the power of advanced AI to elevate your development workflow. Say goodbye to editors and auto-complete and embrace a new era of high-level, AI-driven software creation.
+The latest SOTA LLMs are capable of reading & modifying your entire software project while outputting entire files. Ballistic transforms chats into software development sessions.
 
-## Why Ballistic?
+![Ballistic Overview](./public/screenshot1.png)
 
-- **AI-First Development**: Interact with state-of-the-art LLMs to generate, modify, and analyze entire codebases effortlessly.
-- **Full File Manipulation**: Generate and edit complete files without touching a traditional editor.
-- **Intelligent Context Management**: Automatically capture and optimize project context for AI understanding.
-- **Seamless AI Collaboration**: Execute, write, diff, and undo code changes directly from AI conversations.
-- **Visual Feedback**: Real-time diffs and execution results provide immediate insights.
+Write/Execute/Diff/Undo operations lets you work in confidence and ease. Find new creative levels and speed with Ballistic.
+
+![AI Collaboration](./public/screenshot2.png)
 
 ## Getting Started
 
@@ -45,17 +43,15 @@ Ballistic introduces a transformative approach to software development, harnessi
 4. **Execute**: Use the Execute/Write/Diff/Undo buttons to manage code changes directly from the chat.
 5. **Iterate**: Click "Next Feature" or reload the page to manage chat history.
 
-## Pro Tips
+## Tips
 
-- **Debugging**: Prompt the AI with: "List a couple hypotheses why [issue] is occurring and add log messages to investigate."
-- **Context Validation**: Review `project-content.txt` to ensure critical files are included in the AI context.
 - **API Selection**:
   - Claude 3.5 (Recommended): Ideal for complex tasks with 8192 token output.
   - GPT-4o: Faster with higher rate limits, suitable for simpler tasks.
-
-## Contributing
-
-Ballistic thrives on community input. Check out our open issues or submit a pull request to help shape the future of AI-driven development.
+- **Context Validation**: 
+  - Review `project-content.txt` to ensure critical files are included in the AI context.
+  - For large projects, manage context size by editing context settings to only include relevant paths.  
+- **Debugging**: Prompt the AI with: "List a couple hypotheses why [issue] is occurring and add log messages to investigate."
 
 ## License
 
@@ -63,4 +59,4 @@ Ballistic thrives on community input. Check out our open issues or submit a pull
 
 ---
 
-Embrace the future of coding with Ballistic – where AI and human creativity converge to redefine software development.
+Embrace the future of software development with Ballistic – where AI and human creativity converge.
