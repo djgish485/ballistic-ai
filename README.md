@@ -1,6 +1,6 @@
 # Ballistic: Radical Software Development 🚀
 
-The latest SOTA LLMs are capable of reading & modifying your entire software project and outputting full files. Put away the editor and work in broad strokes - Ballistic transforms chats into software development sessions.
+The latest SOTA LLMs are capable of reading & modifying your entire software project and outputting full files. Put away the editor and work in broad strokes - Ballistic transforms chats into development sessions.
 
 Your project is automatically added into the chat context.
 
@@ -9,6 +9,8 @@ Your project is automatically added into the chat context.
 Write/Execute/Diff/Undo operations allow you to work with LLM outputs with confidence and ease.
 
 ![AI Collaboration](./public/screenshot2.png)
+
+The results will blow you away.
 
 ## Getting Started
 
@@ -52,7 +54,7 @@ Write/Execute/Diff/Undo operations allow you to work with LLM outputs with confi
 - **Context Validation**: 
   - Review `project-content.txt` to ensure critical files are included in the AI context.
   - For large projects, manage context size by editing context settings to only include relevant paths.  
-- **Debugging**: Prompt the AI with: "List a couple hypotheses why [issue] is occurring and add log messages to investigate."
+- **Debugging**: Click "Tips" below the input box to add handy prompts like: "List a couple hypotheses why and add log messages to figure it out."
 - **Full Files**: Ballistic encourages the LLM to provide the full files necessary for operation. If a file gets truncated, remind it to show you the full file.
 - **Manage**: Keep chats manageable by clicking "Next Modification" or refreshing page when you're confident a modification is finished.
 
