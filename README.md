@@ -1,8 +1,8 @@
 # Ballistic: Radical Software Development 🚀
 
-The latest SOTA LLMs are capable of reading & modifying your entire software project and outputting entire files. This allows you to put away the editor and work in broad strokes. Ballistic transforms chats into software development sessions.
+The latest SOTA LLMs are capable of reading & modifying your entire software project and outputting full files. Put away the editor and work in broad strokes - Ballistic transforms chats into software development sessions.
 
-Your project is automatically backed up and added into the chat context.
+Your project is automatically added into the chat context.
 
 ![Ballistic Overview](./public/screenshot1.png)
 
@@ -55,6 +55,10 @@ Write/Execute/Diff/Undo operations allow you to work with LLM outputs with confi
 - **Debugging**: Prompt the AI with: "List a couple hypotheses why [issue] is occurring and add log messages to investigate."
 - **Full Files**: Ballistic encourages the LLM to provide the full files necessary for operation. If a file gets truncated, remind it to show you the full file.
 - **Manage**: Keep chats manageable by clicking "Next Modification" or refreshing page when you're confident a modification is finished.
+
+## A New Paradigm
+
+- Ballistic was created entirely via prompting. The .modification-prompts directory contains a log of the prompts used to create Ballistic. 
 
 ## License
 
