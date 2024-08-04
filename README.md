@@ -1,12 +1,12 @@
-# Ballistic: A Radical New Method for Software Development 🚀
+# Ballistic: Radical Software Development 🚀
 
-The latest SOTA LLMs are capable of reading & modifying your entire software project while outputting entire files. This allows you to put away the editor and focus at a high lvel. Ballistic transforms chats into software development sessions.
+The latest SOTA LLMs are capable of reading & modifying your entire software project and outputting entire files. This allows you to put away the editor and work in broad strokes. Ballistic transforms chats into software development sessions.
 
 Your project is automatically backed up and added into the chat context.
 
 ![Ballistic Overview](./public/screenshot1.png)
 
-Write/Execute/Diff/Undo operations let you work with LLM outputs with confidence and ease.
+Write/Execute/Diff/Undo operations allow you to work with LLM outputs with confidence and ease.
 
 ![AI Collaboration](./public/screenshot2.png)
 
@@ -14,7 +14,7 @@ Write/Execute/Diff/Undo operations let you work with LLM outputs with confidence
 
 1. Clone the repository:
    ```
-   git clone https://github.com/your-username/ballistic-nextjs.git
+   git clone https://github.com/djgish485/ballistic-ai.git
    cd ballistic-nextjs
    ```
 
