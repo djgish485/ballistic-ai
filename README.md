@@ -1,17 +1,16 @@
-# Ballistic - AI-powered Code Analysis Assistant
+# Ballistic: Revolutionizing Software Development with AI 🚀
 
-Ballistic is a Next.js-based application designed to enhance your local software development workflow with AI-powered code analysis and collaboration features. It serves as a tool to assist in developing other software projects, not for developing itself.
+Ballistic introduces a transformative approach to software development, harnessing the power of advanced AI to elevate your development workflow. Say goodbye to editors and auto-complete and embrace a new era of high-level, AI-driven software creation.
 
-## Prerequisites
+## Why Ballistic?
 
-Before you begin, ensure you have the following installed on your system:
-- Node.js (version 14 or later)
-- npm (usually comes with Node.js)
-- Git
+- **AI-First Development**: Interact with state-of-the-art LLMs to generate, modify, and analyze entire codebases effortlessly.
+- **Full File Manipulation**: Generate and edit complete files without touching a traditional editor.
+- **Intelligent Context Management**: Automatically capture and optimize project context for AI understanding.
+- **Seamless AI Collaboration**: Execute, write, diff, and undo code changes directly from AI conversations.
+- **Visual Feedback**: Real-time diffs and execution results provide immediate insights.
 
 ## Getting Started
-
-Follow these steps to set up and run Ballistic on your local machine:
 
 1. Clone the repository:
    ```
@@ -24,59 +23,44 @@ Follow these steps to set up and run Ballistic on your local machine:
    npm install
    ```
 
-3. Start the development server:
+3. Start Ballistic:
    ```
    npm run dev -- /path/to/your/project
    ```
-   Replace `/path/to/your/project` with the absolute path to the project you want to analyze.
 
-4. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open your browser and navigate to:
+   ```
+   http://localhost:3000
+   ```
+
+5. Add your API keys in the Ballistic interface:
+   - [Get Claude API key](https://www.anthropic.com/)
+   - [Get OpenAI API key](https://platform.openai.com/account/api-keys)
 
 ## Quick Start Guide
 
-1. Click 'Start' to begin
-   - Project backup will be automatically created
-   - Crucial project files will be automatically added to AI context
-2. Enhance context by adding extra files (e.g., requirements doc)
-   - Optimize large contexts (>150 KB) via context settings
-3. Expect full file outputs from the AI
-   - Execute/Write/Diff/Undo buttons will appear underneath files & commands
-   - If AI truncates a file, prompt it for the full file
-4. Click "Next Feature" or reload page to keep chat manageable 
+1. **Initiate**: Click 'Start' to begin. Ballistic automatically creates a project backup and adds crucial files to the AI context.
+2. **Enhance**: Add extra context by uploading additional files (e.g., requirements docs).
+3. **Interact**: Engage with the AI to analyze, modify, or generate code. Expect and request full file outputs.
+4. **Execute**: Use the Execute/Write/Diff/Undo buttons to manage code changes directly from the chat.
+5. **Iterate**: Click "Next Feature" or reload the page to manage chat history.
 
-## Choosing Your API
+## Pro Tips
 
-- Anthropic Claude 3.5 (Recommended): 8192 token output, highly capable
-- OpenAI GPT-4 Turbo: 4096 token output, faster with higher rate limits
-
-## Usage
-
-1. Once Ballistic is running, you'll see its interface in your browser.
-2. Use the "Start" button to begin analyzing your target project.
-3. Interact with the AI assistant to ask questions about your project's code or request changes.
-4. Use the file management features to upload, view, or modify project files.
-5. Execute code snippets directly from the chat interface.
-6. Review and apply suggested changes to your target project.
-
-## Features
-
-- Project backup and restoration for your target project
-- Real-time collaborative coding assistance
-- Integrated chat with AI assistant
-- File management and code execution for your target project
-- API key management for different AI services
-- Syntax highlighting and diff viewing
-
-## Customization
-
-You can customize the behavior of Ballistic by modifying the following files:
-- `src/utils/settings.ts`: Adjust default settings like included paths and file extensions.
-- `public/initial_prompt.txt`: Modify the initial prompt given to the AI assistant.
+- **Debugging**: Prompt the AI with: "List a couple hypotheses why [issue] is occurring and add log messages to investigate."
+- **Context Validation**: Review `project-content.txt` to ensure critical files are included in the AI context.
+- **API Selection**:
+  - Claude 3.5 (Recommended): Ideal for complex tasks with 8192 token output.
+  - GPT-4o: Faster with higher rate limits, suitable for simpler tasks.
 
 ## Contributing
 
-Contributions to Ballistic are welcome! Please feel free to submit a Pull Request.
+Ballistic thrives on community input. Check out our open issues or submit a pull request to help shape the future of AI-driven development.
 
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+---
+
+Embrace the future of coding with Ballistic – where AI and human creativity converge to redefine software development.
