@@ -18,12 +18,17 @@ export default function Home() {
   const [hasBackup, setHasBackup] = useState(false);
   const [systemMessages, setSystemMessages] = useState<SystemMessage[]>([]);
   const [fileListKey, setFileListKey] = useState(0);
+  const [showRestoreAlert, setShowRestoreAlert] = useState(false);
 
   useEffect(() => {
     if (projectDir) {
       fetchIncludePaths();
     }
   }, [projectDir]);
+
+  useEffect(() => {
+    console.log('Home: showRestoreAlert changed:', showRestoreAlert);
+  }, [showRestoreAlert]);
 
   const fetchIncludePaths = async () => {
     try {
@@ -131,8 +136,8 @@ export default function Home() {
       if (response.ok) {
         setIsStarted(false);
         setHasBackup(false);
-        setSystemMessages(prev => [...prev, { type: 'restore', content: 'Project restored successfully.' }]);
-        console.log('Project restored successfully');
+        setShowRestoreAlert(true);
+        console.log('Project restored successfully. showRestoreAlert set to true');
         // Refresh file list after restoration
         setFileListKey(prevKey => prevKey + 1);
       } else {
@@ -186,6 +191,8 @@ export default function Home() {
                     onRestore={handleRestore}
                     systemMessages={systemMessages}
                     setIsStarted={setIsStarted}
+                    showRestoreAlert={showRestoreAlert}
+                    setShowRestoreAlert={setShowRestoreAlert}
                   />
                 )}
               </div>

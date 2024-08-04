@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "After backup is restored, remove the \"Restore: Project restored successfully.\" message. Instead show a popup alert. When the alert box is dismissed, refresh the screen to start the user from scratch.\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "The restore is working but the popup is not occurring.\n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

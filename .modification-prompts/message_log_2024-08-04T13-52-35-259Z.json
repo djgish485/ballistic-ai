@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Is it possible to integrate screenshots into the readme?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  }
+]

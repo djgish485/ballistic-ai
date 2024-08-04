@@ -1,0 +1,30 @@
+[
+  {
+    "role": "user",
+    "content": "This app is designed to be run locally to develop a local software project. It will be hosted on GitHub. How should people run it? You clone the repository, then what?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "So they should npm run dev? That makes more sense than npm run build and npm run start?\n\nJust to be clear, the ballistic app is used to develop a different software project. It won't be used to develop itself.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "See the initial_welcome_message quick start guide for information on how to use the app. Update readme accordingly.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "What's the MIT license? Does that make the most sense?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  }
+]

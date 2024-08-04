@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "The readme needs to be a lot more exciting and helpful and concise. The current readme can mostly be discarded. Here's a bunch of random thoughts to incorporate into it. Also incorporate the Quick Start Guide language. Massage the language.\n\n- SOTA LLMs are good enough today to output full files, liberating you from editors and auto-complete. Ballistic is built to take advantage, allowing you to work on a high level with trust without ever touching an editor.\n- Enhanced AI chats supercharge development, making it trustworthy and effortless without ever touching an editor.\n- the execute/write/diff/undo buttons are a key improvement on normal LLM chats.\n\n- If you get stuck, describe the problem the best you can, then add: . Afterwards copy & paste the logs in.\n- Give project-content.txt a scan to make sure your important files are in there. Otherwise the AI tends to hallucinate them.\n- strategies for keeping context length down? \n- This project was created with Claude 3.5 in mind. GPT-4o works ok for simpler tasks, but Claude 3.5 is the first LLM that seems good enough for real software development like this.\n\n\n- Mention that ofc this project eats its own dogfood. You can see the prompts that have been used to improve it in the .modification-prompts directory. \n--- These are saved in the commits - maybe a commit someday will only be its prompts!\n- How to get Claude & OpenAI API keys?\n\n- the system prompt can be edited at /public/system_prompt.txt\n- You can bump up against rate limits when continuing long conversations with images in them, as the images are included in each reply.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Try again. Getting Started should be before quick start and give copy & pastable commands. Analyze the project closely and figure out the most important parts of the project. Emphasize that this is a new transformative way of developing software.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

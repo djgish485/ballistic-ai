@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';
@@ -12,6 +14,8 @@ interface ChatInterfaceProps {
   onRestore: () => void;
   systemMessages: SystemMessage[];
   setIsStarted: (isStarted: boolean) => void;
+  showRestoreAlert: boolean;
+  setShowRestoreAlert: (show: boolean) => void;
 }
 
 interface ErrorDetails {
@@ -27,7 +31,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   onStart, 
   onRestore, 
   systemMessages,
-  setIsStarted
+  setIsStarted,
+  showRestoreAlert,
+  setShowRestoreAlert
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesRef = useRef<Message[]>([]);
@@ -48,6 +54,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const messageLogFileNameRef = useRef<string>('');
   const [errorDetails, setErrorDetails] = useState<ErrorDetails | null>(null);
   const [initialMessage, setInitialMessage] = useState<string>('');
+
+  useEffect(() => {
+    console.log('ChatInterface: showRestoreAlert changed:', showRestoreAlert);
+  }, [showRestoreAlert]);
 
   useEffect(() => {
     const fetchInitialMessage = async () => {
@@ -413,6 +423,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     });
   }, []);
 
+  const handleRestoreAlertClose = () => {
+    console.log('ChatInterface: handleRestoreAlertClose called');
+    setShowRestoreAlert(false);
+    window.location.reload();
+  };
+
   return (
     <div className="flex flex-col h-full" ref={chatContainerRef}>
       <div className="flex-grow overflow-y-auto space-y-4 pb-24">
@@ -427,7 +443,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           </div>
         )}
         <ChatMessages 
-          systemMessages={systemMessages} 
+          systemMessages={systemMessages.filter(msg => msg.type !== 'restore')} 
           messages={messages} 
           onDiff={handleDiff}
           onEditMessage={handleEditMessage}
@@ -477,6 +493,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               onClick={() => setErrorDetails(null)}
             >
               Close
+            </button>
+          </div>
+        </div>
+      )}
+      {showRestoreAlert && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4">Restore Successful</h2>
+            <p className="mb-4">Project has been restored successfully.</p>
+            <button 
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              onClick={handleRestoreAlertClose}
+            >
+              OK
             </button>
           </div>
         </div>
