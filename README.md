@@ -1,10 +1,12 @@
 # Ballistic: A Radical New Method for Software Development 🚀
 
-The latest SOTA LLMs are capable of reading & modifying your entire software project while outputting entire files. Ballistic transforms chats into software development sessions.
+The latest SOTA LLMs are capable of reading & modifying your entire software project while outputting entire files. This allows you to put away the editor and focus at a high lvel. Ballistic transforms chats into software development sessions.
+
+Your project is automatically backed up and added into the chat context.
 
 ![Ballistic Overview](./public/screenshot1.png)
 
-Write/Execute/Diff/Undo operations lets you work in confidence and ease. Find new creative levels and speed with Ballistic.
+Write/Execute/Diff/Undo operations let you work with LLM outputs with confidence and ease.
 
 ![AI Collaboration](./public/screenshot2.png)
 
@@ -32,7 +34,7 @@ Write/Execute/Diff/Undo operations lets you work in confidence and ease. Find ne
    ```
 
 5. Add your API keys in the Ballistic interface:
-   - [Get Claude API key](https://www.anthropic.com/)
+   - [Get Claude API key](https://www.anthropic.com/api)
    - [Get OpenAI API key](https://platform.openai.com/account/api-keys)
 
 ## Quick Start Guide
@@ -41,7 +43,6 @@ Write/Execute/Diff/Undo operations lets you work in confidence and ease. Find ne
 2. **Enhance**: Add extra context by uploading additional files (e.g., requirements docs).
 3. **Interact**: Engage with the AI to analyze, modify, or generate code. Expect and request full file outputs.
 4. **Execute**: Use the Execute/Write/Diff/Undo buttons to manage code changes directly from the chat.
-5. **Iterate**: Click "Next Feature" or reload the page to manage chat history.
 
 ## Tips
 
@@ -52,6 +53,8 @@ Write/Execute/Diff/Undo operations lets you work in confidence and ease. Find ne
   - Review `project-content.txt` to ensure critical files are included in the AI context.
   - For large projects, manage context size by editing context settings to only include relevant paths.  
 - **Debugging**: Prompt the AI with: "List a couple hypotheses why [issue] is occurring and add log messages to investigate."
+- **Full Files**: Ballistic encourages the LLM to provide the full files necessary for operation. If a file gets truncated, remind it to show you the full file.
+- **Manage**: Keep chats manageable by clicking "Next Modification" or refreshing page when you're confident a modification is finished.
 
 ## License
 
