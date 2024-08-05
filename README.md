@@ -2,10 +2,7 @@
 
 Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats into software development sessions. Put away the editor - work in broad strokes and go Ballistic.
 
-<video width="640" height="360" controls>
-  <source src="./public/ballistic-intro.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+![Ballistic Demo](./public/ballistic.gif)
 
 Your software project is automatically added into the chat context. Write/Execute/Diff/Undo operations allow you to work with LLM outputs with confidence and ease. The results will blow you away.
 
