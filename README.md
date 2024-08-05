@@ -38,15 +38,16 @@ Your software project is automatically added into the chat context. Write/Execut
 - **API Selection**:
   - Claude 3.5 (Recommended): Ideal for complex tasks with 8192 token output.
   - GPT-4o: Faster with higher rate limits, suitable for simpler tasks.
-- **Diff button** 
+- **Diff button**
+  - Diff compares the AI output to existing files.
   - Use it liberally to catch hallucinations and file truncations.
 - **Edit buttons** 
-  - Not satisfied with the AI response? Hovering over your message shows a pencil icon to edit and provide direction.
-  - To make changes to a the code returned by AI hover over it to show an edit icon on top.
+  - Not satisfied with the AI response? Hovering over your message shows a pencil icon to edit and provide clarification.
+  - To make changes to a the code returned by AI, hover over it to show the edit icon on top.
 - **Image button**
   - Send images and screenshots along with your message to help describe your issue (Claude only). 
 - **Tips link**
-  - Click "Tips >" underneath the input box to see helpful prompts that help debug and problem solve.
+  - Click "Tips >" underneath the input box to see helpful prompts to help debug and problem solve.
 - **Context Validation**: 
   - Review `project-content.txt` to ensure critical files are included in the AI context.
   - For large projects, manage context size by editing context settings to only include relevant paths.  
