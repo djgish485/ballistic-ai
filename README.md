@@ -2,6 +2,8 @@
 
 Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats into software development sessions. Put away the editor - work in broad strokes and go Ballistic.
 
+https://github.com/user-attachments/assets/74bba813-475b-41e2-b13e-ff9a1b922ea1
+
 Your software project is automatically added into the chat context. Write/Execute/Diff/Undo operations allow you to work with LLM outputs with confidence and ease. The results will blow you away.
 
 ## Getting Started
@@ -63,6 +65,3 @@ Your software project is automatically added into the chat context. Write/Execut
 
 Embrace the future of software development with Ballistic – where AI and human creativity converge.
 
-Intro movie:
-
-https://raw.githubusercontent.com/djgish485/ballistic-ai/main/public/ballistic-intro.mp4
