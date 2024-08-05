@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "Rename \"Next Feature/fix\" to \"Next Modification\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "In the Context box, when no files are found, replace \"No files found.\" with \"<I>Project files will be added when you click Start.</I>\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

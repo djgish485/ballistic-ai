@@ -42,6 +42,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [isAIResponding, setIsAIResponding] = useState(false);
   const [userScrolledUp, setUserScrolledUp] = useState(false);
   const [isBackupInProgress, setIsBackupInProgress] = useState(false);
+  const [isAddingFiles, setIsAddingFiles] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const inputContainerRef = useRef<HTMLDivElement>(null);
@@ -128,6 +129,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setIsLoading(true);
     setIsAIResponding(true);
     setErrorDetails(null);
+    setIsAddingFiles(true);
 
     try {
       setIsBackupInProgress(true);
@@ -155,6 +157,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         signal: abortControllerRef.current.signal,
       });
 
+      setIsAddingFiles(false);
       await processStreamResponse(response);
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
@@ -170,6 +173,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     } finally {
       setIsLoading(false);
       setIsAIResponding(false);
+      setIsAddingFiles(false);
       abortControllerRef.current = null;
     }
   };
@@ -435,6 +439,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         {isBackupInProgress && (
           <div className="bg-yellow-100 p-2 rounded">
             Backup in progress...
+          </div>
+        )}
+        {isAddingFiles && (
+          <div className="bg-yellow-100 p-2 rounded">
+            Adding files to context...
           </div>
         )}
         {!isStarted && initialMessage && (

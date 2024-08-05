@@ -5,5 +5,12 @@
     "images": [],
     "isComplete": true,
     "apiType": "GPT-4o"
+  },
+  {
+    "role": "user",
+    "content": "Can I put a movie into it?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
   }
 ]

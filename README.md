@@ -2,15 +2,12 @@
 
 Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats into software development sessions. Put away the editor - work in broad strokes and go Ballistic.
 
-Your software project is automatically added into the chat context.
+<video width="640" height="360" controls>
+  <source src="./public/ballistic-intro.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
-![Ballistic Overview](./public/screenshot1.png)
-
-Write/Execute/Diff/Undo operations allow you to work with LLM outputs with confidence and ease.
-
-![AI Collaboration](./public/screenshot2.png)
-
-The results will blow you away.
+Your software project is automatically added into the chat context. Write/Execute/Diff/Undo operations allow you to work with LLM outputs with confidence and ease. The results will blow you away.
 
 ## Getting Started
 
@@ -39,23 +36,25 @@ The results will blow you away.
    - [Get Claude API key](https://www.anthropic.com/api)
    - [Get OpenAI API key](https://platform.openai.com/account/api-keys)
 
-## Quick Start Guide
-
-1. **Initiate**: Click 'Start' to begin. Ballistic automatically creates a project backup and adds crucial files to the AI context.
-2. **Enhance**: Add extra context by uploading additional files (e.g., requirements docs).
-3. **Interact**: Engage with the AI to analyze, modify, or generate code. Expect and request full file outputs.
-4. **Execute**: Use the Execute/Write/Diff/Undo buttons to manage code changes directly from the chat.
-
 ## Tips
 
 - **API Selection**:
   - Claude 3.5 (Recommended): Ideal for complex tasks with 8192 token output.
   - GPT-4o: Faster with higher rate limits, suitable for simpler tasks.
+- **Diff button** 
+  - Use it liberally to catch hallucinations (GPT-4o's tendency) and file truncations (Claude's tendency).
+- **Edit buttons** 
+  - Hovering over your message shows a pencil icon to edit if you weren't satisfied with the AI response.
+  - Hovering over a code block shows a pencil icon on top, to make small changes to the AI output.
+- **Image button**
+  - Send images and screenshots along with your message to help describe your request (Claude only). 
+- **Tips link**
+  - Click "Tips >" underneath the input box to see helpful prompts to add to your message.
+  - These show best practices we've found to help debug and problem solve.
+  - Click on a prompt to append to your message.
 - **Context Validation**: 
   - Review `project-content.txt` to ensure critical files are included in the AI context.
   - For large projects, manage context size by editing context settings to only include relevant paths.  
-- **Debugging**: Click "Tips" below the input box to add handy prompts like: "List a couple hypotheses why and add log messages to figure it out."
-- **Full Files**: Ballistic relies upon and encourages the LLMs to output full files. If a file does get truncated, simply remind the AI to show you the full file.
 - **Manage**: Keep chats manageable by clicking "Next Modification" or refreshing the page when you're confident a modification is finished.
 
 ## A New Paradigm

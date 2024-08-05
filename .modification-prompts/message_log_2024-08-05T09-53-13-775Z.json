@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "How do I add a video tag to the readme on github",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "can the video source be local and relative to the project? Would like to put the mp4 in the public directory",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

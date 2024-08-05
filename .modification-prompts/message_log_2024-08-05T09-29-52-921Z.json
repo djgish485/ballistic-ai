@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "When beginning to analyze project, put up a yellow message \"Adding files to context...\". When finished, remove the yellow message and show the \"xx files added to project context\" message like the app does currently.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
