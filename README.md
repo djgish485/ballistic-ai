@@ -2,8 +2,6 @@
 
 Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats into software development sessions. Put away the editor - work in broad strokes and go Ballistic.
 
-https://github.com/user-attachments/assets/74bba813-475b-41e2-b13e-ff9a1b922ea1
-
 Your software project is automatically added into the chat context. Write/Execute/Diff/Undo operations allow you to work with LLM outputs with confidence and ease. The results will blow you away.
 
 ## Getting Started
@@ -41,13 +39,12 @@ Your software project is automatically added into the chat context. Write/Execut
 - **Diff button** 
   - Use it liberally to catch hallucinations and file truncations.
 - **Edit buttons** 
-  - Not satisfied with the AI response? Hovering over your message shows a pencil icon to edit.
-  - Hovering over a code block shows a pencil icon on top, to make small changes to the AI output.
+  - Not satisfied with the AI response? Hovering over your message shows a pencil icon to edit and provide direction.
+  - To make changes to a the code returned by AI hover over it to show an edit icon on top.
 - **Image button**
   - Send images and screenshots along with your message to help describe your issue (Claude only). 
 - **Tips link**
-  - Click "Tips >" underneath the input box to see helpful prompts to add to your message.
-  - These show best practices to help debug and problem solve.
+  - Click "Tips >" underneath the input box to see helpful prompts that help debug and problem solve.
 - **Context Validation**: 
   - Review `project-content.txt` to ensure critical files are included in the AI context.
   - For large projects, manage context size by editing context settings to only include relevant paths.  
@@ -64,4 +61,3 @@ Your software project is automatically added into the chat context. Write/Execut
 ---
 
 Embrace the future of software development with Ballistic – where AI and human creativity converge.
-
