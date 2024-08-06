@@ -47,7 +47,7 @@ Your software project is automatically added into the chat context. Write/Execut
 - **Image button**
   - Send images and screenshots along with your message to help describe your issue (Claude only). 
 - **Prompting Tips**
-  - Click "Tips >" underneath the input area to see helpful prompts that for debugging and problem solving.
+  - Click "Tips >" underneath the input area to see helpful prompts for debugging and problem solving.
 - **Context Validation**: 
   - Review `project-content.txt` to ensure critical files are included in the AI context.
   - For large projects, manage context size by editing context settings to only include relevant paths.  
