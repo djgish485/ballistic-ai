@@ -2,7 +2,8 @@
 
 Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats into software development sessions. Put away the editor - work in broad strokes and go Ballistic.
 
-https://github.com/user-attachments/assets/a05216f9-4beb-4ffc-8236-4ab6c23ac8b9
+![Screenshot 2024-08-12 at 7 47 16 PM](https://github.com/user-attachments/assets/b5ffeb2e-5e37-4c35-a31c-1d68692df68c)
+
 
 ## Why Ballistic?
 - With AI editors like Cursor, you still have the mental overhead of figuring out which files to modify and how the code fits together.
@@ -47,13 +48,8 @@ https://github.com/user-attachments/assets/a05216f9-4beb-4ffc-8236-4ab6c23ac8b9
 - **Edit buttons** 
   - Not satisfied with the AI response? Hovering over your message shows a pencil icon to edit and provide clarification.
   - To make changes to a the code returned by AI, hover over it to show an edit button on top.
-- **Image button**
-  - Send images and screenshots along with your message to help describe your issue (Claude only). 
-- **Prompting Tips**
-  - Click "Tips >" underneath the input area to see helpful prompts for debugging and problem solving.
-- **Context Validation**: 
-  - Review `project-content.txt` to ensure critical files are included in the AI context.
-  - For large projects, manage context size by editing context settings to only include relevant paths.  
+- Click "Tips >" underneath the input area to see helpful prompts for debugging and problem solving.
+- For large projects, manage context size by editing context settings to only include relevant paths.  
 - Keep chats manageable by clicking "Next Modification" or refreshing the page when you're confident a modification is finished.
 
 ## A New Paradigm
