@@ -12,5 +12,26 @@
     "images": [],
     "isComplete": true,
     "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "The video isn't showing in safari. I think if I just put the url in the readme it will work. But I need a url to the video at https://user-images.githubusercontent.com",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "I edited & committed the readme on Github's website. But I made some local changes and would like to overwrite the changes made on the website. How do I do so?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "the force seems to want to push every file. Let's do it without the force.\n\n$ git push \nTo https://github.com/djgish485/ballistic-ai.git\n ! [rejected]        main -> main (fetch first)\nerror: failed to push some refs to 'https://github.com/djgish485/ballistic-ai.git'\nhint: Updates were rejected because the remote contains work that you do\nhint: not have locally. This is usually caused by another repository pushing\nhint: to the same ref. You may want to first integrate the remote changes\nhint: (e.g., 'git pull ...') before pushing again.\nhint: See the 'Note about fast-forwards' in 'git push --help' for details.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
   }
 ]

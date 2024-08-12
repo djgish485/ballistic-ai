@@ -7,20 +7,35 @@
   --background-rgb: 243, 244, 246;  /* Light grey background */
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255;
+    --background-rgb: 31, 41, 55;  /* Dark grey background */
+  }
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background-color: rgb(var(--background-rgb));
   min-height: 100vh;
 }
 
-/* Ensure text is dark in all modes */
-body {
-  color: #333333 !important;
+/* Ensure text is dark in light mode and light in dark mode */
+@media (prefers-color-scheme: light) {
+  body {
+    color: #333333 !important;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    color: #ffffff !important;
+  }
 }
 
 @layer base {
   body {
-    @apply text-gray-900;
+    @apply text-gray-900 dark:text-gray-100;
   }
   h4 {
     @apply text-sm; /* Apply small text size to <h4> elements */

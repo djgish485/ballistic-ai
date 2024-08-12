@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Make the Context Settings box look good in dark mode.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -92,13 +92,13 @@ const History: React.FC<HistoryProps> = ({ projectDir }) => {
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow mt-4">
-      <h2 className="text-lg font-semibold mb-2">History</h2>
+    <div className="bg-white dark:bg-darkBox p-4 rounded shadow mt-4">
+      <h2 className="text-lg font-semibold mb-2 dark:text-darkText">History</h2>
       <div className="relative">
         <select
           value={selectedFile}
           onChange={(e) => handleFileSelect(e.target.value)}
-          className="w-full px-3 py-2 text-gray-700 bg-white border rounded-lg shadow-sm outline-none appearance-none focus:border-blue-500"
+          className="w-full px-3 py-2 text-gray-700 bg-white border rounded-lg shadow-sm outline-none appearance-none focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600"
         >
           <option value="">Select to view</option>
           {logFiles.map((file) => (
@@ -108,7 +108,7 @@ const History: React.FC<HistoryProps> = ({ projectDir }) => {
           ))}
         </select>
         <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
-          <svg className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+          <svg className="w-4 h-4 fill-current text-gray-500 dark:text-gray-300" viewBox="0 0 20 20">
             <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" fillRule="evenodd"></path>
           </svg>
         </div>
@@ -116,21 +116,21 @@ const History: React.FC<HistoryProps> = ({ projectDir }) => {
 
       {showLogContent && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div ref={popupRef} className="bg-white rounded-lg max-w-3xl w-full max-h-[80vh] flex flex-col">
-            <div className="sticky top-0 bg-white p-4 rounded-t-lg border-b flex justify-between items-center">
-              <h2 className="text-xl font-bold">Log Content: {formatFileName(selectedFile)}</h2>
+          <div ref={popupRef} className="bg-white dark:bg-darkBox rounded-lg max-w-3xl w-full max-h-[80vh] flex flex-col">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 p-4 rounded-t-lg border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+              <h2 className="text-xl font-bold dark:text-darkText">Log Content: {formatFileName(selectedFile)}</h2>
               <button
                 onClick={handlePopupClose}
-                className="text-gray-500 hover:text-gray-700 focus:outline-none"
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-100 focus:outline-none"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
             <div className="overflow-auto p-4 flex-grow">
               {logContent.map((entry, index) => (
-                <div key={index} className={`mb-4 p-2 rounded ${entry.role === 'user' ? 'bg-blue-100' : 'bg-gray-100'}`}>
-                  <strong>{entry.role === 'user' ? 'User:' : `${entry.apiType || 'Assistant'}:`}</strong>
-                  <pre className="whitespace-pre-wrap">{entry.content}</pre>
+                <div key={index} className={`mb-4 p-2 rounded ${entry.role === 'user' ? 'bg-blue-100 dark:bg-blue-800' : 'bg-gray-100 dark:bg-gray-700'}`}>
+                  <strong className="dark:text-darkText">{entry.role === 'user' ? 'User:' : `${entry.apiType || 'Assistant'}:`}</strong>
+                  <pre className="whitespace-pre-wrap dark:text-gray-200">{entry.content}</pre>
                 </div>
               ))}
             </div>

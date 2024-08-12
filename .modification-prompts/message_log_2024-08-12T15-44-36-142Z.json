@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "The diff popup makes each addition or subtraction horizontally scrollable. Can the whole code block be scrollable instead?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Works well. Don't show line numbers.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

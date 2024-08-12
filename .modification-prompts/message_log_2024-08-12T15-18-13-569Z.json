@@ -1,0 +1,48 @@
+[
+  {
+    "role": "user",
+    "content": "The contrast on the diff popup in dark mode is a little too much. Make the green and red colors a little more subtle in dark mode.",
+    "images": [
+      {}
+    ],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Even more subtle. See how GitHub looks. Also, can you add code formatting into the popup?",
+    "images": [
+      {}
+    ],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "In the title of the popup, can you remove the project directory from the path? project directory is the value after \"Project Directory:\" in the page header. \n\nSo \"File Diff: /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme.md\" would become \"File Diff: GenAI_creativity_scripts/readme.md\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Does that variable need to get passed in?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Didn't work. Use the same variable that the page header uses.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

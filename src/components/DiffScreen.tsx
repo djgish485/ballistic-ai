@@ -1,14 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { diffLines, Change } from 'diff';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus, vs } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 interface DiffScreenProps {
   filePath: string;
   newContent: string;
   onClose: () => void;
+  projectDir: string;
 }
 
-const DiffScreen: React.FC<DiffScreenProps> = ({ filePath, newContent, onClose }) => {
+const DiffScreen: React.FC<DiffScreenProps> = ({ filePath, newContent, onClose, projectDir }) => {
   const [diff, setDiff] = useState<Change[]>([]);
   const [error, setError] = useState<string | null>(null);
   const popupRef = useRef<HTMLDivElement>(null);
@@ -51,25 +54,61 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ filePath, newContent, onClose }
   }, [filePath, newContent]);
 
   const renderDiff = () => {
-    return diff.map((part, index) => {
-      const color = part.added ? 'bg-green-100' : part.removed ? 'bg-red-100' : 'bg-white';
-      const prefix = part.added ? '+' : part.removed ? '-' : ' ';
-      return (
-        <pre key={index} className={`${color} p-1`}>
-          {part.value.split('\n').map((line, lineIndex) => (
-            <div key={lineIndex}>
-              {prefix} {line}
-            </div>
-          ))}
+    const language = filePath.split('.').pop() || 'text';
+    return (
+      <div className="overflow-x-auto">
+        <pre className="flex">
+          <code className="flex-shrink-0">
+            {diff.map((part, index) => {
+              const backgroundColor = part.added
+                ? 'bg-[#e6ffec] dark:bg-[#0f2f1a]'
+                : part.removed
+                ? 'bg-[#ffebe9] dark:bg-[#2d1214]'
+                : 'bg-white dark:bg-gray-800';
+              const textColor = part.added
+                ? 'text-green-800 dark:text-green-300'
+                : part.removed
+                ? 'text-red-800 dark:text-red-300'
+                : 'text-gray-800 dark:text-gray-200';
+              const prefix = part.added ? '+' : part.removed ? '-' : ' ';
+              return (
+                <div key={index} className={`${backgroundColor} ${textColor}`}>
+                  <SyntaxHighlighter
+                    language={language}
+                    style={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? vscDarkPlus : vs}
+                    customStyle={{
+                      margin: 0,
+                      padding: '0.5rem',
+                      background: 'transparent',
+                    }}
+                    showLineNumbers={false}
+                    wrapLines={true}
+                    lineProps={() => ({
+                      style: { display: 'block', width: '100%' },
+                    })}
+                  >
+                    {part.value.split('\n').map(line => `${prefix}${line}`).join('\n')}
+                  </SyntaxHighlighter>
+                </div>
+              );
+            })}
+          </code>
         </pre>
-      );
-    });
+      </div>
+    );
   };
 
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
+  };
+
+  const getRelativeFilePath = (fullPath: string) => {
+    if (projectDir && fullPath.startsWith(projectDir)) {
+      return fullPath.slice(projectDir.length).replace(/^\//, '');
+    }
+    return fullPath;
   };
 
   return (
@@ -79,25 +118,25 @@ const DiffScreen: React.FC<DiffScreenProps> = ({ filePath, newContent, onClose }
     >
       <div
         ref={popupRef}
-        className="bg-white rounded-lg max-w-3xl w-full max-h-[80vh] flex flex-col"
+        className="bg-white dark:bg-gray-900 rounded-lg max-w-3xl w-full max-h-[80vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 bg-white p-4 rounded-t-lg border-b flex justify-between items-center">
-          <h2 className="text-xl font-bold">File Diff: {filePath}</h2>
+        <div className="sticky top-0 bg-white dark:bg-gray-800 p-4 rounded-t-lg border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+          <h2 className="text-xl font-bold dark:text-white">File Diff: {getRelativeFilePath(filePath)}</h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 focus:outline-none"
+            className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
         </div>
         <div className="overflow-auto p-4 flex-grow">
           {error ? (
-            <p className="text-red-500">{error}</p>
+            <p className="text-red-500 dark:text-red-400">{error}</p>
           ) : diff.length === 0 ? (
-            <p>Loading diff...</p>
+            <p className="dark:text-gray-300">Loading diff...</p>
           ) : (
-            <div className="bg-gray-100 p-4 rounded overflow-x-auto">
+            <div className="bg-gray-100 dark:bg-gray-800 rounded overflow-hidden">
               {renderDiff()}
             </div>
           )}

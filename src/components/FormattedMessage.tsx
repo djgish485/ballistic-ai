@@ -5,7 +5,7 @@ import { parseCommand } from '@/utils/commandParser';
 import { PencilIcon } from '@heroicons/react/24/solid';
 import EditCodePopup from './EditCodePopup';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vs } from 'react-syntax-highlighter/dist/cjs/styles/prism';
+import { vs, vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
 interface FormattedMessageProps {
   content: string;
@@ -271,24 +271,26 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
         onMouseLeave={() => setIsHovered(false)}
       >
         <div className="overflow-x-auto" style={{ maxWidth: `${maxWidth}px` }}>
-          <SyntaxHighlighter
-            language={language}
-            style={vs}
-            customStyle={{
-              backgroundColor: 'transparent',
-              padding: '1rem',
-              borderRadius: '0.5rem',
-              width: `${maxWidth}px`,
-            }}
-          >
-            {String(children).replace(/\n$/, '')}
-          </SyntaxHighlighter>
+          <div className="border border-gray-200 dark:border-darkCodeBorder rounded-lg overflow-hidden">
+            <SyntaxHighlighter
+              language={language}
+              style={typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? vscDarkPlus : vs}
+              customStyle={{
+                backgroundColor: 'transparent',
+                padding: '1rem',
+                margin: 0,
+                width: `${maxWidth}px`,
+              }}
+            >
+              {String(children).replace(/\n$/, '')}
+            </SyntaxHighlighter>
+          </div>
         </div>
         {!isEditing && isHovered && (
           <div className="absolute top-2 right-2">
             <div className="p-1 rounded transition-colors duration-200 group hover:bg-blue-500">
               <PencilIcon
-                className="h-6 w-6 text-gray-500 group-hover:text-white cursor-pointer"
+                className="h-6 w-6 text-gray-500 group-hover:text-white cursor-pointer dark:text-gray-400 dark:group-hover:text-white"
                 onClick={handleEditClick}
               />
             </div>
@@ -307,14 +309,14 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
                 <>
                   <button
                     onClick={handleWrite}
-                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
                   >
                     Write
                   </button>
                   {newContent !== null && (
                     <button
                       onClick={() => handleDiffClick(filePath, newContent)}
-                      className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                      className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
                     >
                       Diff
                     </button>
@@ -322,7 +324,7 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
                   {isNewFile && (
                     <button
                       onClick={handleUndo}
-                      className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                      className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700"
                     >
                       Undo (Delete File)
                     </button>
@@ -330,7 +332,7 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
                   {canRestore && !isRestored && (
                     <button
                       onClick={handleRestoreClick}
-                      className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
+                      className="px-2 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700"
                     >
                       Restore
                     </button>
@@ -340,7 +342,7 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
                 <>
                   <button
                     onClick={handleExecute}
-                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                    className="px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700"
                     disabled={isExecuting}
                   >
                     {isExecuting ? 'Executing...' : 'Execute'}
@@ -348,7 +350,7 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
                   {isExecuting && (
                     <button
                       onClick={handleCancelExecution}
-                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                      className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
                     >
                       Cancel
                     </button>
@@ -357,8 +359,8 @@ const CodeBlock: React.FC<CodeBlockProps> = React.memo(({
               )}
             </div>
             {!isRestored && executionResults[id] && (
-              <div className="mt-2 bg-gray-100 p-2 rounded">
-                <pre className="whitespace-pre-wrap overflow-x-auto">
+              <div className="mt-2 bg-gray-100 p-2 rounded dark:bg-gray-700 border border-gray-200 dark:border-darkCodeBorder">
+                <pre className="whitespace-pre-wrap overflow-x-auto dark:text-gray-200">
                   {executionResults[id]}
                 </pre>
               </div>

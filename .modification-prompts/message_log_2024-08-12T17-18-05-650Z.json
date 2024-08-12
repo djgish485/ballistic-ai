@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "Make the Edit Command popup look good when in dark mode. Don't change anything in light mode.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Make the Context Settings popup look good when in dark mode. Don't change anything in light mode.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

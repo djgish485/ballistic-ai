@@ -51,7 +51,6 @@ export default function Home() {
   const handleStart = useCallback(async () => {
     if (!projectDir) return;
 
-    // Check if an API key is selected
     const selectedAPIKeyIndex = sessionStorage.getItem('selectedAPIKeyIndex');
     if (!selectedAPIKeyIndex) {
       alert('Please add and select an API key before starting.');
@@ -74,7 +73,6 @@ export default function Home() {
     console.log('isStarted set to true');
 
     try {
-      // Create backup
       console.log('Creating backup...');
       const backupResponse = await fetch('/api/project-backup', {
         method: 'POST',
@@ -90,7 +88,6 @@ export default function Home() {
         throw new Error(backupData.error || 'Failed to create backup');
       }
 
-      // Analyze project
       await analyzeProject();
 
       console.log('Project started successfully. Current state:', { isStarted: true, hasBackup: true });
@@ -113,7 +110,6 @@ export default function Home() {
     setSystemMessages(prev => [...prev, { type: 'analysis', content: analyzeData.message }]);
     console.log('Analyze project response:', analyzeData);
 
-    // Refresh file list after analysis
     setFileListKey(prevKey => prevKey + 1);
   };
 
@@ -138,7 +134,6 @@ export default function Home() {
         setHasBackup(false);
         setShowRestoreAlert(true);
         console.log('Project restored successfully. showRestoreAlert set to true');
-        // Refresh file list after restoration
         setFileListKey(prevKey => prevKey + 1);
       } else {
         throw new Error(data.error || 'Failed to restore backup');
@@ -151,12 +146,12 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="container mx-auto px-4 py-8 h-screen flex flex-col">
+      <div className="container mx-auto px-4 py-8 h-screen flex flex-col dark:bg-darkBg dark:text-darkText">
         <h1 className="text-2xl font-bold mb-4">Ballistic</h1>
         {loading ? (
           <p>Loading project directory...</p>
         ) : error ? (
-          <p className="text-red-500">Error: {error.message}</p>
+          <p className="text-red-500 dark:text-red-400">Error: {error.message}</p>
         ) : (
           <>
             <p className="mb-2">Project Directory: {projectDir}</p>
@@ -166,14 +161,14 @@ export default function Home() {
             <div className="mb-4 flex space-x-2">
               <button
                 onClick={handleStart}
-                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400"
+                className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 disabled:bg-gray-400 dark:bg-green-600 dark:hover:bg-green-700 dark:disabled:bg-gray-600"
               >
                 {isStarted ? 'Next Modification' : 'Start'}
               </button>
               {hasBackup && (
                 <button
                   onClick={handleRestore}
-                  className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:bg-gray-400"
+                  className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 disabled:bg-gray-400 dark:bg-yellow-600 dark:hover:bg-yellow-700 dark:disabled:bg-gray-600"
                   disabled={!isStarted}
                 >
                   Undo All & Restore Backup

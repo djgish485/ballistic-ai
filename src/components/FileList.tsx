@@ -154,20 +154,20 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow">
+    <div className="bg-white dark:bg-darkBox p-4 rounded shadow">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Context</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-darkText">Context</h2>
         <div className="flex space-x-2">
           <button
             onClick={handleAddFile}
-            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
             title="Upload file"
           >
             <ArrowUpTrayIcon className="h-5 w-5" />
           </button>
           <button
             onClick={handleSettingsClick}
-            className="p-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            className="p-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500"
             title="Settings"
           >
             <Cog6ToothIcon className="h-5 w-5" />
@@ -183,18 +183,18 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
         />
       </div>
       {loading ? (
-        <p className="text-gray-600">Loading files...</p>
+        <p className="text-gray-600 dark:text-gray-300">Loading files...</p>
       ) : error ? (
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500 dark:text-red-400">{error}</p>
       ) : files.length === 0 ? (
-        <p className="text-gray-600"><i>Project files will be added when you click Start.</i></p>
+        <p className="text-gray-600 dark:text-gray-300"><i>Project files will be added when you click Start.</i></p>
       ) : (
         <>
           <ul className="space-y-1 mb-4">
             {files.map((file, index) => (
               <li 
                 key={index} 
-                className="flex justify-between hover:bg-gray-100 p-1 rounded text-gray-900"
+                className="flex justify-between hover:bg-gray-100 dark:hover:bg-gray-600 p-1 rounded text-gray-900 dark:text-gray-200"
                 onMouseEnter={() => setHoveredFile(file.path)}
                 onMouseLeave={() => setHoveredFile(null)}
               >
@@ -207,17 +207,17 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
                 {hoveredFile === file.path ? (
                   <button
                     onClick={(e) => handleDeleteFile(file.path, e)}
-                    className="text-red-500 hover:text-red-700"
+                    className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                   >
                     <TrashIcon className="h-5 w-5" />
                   </button>
                 ) : (
-                  <span className="text-gray-500">{formatFileSize(file.size)}</span>
+                  <span className="text-gray-500 dark:text-gray-400">{formatFileSize(file.size)}</span>
                 )}
               </li>
             ))}
           </ul>
-          <div className="text-right text-gray-600">
+          <div className="text-right text-gray-600 dark:text-gray-300">
             Total size: {formatFileSize(totalSize)}
           </div>
         </>

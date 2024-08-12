@@ -32,7 +32,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
         <div
           key={`system-${index}`}
           className={`p-4 rounded ${styles.markdownContent} ${
-            msg.type === 'restore' ? 'bg-yellow-100' : 'bg-blue-100'
+            msg.type === 'restore' ? 'bg-yellow-100 dark:bg-yellow-800' : 'bg-blue-100 dark:bg-darkMessageBox'
           }`}
         >
           {msg.type === 'backup' && <strong></strong>}
@@ -44,7 +44,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
         <div
           key={`chat-${index}`}
           className={`p-4 rounded ${styles.markdownContent} ${
-            msg.role === 'user' ? 'bg-blue-100' : 'bg-white'
+            msg.role === 'user' ? 'bg-blue-100 dark:bg-darkMessageBox' : 'bg-white dark:bg-darkBox'
           } relative`}
           onMouseEnter={() => setHoveredMessageIndex(index)}
           onMouseLeave={() => setHoveredMessageIndex(null)}
@@ -56,7 +56,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
               ))}
             </div>
           )}
-          <strong>{msg.role === 'user' ? '' : `${msg.apiType}: `}</strong>
+          <strong className="dark:text-darkText">{msg.role === 'user' ? '' : `${msg.apiType}: `}</strong>
           <FormattedMessage 
             content={msg.content} 
             onDiff={onDiff} 
@@ -68,7 +68,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
           />
           {msg.role === 'user' && hoveredMessageIndex === index && (
             <PencilIcon
-              className="h-5 w-5 absolute top-2 right-2 text-gray-500 cursor-pointer"
+              className="h-5 w-5 absolute top-2 right-2 text-gray-500 dark:text-gray-400 cursor-pointer"
               onClick={() => handleEditClick(index)}
             />
           )}

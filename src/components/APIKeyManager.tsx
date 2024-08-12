@@ -29,35 +29,35 @@ const APIKeyPopup: React.FC<APIKeyPopupProps> = ({ isOpen, onClose, onAddKey }) 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white p-6 rounded-lg max-w-md w-full">
-        <h2 className="text-lg font-medium mb-4">Add New API Key</h2>
+      <div className="bg-white dark:bg-darkBox p-6 rounded-lg max-w-md w-full">
+        <h2 className="text-lg font-medium mb-4 dark:text-darkText">Add New API Key</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block mb-2">API Type:</label>
+            <label className="block mb-2 dark:text-darkText">API Type:</label>
             <select
               value={newKeyType}
               onChange={(e) => setNewKeyType(e.target.value)}
-              className="w-full px-2 py-1 border rounded"
+              className="w-full px-2 py-1 border rounded dark:bg-gray-700 dark:text-darkText dark:border-gray-600"
             >
               <option value="Claude">Claude</option>
               <option value="OpenAI">OpenAI</option>
             </select>
           </div>
           <div className="mb-4">
-            <label className="block mb-2">API Key:</label>
+            <label className="block mb-2 dark:text-darkText">API Key:</label>
             <input
               type="text"
               value={newKey}
               onChange={(e) => setNewKey(e.target.value)}
-              className="w-full px-2 py-1 border rounded"
+              className="w-full px-2 py-1 border rounded dark:bg-gray-700 dark:text-darkText dark:border-gray-600"
               placeholder="Enter new API key"
             />
           </div>
           <div className="flex justify-end space-x-2">
-            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">
+            <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 dark:bg-gray-600 dark:text-darkText dark:hover:bg-gray-500">
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            <button type="submit" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">
               Add Key
             </button>
           </div>
@@ -166,12 +166,12 @@ const APIKeyManager: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-4 rounded shadow">
+    <div className="bg-white dark:bg-darkBox p-4 rounded shadow">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">API Keys</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-darkText">API Keys</h2>
         <button
           onClick={() => setIsPopupOpen(true)}
-          className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          className="p-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
           title="Add new API key"
         >
           <PlusIcon className="h-5 w-5" />
@@ -182,20 +182,20 @@ const APIKeyManager: React.FC = () => {
           <div 
             key={index} 
             className={`flex justify-between items-center p-2 rounded cursor-pointer ${
-              index === selectedIndex ? 'bg-blue-100' : 
-              index === hoveredIndex ? 'bg-gray-100' : ''
+              index === selectedIndex ? 'bg-blue-100 dark:bg-blue-700' : 
+              index === hoveredIndex ? 'bg-gray-100 dark:bg-gray-600' : ''
             }`}
             onClick={() => selectKey(index)}
             onMouseEnter={() => setHoveredIndex(index)}
             onMouseLeave={() => setHoveredIndex(null)}
           >
-            <span className={index === selectedIndex ? 'font-bold' : ''}>
+            <span className={index === selectedIndex ? 'font-bold dark:text-darkText' : 'dark:text-darkText'}>
               [{key.type}] {key.key.slice(0, 8)}...{key.key.slice(-4)}
             </span>
             {index === hoveredIndex && (
               <button
                 onClick={(e) => deleteKey(index, e)}
-                className="text-red-500 hover:text-red-700"
+                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                 title="Delete API key"
               >
                 <TrashIcon className="h-5 w-5" />

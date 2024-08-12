@@ -109,10 +109,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
     <div className="relative">
       <form onSubmit={(e) => { e.preventDefault(); handleSendMessage(); }} className="flex flex-col space-y-2">
         {selectedImages.length > 0 && (
-          <div className="flex flex-wrap gap-2 p-2 bg-gray-100 rounded">
+          <div className="flex flex-wrap gap-2 p-2 bg-gray-100 dark:bg-gray-700 rounded">
             {selectedImages.map((file, index) => (
               <div key={index} className="relative group">
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm">
+                <span className="bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 px-2 py-1 rounded text-sm">
                   {file.name}
                 </span>
                 <button
@@ -126,11 +126,11 @@ const ChatInput: React.FC<ChatInputProps> = ({
             ))}
           </div>
         )}
-        <div className="flex-grow flex border rounded-lg overflow-hidden bg-white">
+        <div className="flex-grow flex border rounded-lg overflow-hidden bg-white dark:bg-gray-700 border-gray-200 dark:border-darkCodeBorder">
           <button
             type="button"
             onClick={handleImageUpload}
-            className={`p-2 ${disabled ? 'text-gray-400' : 'text-blue-500 hover:text-blue-600'} focus:outline-none self-end`}
+            className={`p-2 ${disabled ? 'text-gray-400 dark:text-gray-500' : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'} focus:outline-none self-end`}
             disabled={disabled}
           >
             <PhotoIcon className="h-8 w-8" />
@@ -141,7 +141,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
               value={input}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              className="w-full px-2 py-2 resize-none overflow-y-auto focus:outline-none"
+              className="w-full px-2 py-2 resize-none overflow-y-auto focus:outline-none dark:bg-gray-700 dark:text-white"
               placeholder="Type your message..."
               disabled={isLoading || disabled}
               rows={1}
@@ -153,8 +153,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
             onClick={isAIResponding ? handleCancel : handleSendMessage}
             className={`p-2 ${
               isAIResponding || (!input.trim() && selectedImages.length === 0) || disabled
-                ? 'text-gray-400'
-                : 'text-blue-500 hover:text-blue-600'
+                ? 'text-gray-400 dark:text-gray-500'
+                : 'text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300'
             } focus:outline-none self-end`}
             disabled={!isAIResponding && (isLoading || (!input.trim() && selectedImages.length === 0) || disabled)}
           >
@@ -178,22 +178,22 @@ const ChatInput: React.FC<ChatInputProps> = ({
       <div className="absolute bottom-0 right-0 transform translate-y-full mt-1">
         <button
           onClick={handleTipsClick}
-          className="text-xs text-gray-500 hover:text-gray-700 focus:outline-none"
+          className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none"
         >
           Tips &gt;
         </button>
       </div>
       {showTips && (
-        <div className="fixed bottom-0 right-0 bg-white shadow-lg p-4 transform transition-all duration-300 ease-in-out max-w-xs w-full overflow-y-auto" style={{ 
+        <div className="fixed bottom-0 right-0 bg-white dark:bg-darkBox shadow-lg p-4 transform transition-all duration-300 ease-in-out max-w-xs w-full overflow-y-auto" style={{ 
           transform: showTips ? 'translateX(0)' : 'translateX(100%)',
           maxHeight: 'calc(100vh - 100px)'
         }}>
-          <h3 className="text-lg font-semibold mb-2">Tips</h3>
-          <p className="text-sm mb-2">Helpful text to add to your prompts:</p>
+          <h3 className="text-lg font-semibold mb-2 dark:text-white">Tips</h3>
+          <p className="text-sm mb-2 dark:text-gray-300">Helpful text to add to your prompts:</p>
           <ul className="text-sm space-y-2">
             {tipBlurbs.map((tip, index) => (
               <li key={index} 
-                  className="cursor-pointer hover:bg-gray-100 p-1 rounded transition-colors duration-200"
+                  className="cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 p-1 rounded transition-colors duration-200 dark:text-gray-200"
                   onClick={() => appendTip(tip)}>
                 • {tip}
               </li>
@@ -201,7 +201,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           </ul>
           <button
             onClick={handleTipsClick}
-            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+            className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none"
           >
             &times;
           </button>

@@ -437,18 +437,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     <div className="flex flex-col h-full" ref={chatContainerRef}>
       <div className="flex-grow overflow-y-auto space-y-4 pb-24">
         {isBackupInProgress && (
-          <div className="bg-yellow-100 p-2 rounded">
+          <div className="bg-yellow-100 dark:bg-yellow-800 p-2 rounded">
             Backup in progress...
           </div>
         )}
         {isAddingFiles && (
-          <div className="bg-yellow-100 p-2 rounded">
+          <div className="bg-yellow-100 dark:bg-yellow-800 p-2 rounded">
             Adding files to context...
           </div>
         )}
         {!isStarted && initialMessage && (
-          <div className="bg-blue-100 p-4 rounded">
-            <div className="whitespace-pre-wrap">{initialMessage}</div>
+          <div className="bg-blue-100 dark:bg-darkMessageBox p-4 rounded">
+            <div className="whitespace-pre-wrap dark:text-darkText">{initialMessage}</div>
           </div>
         )}
         <ChatMessages 
@@ -463,7 +463,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
       <div 
         ref={inputContainerRef}
-        className="fixed bottom-0 bg-gray-100 pb-6 z-10"
+        className="fixed bottom-0 bg-gray-100 dark:bg-gray-800 pb-6 z-10"
         style={{ width: '100%' }}
       >
         <ChatInput
@@ -481,24 +481,25 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           filePath={diffFilePath}
           newContent={diffNewContent}
           onClose={() => setShowDiff(false)}
+          projectDir={projectDir}
         />
       )}
       {errorDetails && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-lg w-full">
-            <h2 className="text-xl font-bold mb-4">Error</h2>
-            <p className="mb-2"><strong>Message:</strong> {errorDetails.message}</p>
-            {errorDetails.type && <p className="mb-2"><strong>Type:</strong> {errorDetails.type}</p>}
+          <div className="bg-white dark:bg-darkBox p-6 rounded-lg shadow-lg max-w-lg w-full">
+            <h2 className="text-xl font-bold mb-4 dark:text-darkText">Error</h2>
+            <p className="mb-2 dark:text-darkText"><strong>Message:</strong> {errorDetails.message}</p>
+            {errorDetails.type && <p className="mb-2 dark:text-darkText"><strong>Type:</strong> {errorDetails.type}</p>}
             {errorDetails.details && (
               <div className="mb-2">
-                <strong>Details:</strong>
-                <pre className="bg-gray-100 p-2 rounded mt-1 overflow-x-auto">
+                <strong className="dark:text-darkText">Details:</strong>
+                <pre className="bg-gray-100 dark:bg-gray-700 p-2 rounded mt-1 overflow-x-auto dark:text-gray-200">
                   {errorDetails.details}
                 </pre>
               </div>
             )}
             <button 
-              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
               onClick={() => setErrorDetails(null)}
             >
               Close
@@ -508,11 +509,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       )}
       {showRestoreAlert && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h2 className="text-xl font-bold mb-4">Restore Successful</h2>
-            <p className="mb-4">Project has been restored successfully.</p>
+          <div className="bg-white dark:bg-darkBox p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4 dark:text-darkText">Restore Successful</h2>
+            <p className="mb-4 dark:text-darkText">Project has been restored successfully.</p>
             <button 
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
               onClick={handleRestoreAlertClose}
             >
               OK

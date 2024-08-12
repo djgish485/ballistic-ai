@@ -6,6 +6,7 @@ const config: Config = {
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
+  darkMode: 'media', // This enables dark mode based on the user's system preferences
   theme: {
     extend: {
       backgroundImage: {
@@ -16,8 +17,15 @@ const config: Config = {
       minWidth: {
         '260': '18rem',
       },
-      width: { // Add width with the same value
+      width: {
         '260': '18rem',
+      },
+      colors: {
+        darkBg: '#1F2937',
+        darkText: '#F3F4F6',
+        darkBox: '#374151', // Color for box backgrounds in dark mode
+        darkMessageBox: '#2C3E50', // Color for message boxes in dark mode
+        darkCodeBorder: '#4B5563', // New color for code block borders in dark mode
       },
     },
   },

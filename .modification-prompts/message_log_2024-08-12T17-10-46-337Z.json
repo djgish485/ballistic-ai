@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Make the default font a little less bold.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
