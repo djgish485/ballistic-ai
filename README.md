@@ -39,22 +39,23 @@ Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats 
 
 ## Tips
 
-- **API Selection**:
+**API Selection**:
   - Claude 3.5 (Recommended): Ideal for complex tasks with 8192 token output.
   - GPT-4o: Faster with higher rate limits, suitable for simpler tasks.
-- **Diff button**
-  - Diff compares the AI output to existing files.
-  - Use it liberally to catch hallucinations and file truncations.
-- **Edit buttons** 
-  - Not satisfied with the AI response? Hovering over your message shows a pencil icon to edit and provide clarification.
-  - To make changes to a the code returned by AI, hover over it to show an edit button on top.
-- Click "Tips >" underneath the input area to see helpful prompts for debugging and problem solving.
-- For large projects, manage context size by editing context settings to only include relevant paths.  
-- Keep chats manageable by clicking "Next Modification" or refreshing the page when you're confident a modification is finished.
+
+**Diff button** compares the AI output to existing files. Use it liberally to catch hallucinations and truncations.
+
+**Edit buttons** Hovering over your messages shows a pencil icon to edit. Hovering over code blocks shows an edit button on top.
+
+**Tips button** underneath the input contains helpful prompts for debugging and problem solving.
+
+Manage context size in large projects by editing context settings to only include relevant paths. 
+
+Keep chats manageable by clicking "Next Modification" or refreshing the page when you're confident a modification is finished.
 
 ## A New Paradigm
 
-- Ballistic was created entirely via prompting. The .modification-prompts directory contains a log of the prompts used to create Ballistic. 
+Ballistic was created entirely via prompting. The .modification-prompts directory contains a log of the prompts used to create Ballistic. 
 
 ## License
 
