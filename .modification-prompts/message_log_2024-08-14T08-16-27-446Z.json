@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Currently, when context settings are changed, if the chat has already begun, the project is analyzed. Make it so that the project ALSO gets analyzed when the chat *hasn't* begun yet.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

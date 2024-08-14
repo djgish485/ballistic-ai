@@ -61,9 +61,7 @@ const ContextSettings: React.FC<ContextSettingsProps> = ({
       });
       if (response.ok) {
         onSettingsUpdate(includePaths);
-        if (isChatStarted) {
-          await onAnalyzeProject();
-        }
+        await onAnalyzeProject(); // Always analyze the project, regardless of chat status
         onClose();
       } else {
         console.error('Failed to save settings');

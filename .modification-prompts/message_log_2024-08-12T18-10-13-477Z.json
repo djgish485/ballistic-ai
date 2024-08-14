@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "I have this in my GitHub readme. Are there any legal issues with mentioning competitors?\n\nWhy Ballistic?\n\nWith AI editors like Cursor, you still have the mental overhead of figuring out which files to modify and how the code fits together.\nWith Claude Artifacts, you are copy & pasting files, unsure of what changes were made.\nIn Ballistic your software project is directly tied into the chat. Buttons like Write/Execute/Diff/Undo allow you to work with confidence and ease. The results will blow you away.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -220,6 +220,11 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
           <div className="text-right text-gray-600 dark:text-gray-300">
             Total size: {formatFileSize(totalSize)}
           </div>
+          {totalSize > 400 * 1024 && (
+            <div className="mt-4 p-3 bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 rounded-md">
+              Context length may be too long. Adjust context settings to target the specific areas of the project you're working on.
+            </div>
+          )}
         </>
       )}
       <ContextSettings

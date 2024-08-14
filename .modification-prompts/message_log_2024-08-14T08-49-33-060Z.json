@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "If Context's Total size is greater than 50 KB, put an alert box underneath that says \"Context length may be too long. Adjust context settings to target the specific areas of the project you're working on.\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
