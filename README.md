@@ -60,7 +60,3 @@ Ballistic was created entirely via prompting. The .modification-prompts director
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
----
-
-Embrace the future of software development with Ballistic – where AI and human creativity converge.
