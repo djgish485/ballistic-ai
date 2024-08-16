@@ -15,7 +15,7 @@ Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats 
 1. Clone the repository:
    ```
    git clone https://github.com/djgish485/ballistic-ai.git
-   cd ballistic-nextjs
+   cd ballistic-ai
    ```
 
 2. Install dependencies:
