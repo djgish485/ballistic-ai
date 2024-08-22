@@ -15,7 +15,7 @@ Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats 
 1. Clone the repository:
    ```
    git clone https://github.com/djgish485/ballistic-ai.git
-   cd ballistic-nextjs
+   cd ballistic-ai
    ```
 
 2. Install dependencies:
@@ -60,7 +60,3 @@ Ballistic was created entirely via prompting. The .modification-prompts director
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
-
----
-
-Embrace the future of software development with Ballistic – where AI and human creativity converge.
