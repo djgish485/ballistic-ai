@@ -2,6 +2,7 @@
 
 import React, { useRef, useEffect, useCallback, useState } from 'react';
 import { PhotoIcon, PaperAirplaneIcon, StopIcon } from '@heroicons/react/24/solid';
+import ImageThumbnail from './ImageThumbnail';
 
 interface ChatInputProps {
   input: string;
@@ -112,9 +113,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           <div className="flex flex-wrap gap-2 p-2 bg-gray-100 dark:bg-gray-700 rounded">
             {selectedImages.map((file, index) => (
               <div key={index} className="relative group">
-                <span className="bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 px-2 py-1 rounded text-sm">
-                  {file.name}
-                </span>
+                <ImageThumbnail file={file} />
                 <button
                   type="button"
                   onClick={() => handleRemoveImage(index)}

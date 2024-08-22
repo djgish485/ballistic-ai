@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Currently when you select an image(s) it shows the file name above the input box. Show a thumbnail of the image instead.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
