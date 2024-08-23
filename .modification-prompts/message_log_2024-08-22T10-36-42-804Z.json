@@ -1,0 +1,86 @@
+[
+  {
+    "role": "user",
+    "content": "Add a radio button at the bottom of the Context box that's titled \"Dynamic Context\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "If this box is checked, when a user sends a message, before sending to the LLM do a separate query to the LLM asking it to guess which files may be modified. \n- In this query, construct the messages exactly the same as in apiResponseHandler. That is, the LLM should be sent the same chat history & context as a normal message.\n- Have it structure its response as a list of files. print log messages with each file it is guessing. Then proceed as normal for now.\n- Have most of this logic on the server side. Just have the client pass along if the Dynamic Context box is checked to the normal LLM API call. Then if dynamic context the server calls the guess files LLM query first.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show me the complete ChatInterface.tsx file ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the complete apiResponseHandler.ts",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the complete app/page.tsx file",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "update the FileList component to accept the new setIsDynamicContext prop and use it to update the state when the checkbox is toggled.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "For each entry in Guessed files, find any file paths. \n\nI'm seeing data like:\nGuessed files: [\n  'Based on this conversation, the following files might be modified or needed for context:',\n  '- /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme.md',\n  '- /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/run_genai_analysis.sh',\n  '- /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/scripts/ai_human_story_similarity.py'\n]\n\nSo there's only three paths in there actually - find those. Be flexible, any strings could be returned by the LLM, we're just looking for the paths. Log the raw string returned by the LLM and then only the file paths returned by the LLM.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "It wasn't flexible enough here, it didn't find the paths.\n\nRaw LLM response: Here are the file paths that might be modified or needed for context based on this conversation:\n\n- /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/readme.md\n- /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/run_genai_analysis.sh\n- /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/scripts/00_control_center.do\n- /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/scripts/01_writer_process_output.do\n- /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/scripts/02_evaluator_process_output.do\n- /Users/dgish/code-git/superhero-ai/superhero-python/example_project/GenAI_creativity_scripts/scripts/ai_human_story_similarity.py\n\nThese files contain the setup, execution, and configuration details that may need to be included or referenced in the README for accurate translation and understanding.\nExtracted file paths: []\nGuessed files: []\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full apiResponseHandler.ts",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Great. Now, take the file paths returned by guessModifiedFiles and populate project-content.txt with the file contents (if a file path exists). ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full apiResponseHandler.ts",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "That's the wrong place for project-content.txt. It should replace the same file as the one created when analyzing project. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

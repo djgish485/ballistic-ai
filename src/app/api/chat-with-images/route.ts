@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getProjectFiles } from '@/utils/projectUtils';
 import { getSelectedAPIKey, readAPIKeys } from '@/utils/apiKeyManager';
-import { fetchAPIResponse } from '@/utils/apiResponseHandler';
+import { fetchAPIResponse, guessModifiedFiles } from '@/utils/apiResponseHandler';
 import { getInitialPrompt, constructInitialMessage, constructServerMessages } from '@/utils/messageProcessor';
 import { createResponseStream } from '@/utils/streamHandler';
 import { Message } from '@/types/chat';
@@ -10,10 +10,11 @@ export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
 
-    const projectDir = formData.get('projectDir');
+    const projectDir = formData.get('projectDir') as string;
     const isInitial = formData.get('isInitial') === 'true';
     const conversationHistory = JSON.parse(formData.get('conversationHistory') as string) as Message[];
     const selectedAPIKeyIndex = formData.get('selectedAPIKeyIndex') as string;
+    const isDynamicContext = formData.get('isDynamicContext') === 'true';
 
     if (!projectDir || typeof projectDir !== 'string') {
       return NextResponse.json({ error: 'Invalid project directory' }, { status: 400 });
@@ -55,6 +56,16 @@ export async function POST(req: NextRequest) {
 
     const serverMessages = constructServerMessages(isInitial, initialMessage, updatedConversationHistory);
 
+    let dynamicContextFileCount = 0;
+    let contextFiles: string[] = [];
+    if (isDynamicContext) {
+      console.log('Dynamic Context is enabled. Guessing files to be modified...');
+      const guessedFiles = await guessModifiedFiles(apiKey, systemPrompt, serverMessages, projectDir);
+      console.log('Guessed files:', guessedFiles);
+      dynamicContextFileCount = guessedFiles.length;
+      contextFiles = guessedFiles;
+    }
+
     const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages, projectDir);
 
     const stream = createResponseStream(apiKey, apiResponse, (messages: Message[]) => {
@@ -66,7 +77,7 @@ export async function POST(req: NextRequest) {
       isCancelled = true;
     });
 
-    return new NextResponse(new ReadableStream({
+    const responseStream = new ReadableStream({
       async start(controller) {
         const reader = stream.getReader();
         try {
@@ -84,11 +95,15 @@ export async function POST(req: NextRequest) {
           reader.releaseLock();
         }
       }
-    }), {
+    });
+
+    return new NextResponse(responseStream, {
       headers: {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
+        'X-Dynamic-Context-Files': dynamicContextFileCount.toString(),
+        'X-Context-Files': JSON.stringify(contextFiles),
       },
     });
   } catch (error) {

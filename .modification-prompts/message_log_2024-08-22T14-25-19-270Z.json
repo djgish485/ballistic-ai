@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "If using dynamic context, before the call to guessModifiedFiles is made, IMMEDIATELY display a message on the bottom of the message list with the text \"Dynamic context being built...\". ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

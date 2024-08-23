@@ -14,10 +14,20 @@ interface ChatMessagesProps {
   onEditMessage: (index: number, newContent: string) => void;
   onEditCommand: (oldCommand: string, newCommand: string) => void;
   projectDir: string;
+  dynamicContextFileCount: number | null;
 }
 
-const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, onDiff, onEditMessage, onEditCommand, projectDir }) => {
+const ChatMessages: React.FC<ChatMessagesProps> = ({ 
+  systemMessages, 
+  messages, 
+  onDiff, 
+  onEditMessage, 
+  onEditCommand, 
+  projectDir,
+  dynamicContextFileCount
+}) => {
   const [hoveredMessageIndex, setHoveredMessageIndex] = useState<number | null>(null);
+  const [showContextFiles, setShowContextFiles] = useState(false);
 
   const handleEditClick = (index: number) => {
     const confirmMessage = "Warning: threading not implemented yet and all messages below will be forgotten. Do you want to proceed?";
@@ -54,6 +64,26 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({ systemMessages, messages, o
               {msg.images.map((image, imgIndex) => (
                 <ImageThumbnail key={imgIndex} file={image} />
               ))}
+            </div>
+          )}
+          {msg.role === 'assistant' && msg.dynamicContextFileCount !== undefined && msg.dynamicContextFileCount > 0 && (
+            <div className="bg-green-100 dark:bg-green-800 p-2 rounded mb-2 relative">
+              <span 
+                className="cursor-pointer relative"
+                onMouseEnter={() => setShowContextFiles(true)}
+                onMouseLeave={() => setShowContextFiles(false)}
+              >
+                {msg.dynamicContextFileCount} files added to context
+                {showContextFiles && (
+                  <div className="absolute z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded p-2 shadow-lg mt-1 left-0">
+                    <ul className="list-disc pl-4">
+                      {msg.contextFiles && msg.contextFiles.map((file, fileIndex) => (
+                        <li key={fileIndex} className="text-sm">{file}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </span>
             </div>
           )}
           <strong className="dark:text-darkText">{msg.role === 'user' ? '' : `${msg.apiType}: `}</strong>

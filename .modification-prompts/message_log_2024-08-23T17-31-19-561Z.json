@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "When analyzing project in the beginning, IF dynamic context is enabled, only include README files in project-content.txt (be flexible in finding the README files with the various spelling of file names and locations they could be in). ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

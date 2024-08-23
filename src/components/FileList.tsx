@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef } from 'react';
 import { ArrowUpTrayIcon, Cog6ToothIcon, TrashIcon } from '@heroicons/react/24/outline';
 import ContextSettings from './ContextSettings';
 
@@ -15,9 +15,11 @@ interface Props {
   onSettingsUpdate: (newIncludePaths: string[]) => void;
   isChatStarted: boolean;
   onAnalyzeProject: () => Promise<void>;
+  setIsDynamicContext: React.Dispatch<React.SetStateAction<boolean>>;
+  isDynamicContext: boolean;
 }
 
-const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted, onAnalyzeProject }) => {
+const FileList = forwardRef<{ fetchFiles: () => Promise<void> }, Props>(({ projectDir, onSettingsUpdate, isChatStarted, onAnalyzeProject, setIsDynamicContext, isDynamicContext }, ref) => {
   const [files, setFiles] = useState<FileInfo[]>([]);
   const [totalSize, setTotalSize] = useState<number>(0);
   const [loading, setLoading] = useState(true);
@@ -34,28 +36,39 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
   ];
 
   useEffect(() => {
+    console.log('FileList: Initial render or projectDir changed, fetching files');
     fetchFiles();
   }, [projectDir]);
 
+  useEffect(() => {
+    console.log('FileList: isDynamicContext changed:', isDynamicContext);
+  }, [isDynamicContext]);
+
+  useImperativeHandle(ref, () => ({
+    fetchFiles,
+  }));
+
   const fetchFiles = async () => {
     if (!projectDir) {
-      console.log('Project directory not available, skipping file fetch');
+      console.log('FileList: Project directory not available, skipping file fetch');
       return;
     }
 
-    console.log('Fetching files for project directory:', projectDir);
+    console.log('FileList: Fetching files for project directory:', projectDir);
     try {
+      setLoading(true);
       const response = await fetch(`/api/list-files?projectDir=${encodeURIComponent(projectDir)}`);
-      console.log('API response status:', response.status);
+      console.log('FileList: API response status:', response.status);
       if (!response.ok) {
         throw new Error('Failed to fetch file list');
       }
       const data = await response.json();
-      console.log('Received file list:', data.files);
+      console.log('FileList: Received file list:', data.files);
       setFiles(data.files);
       setTotalSize(data.totalSize);
+      console.log('FileList: Updated files state with', data.files.length, 'files');
     } catch (err) {
-      console.error('Error fetching files:', err);
+      console.error('FileList: Error fetching files:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
       setLoading(false);
@@ -104,10 +117,10 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
         throw new Error('Failed to upload files');
       }
 
-      console.log('Files uploaded successfully');
+      console.log('FileList: Files uploaded successfully');
       fetchFiles(); // Refresh the file list
     } catch (err) {
-      console.error('Error uploading files:', err);
+      console.error('FileList: Error uploading files:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
   };
@@ -144,14 +157,86 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
           throw new Error('Failed to delete file');
         }
 
-        console.log('File deleted successfully');
+        console.log('FileList: File deleted successfully');
         fetchFiles(); // Refresh the file list
       } catch (err) {
-        console.error('Error deleting file:', err);
+        console.error('FileList: Error deleting file:', err);
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       }
     }
   };
+
+  const handleDynamicContextChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = event.target.checked;
+    console.log('FileList: Dynamic Context changed to:', newValue);
+    setIsDynamicContext(newValue);
+
+    try {
+      const response = await fetch('/api/save-dynamic-context', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ projectDir, isDynamicContext: newValue }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save Dynamic Context preference');
+      }
+
+      console.log('FileList: Dynamic Context preference saved successfully');
+      fetchFiles(); // Refresh the file list after changing dynamic context
+    } catch (err) {
+      console.error('FileList: Error saving Dynamic Context preference:', err);
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+    }
+  };
+
+  const renderFileList = () => (
+    <div>
+      {files.length === 0 ? (
+        <p className="text-gray-600 dark:text-gray-300 mb-4"><i>Project files will be added when you click Start.</i></p>
+      ) : (
+        <>
+          <ul className="space-y-1 mb-4">
+            {files.map((file, index) => (
+              <li 
+                key={index} 
+                className="flex justify-between hover:bg-gray-100 dark:hover:bg-gray-600 p-1 rounded text-gray-900 dark:text-gray-200"
+                onMouseEnter={() => setHoveredFile(file.path)}
+                onMouseLeave={() => setHoveredFile(null)}
+              >
+                <span
+                  className="cursor-pointer hover:underline"
+                  onClick={() => handleFileClick(file.path)}
+                >
+                  {file.name}
+                </span>
+                {hoveredFile === file.path ? (
+                  <button
+                    onClick={(e) => handleDeleteFile(file.path, e)}
+                    className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                  >
+                    <TrashIcon className="h-5 w-5" />
+                  </button>
+                ) : (
+                  <span className="text-gray-500 dark:text-gray-400">{formatFileSize(file.size)}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+          <div className="text-right text-gray-600 dark:text-gray-300 mb-4">
+            Total size: {formatFileSize(totalSize)}
+          </div>
+          {totalSize > 400 * 1024 && (
+            <div className="mt-4 p-3 bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 rounded-md mb-4">
+              Context length may be too long. Adjust context settings to target the specific areas of the project you're working on.
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  );
 
   return (
     <div className="bg-white dark:bg-darkBox p-4 rounded shadow">
@@ -186,45 +271,21 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
         <p className="text-gray-600 dark:text-gray-300">Loading files...</p>
       ) : error ? (
         <p className="text-red-500 dark:text-red-400">{error}</p>
-      ) : files.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-300"><i>Project files will be added when you click Start.</i></p>
       ) : (
         <>
-          <ul className="space-y-1 mb-4">
-            {files.map((file, index) => (
-              <li 
-                key={index} 
-                className="flex justify-between hover:bg-gray-100 dark:hover:bg-gray-600 p-1 rounded text-gray-900 dark:text-gray-200"
-                onMouseEnter={() => setHoveredFile(file.path)}
-                onMouseLeave={() => setHoveredFile(null)}
-              >
-                <span
-                  className="cursor-pointer hover:underline"
-                  onClick={() => handleFileClick(file.path)}
-                >
-                  {file.name}
-                </span>
-                {hoveredFile === file.path ? (
-                  <button
-                    onClick={(e) => handleDeleteFile(file.path, e)}
-                    className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                  >
-                    <TrashIcon className="h-5 w-5" />
-                  </button>
-                ) : (
-                  <span className="text-gray-500 dark:text-gray-400">{formatFileSize(file.size)}</span>
-                )}
-              </li>
-            ))}
-          </ul>
-          <div className="text-right text-gray-600 dark:text-gray-300">
-            Total size: {formatFileSize(totalSize)}
+          {renderFileList()}
+          <div className="mt-4 flex items-center">
+            <input
+              type="checkbox"
+              id="dynamicContext"
+              checked={isDynamicContext}
+              onChange={handleDynamicContextChange}
+              className="mr-2"
+            />
+            <label htmlFor="dynamicContext" className="text-gray-700 dark:text-gray-300">
+              Dynamic Context
+            </label>
           </div>
-          {totalSize > 400 * 1024 && (
-            <div className="mt-4 p-3 bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 rounded-md">
-              Context length may be too long. Adjust context settings to target the specific areas of the project you're working on.
-            </div>
-          )}
         </>
       )}
       <ContextSettings
@@ -237,6 +298,8 @@ const FileList: React.FC<Props> = ({ projectDir, onSettingsUpdate, isChatStarted
       />
     </div>
   );
-};
+});
+
+FileList.displayName = 'FileList';
 
 export default FileList;

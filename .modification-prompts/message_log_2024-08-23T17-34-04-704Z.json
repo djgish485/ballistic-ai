@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "If dynamic context is enabled, when querying the LLM to guess which files may be modified, it's sometimes returning a bunch of other stuff. Make sure it ONLY returns a list of file paths. But still handle the case when it returns other stuff (don't change the handling of the output).",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import dynamic from 'next/dynamic';
 import Layout from '../components/Layout';
 import { useProjectDir } from '../hooks/useProjectDir';
@@ -17,12 +17,15 @@ export default function Home() {
   const [isStarted, setIsStarted] = useState(false);
   const [hasBackup, setHasBackup] = useState(false);
   const [systemMessages, setSystemMessages] = useState<SystemMessage[]>([]);
-  const [fileListKey, setFileListKey] = useState(0);
   const [showRestoreAlert, setShowRestoreAlert] = useState(false);
+  const [isDynamicContext, setIsDynamicContext] = useState(false);
+  const fileListRef = useRef<{ fetchFiles: () => Promise<void> } | null>(null);
+  const [fileListKey, setFileListKey] = useState(0);
 
   useEffect(() => {
     if (projectDir) {
       fetchIncludePaths();
+      fetchDynamicContextPreference();
     }
   }, [projectDir]);
 
@@ -41,6 +44,20 @@ export default function Home() {
       }
     } catch (error) {
       console.error('Error fetching include paths:', error);
+    }
+  };
+
+  const fetchDynamicContextPreference = async () => {
+    try {
+      if (projectDir) {
+        const response = await fetch(`/api/save-dynamic-context?projectDir=${encodeURIComponent(projectDir)}`);
+        if (response.ok) {
+          const settings = await response.json();
+          setIsDynamicContext(settings.isDynamicContext);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching Dynamic Context preference:', error);
     }
   };
 
@@ -110,7 +127,10 @@ export default function Home() {
     setSystemMessages(prev => [...prev, { type: 'analysis', content: analyzeData.message }]);
     console.log('Analyze project response:', analyzeData);
 
+    // Update the file list after analysis
+    console.log('Attempting to update file list after analysis');
     setFileListKey(prevKey => prevKey + 1);
+    console.log('FileList key updated to trigger re-render');
   };
 
   const handleRestore = useCallback(async () => {
@@ -134,7 +154,9 @@ export default function Home() {
         setHasBackup(false);
         setShowRestoreAlert(true);
         console.log('Project restored successfully. showRestoreAlert set to true');
+        console.log('Attempting to update file list after restore');
         setFileListKey(prevKey => prevKey + 1);
+        console.log('FileList key updated to trigger re-render');
       } else {
         throw new Error(data.error || 'Failed to restore backup');
       }
@@ -143,6 +165,11 @@ export default function Home() {
       setSystemMessages(prev => [...prev, { type: 'error', content: `Error restoring backup: ${error instanceof Error ? error.message : 'Unknown error'}` }]);
     }
   }, [hasBackup, projectDir]);
+
+  const updateFileList = useCallback(() => {
+    console.log('Updating file list after dynamic context build');
+    setFileListKey(prevKey => prevKey + 1);
+  }, []);
 
   return (
     <Layout>
@@ -188,6 +215,8 @@ export default function Home() {
                     setIsStarted={setIsStarted}
                     showRestoreAlert={showRestoreAlert}
                     setShowRestoreAlert={setShowRestoreAlert}
+                    isDynamicContext={isDynamicContext}
+                    updateFileList={updateFileList}
                   />
                 )}
               </div>
@@ -195,10 +224,13 @@ export default function Home() {
                 {projectDir && (
                   <FileList
                     key={fileListKey}
+                    ref={fileListRef}
                     projectDir={projectDir}
                     onSettingsUpdate={handleSettingsUpdate}
                     isChatStarted={isStarted}
                     onAnalyzeProject={analyzeProject}
+                    setIsDynamicContext={setIsDynamicContext}
+                    isDynamicContext={isDynamicContext}
                   />
                 )}
                 <APIKeyManager />

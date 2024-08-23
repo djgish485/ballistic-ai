@@ -1,0 +1,30 @@
+[
+  {
+    "role": "user",
+    "content": "When analyzing project, IF dynamic context is enabled, only include README files in project-content.txt (be flexible in finding the README files with the various spelling of file names and locations they could be in). ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Dynamic context is enabled and project-content.txt is empty after analyzing. Yet there's a file named \"readme.md\". Why didn't it include this file in project-content?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Here's the logs:\n POST /api/project-backup 200 in 39ms\nDynamic Context is enabled\nAnalyzing directory: /Users/dgish/code-git/superhero-ai/superhero-python/example_project\nChecking file: .DS_Store, isDynamicContext: true\n.DS_Store is not a README file\nChecking file: GenAI_creativity_scripts, isDynamicContext: true\nGenAI_creativity_scripts is not a README file\nContent to be written:\nProject Content:\n\nAnd here's project structure:\nProject Structure:\n=================\n\nRoot: /Users/dgish/code-git/superhero-ai/superhero-python/example_project\n\nGenAI_creativity_scripts/\n  already_processed_data/\n    creators.dta\n    evaluators_stories.dta\n  log_files/\n  processed_data/\n    creators_with_similarity.csv\n  raw_data/\n    evaluators-2023-07-06.csv\n    writers-2023-06-28.csv\n  readme.md\n  run_genai_analysis.sh\n  scripts/\n    00_control_center.do\n    01_writer_process_output.do\n    02_evaluator_process_output.do\n    03_analysis.R\n    03_analysis.do\n    ai_human_story_similarity.py\n    compute_dats.py\n    dat.py\n    log_utils.py\n    words_glove/\n      glove.840B.300d.zip\n  tables_graphs/\n    evaluators/\n    figs/\n    writers/\n\nMake minimal changes to fix this. Don't change how project-content gets built when dynamic context isn't enabled.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Ok that worked when dynamic context is enabled, but wrecked the building of project-content when dynamic context isn't enabled. ENSURE that things work like they did before when dynamic context is not enabled.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

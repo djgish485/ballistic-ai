@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "When analyzing project, IF dynamic context is enabled, only include README files in project-content.txt (be flexible in finding the README files with the various spelling of file names and locations they could be in). ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Does getSettings return if dynamic context is enabled? Look at api response handler to see how it figures out if the dynamic context setting is enabled.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

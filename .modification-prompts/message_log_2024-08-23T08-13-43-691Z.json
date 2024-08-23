@@ -1,0 +1,32 @@
+[
+  {
+    "role": "user",
+    "content": "The green box on top of messages that says, for example, \"2 files added to context\". When hovering over that text, display a popup with the file paths of those files. Other than that don't change anything.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "The popup box is blank. Do you need to send those file paths from the server?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Good. Only show the popup when hovering over the text itself, not the entire green box.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Put the green line above the LLM name instead of below it.",
+    "images": [
+      {}
+    ],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -1,0 +1,74 @@
+[
+  {
+    "role": "user",
+    "content": "If dynamic context is on, on top of the LLM's reply box, put a line of text that says \"X files added to context\" where X is the number of files the server Added content of to project_content.txt ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Put the text INSIDE the LLM reply box, at the top.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "This line of text shows up but then disappears when the next LLM reply is received and there's a new line of text. All of them should stay there.\n\nBeyond that DON'T CHANGE ANYTHING",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "It's not showing the number of files. Also, don't show this green line if there's no files added to context.",
+    "images": [
+      {}
+    ],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "It's not showing the green line at all now. I'm guessing msg.dynamicContextFileCount isn't being set properly? \n\n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "So it works perfectly AFTER the first LLM reply. For some reason the green line isn't showing up in the first LLM reply. Here's the logs:\n\nFIRST TIME FAILURE:\n[Log] Rendering message 0:\nObject\n\napiType: \"GPT-4o\"\n\ncontent: \"The **GenAI Creativity Scripts** project analyzes how Generative AI can enhance creativity but may reduce content diversity. The projec…\"\n\ndynamicContextFileCount: null\n\nisComplete: true\n\nrole: \"assistant\"\n\nObject Prototype\n[Log] Rendering message 0: – {role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, …}\n{role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, apiType: \"GPT-4o\", dynamicContextFileCount: null}Object\n[Log] Rendering message 0: – {role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, …}\n{role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, apiType: \"GPT-4o\", dynamicContextFileCount: null}Object\n[Log] Rendering message 0: – {role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, …}\n{role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, apiType: \"GPT-4o\", dynamicContextFileCount: null}Object\n[Log] Rendering message 0: – {role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, …}\n{role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, apiType: \"GPT-4o\", dynamicContextFileCount: null}Object\n[Log] Rendering message 0: – {role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, …}\n{role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, apiType: \"GPT-4o\", dynamicContextFileCount: null}Object\n[Log] Rendering message 0: – {role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, …}\n{role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, apiType: \"GPT-4o\", dynamicContextFileCount: null}Object\n[Log] Rendering message 0:\nObject\n\napiType: \"GPT-4o\"\n\ncontent: \"The **GenAI Creativity Scripts** project analyzes how Generative AI can enhance creativity but may reduce content diversity. The projec…\"\n\ndynamicContextFileCount: null\n\nisComplete: true\n\nrole: \"assistant\"\n\nObject Prototype\n----\nNEXT REPLY SUCCESS:\n[Log] Rendering message 0:\nObject\n\napiType: \"GPT-4o\"\n\ncontent: \"The **GenAI Creativity Scripts** project analyzes how Generative AI can enhance creativity but may reduce content diversity. The projec…\"\n\ndynamicContextFileCount: null\n\nisComplete: true\n\nrole: \"assistant\"\n\nObject Prototype\n[Log] Rendering message 0: – {role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, …}\n{role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, apiType: \"GPT-4o\", dynamicContextFileCount: null}Object\n[Log] Rendering message 0: – {role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, …}\n{role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, apiType: \"GPT-4o\", dynamicContextFileCount: null}Object\n[Log] Rendering message 1: – {role: \"user\", content: \"replace readme.md with a French translation\", images: [], …}\n{role: \"user\", content: \"replace readme.md with a French translation\", images: [], isComplete: true, apiType: \"GPT-4o\"}Object\n[Log] Rendering message 0: – {role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, …}\n{role: \"assistant\", content: \"The **GenAI Creativity Scripts** project analyzes …cific changes and improvements you'd like to see!\", isComplete: true, apiType: \"GPT-4o\", dynamicContextFileCount: null}Object\n[Log] Rendering message 1: – {role: \"user\", content: \"replace readme.md with a French translation\", images: [], …}\n{role: \"user\", content: \"replace readme.md with a French translation\", images: [], isComplete: true, apiType: \"GPT-4o\"}Object\n[Log] ChatMessages: dynamicContextFileCount changed: – null\n[Log] ChatMessages: messages updated: – [Object, Object] (2)\n[Object, Object]Array (2)\n[Log] Dynamic context file count: – 1\n[Log] Rendering message 0:\nObject\n\napiType: \"GPT-4o\"\n\ncontent: \"The **GenAI Creativity Scripts** project analyzes how Generative AI can enhance creativity but may reduce content diversity. The projec…\"\n\ndynamicContextFileCount: null\n\nisComplete: true\n\nrole: \"assistant\"\n\nObject Prototype",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "It works. Now clean up and remove the debugging logging. Be sure to show me the full files.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

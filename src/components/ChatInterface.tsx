@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';
 import DiffScreen from './DiffScreen';
@@ -16,6 +16,8 @@ interface ChatInterfaceProps {
   setIsStarted: (isStarted: boolean) => void;
   showRestoreAlert: boolean;
   setShowRestoreAlert: (show: boolean) => void;
+  isDynamicContext: boolean;
+  updateFileList: () => void;
 }
 
 interface ErrorDetails {
@@ -33,7 +35,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   systemMessages,
   setIsStarted,
   showRestoreAlert,
-  setShowRestoreAlert
+  setShowRestoreAlert,
+  isDynamicContext,
+  updateFileList
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesRef = useRef<Message[]>([]);
@@ -55,10 +59,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const messageLogFileNameRef = useRef<string>('');
   const [errorDetails, setErrorDetails] = useState<ErrorDetails | null>(null);
   const [initialMessage, setInitialMessage] = useState<string>('');
-
-  useEffect(() => {
-    console.log('ChatInterface: showRestoreAlert changed:', showRestoreAlert);
-  }, [showRestoreAlert]);
+  const [isDynamicContextBuilding, setIsDynamicContextBuilding] = useState(false);
+  const [dynamicContextFileCount, setDynamicContextFileCount] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchInitialMessage = async () => {
@@ -158,7 +160,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       });
 
       setIsAddingFiles(false);
-      await processStreamResponse(response);
+
+      const dynamicContextFiles = response.headers.get('X-Dynamic-Context-Files');
+      let contextFileCount = null;
+      if (dynamicContextFiles) {
+        contextFileCount = parseInt(dynamicContextFiles, 10);
+        setDynamicContextFileCount(contextFileCount);
+      }
+
+      const contextFiles = response.headers.get('X-Context-Files');
+      let parsedContextFiles: string[] = [];
+      if (contextFiles) {
+        parsedContextFiles = JSON.parse(contextFiles);
+      }
+
+      await processStreamResponse(response, contextFileCount, parsedContextFiles);
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
         // Request was cancelled
@@ -168,7 +184,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           message: 'An error occurred while initiating the chat',
           details: error instanceof Error ? error.message : 'Unknown error'
         });
-        setIsStarted(false);  // Reset to show the "Start" button again
+        setIsStarted(false);
       }
     } finally {
       setIsLoading(false);
@@ -220,7 +236,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   }, [messages, systemMessages, userScrolledUp, scrollToBottom]);
 
-  const processStreamResponse = async (response: Response) => {
+  const processStreamResponse = async (response: Response, contextFileCount: number | null, contextFiles: string[]) => {
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || 'Unknown error occurred');
@@ -240,7 +256,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         role: 'assistant', 
         content: '', 
         isComplete: false,
-        apiType: getCurrentApiType()
+        apiType: getCurrentApiType(),
+        dynamicContextFileCount: contextFileCount,
+        contextFiles: contextFiles
       }];
       messagesRef.current = newMessages;
       return newMessages;
@@ -254,6 +272,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       const lines = chunk.split('\n');
 
       for (const line of lines) {
+        if (line.trim() === 'data: [DONE]') continue;
         if (line.startsWith('data: ')) {
           try {
             const data = JSON.parse(line.slice(6));
@@ -273,14 +292,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               const newMessages = data.conversationHistory.map((msg: Message) => ({ 
                 ...msg, 
                 isComplete: true,
-                apiType: getCurrentApiType()
+                apiType: getCurrentApiType(),
+                dynamicContextFileCount: contextFileCount,
+                contextFiles: contextFiles
               }));
               setMessages(newMessages);
               messagesRef.current = newMessages;
               return;
             }
           } catch (error) {
-            console.error('Error parsing JSON:', error);
+            // Error parsing JSON, but we'll silently ignore it
           }
         }
       }
@@ -309,7 +330,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         apiType: getCurrentApiType(),
       };
 
-      // Immediately add the user message to the chat interface
       setMessages(prev => [...prev, userMessage]);
       messagesRef.current = [...messagesRef.current, userMessage];
 
@@ -321,12 +341,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       try {
         abortControllerRef.current = new AbortController();
 
+        if (isDynamicContext) {
+          setIsDynamicContextBuilding(true);
+          setDynamicContextFileCount(null);
+        }
+
         const formData = new FormData();
         formData.append('projectDir', projectDir);
         formData.append('message', userMessage.content);
         formData.append('isInitial', 'false');
         formData.append('conversationHistory', JSON.stringify(messagesRef.current));
         formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
+        formData.append('isDynamicContext', isDynamicContext.toString());
 
         messagesRef.current.forEach((msg, msgIndex) => {
           msg.images?.forEach((image, imgIndex) => {
@@ -340,7 +366,27 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           signal: abortControllerRef.current.signal,
         });
 
-        await processStreamResponse(response);
+        setIsDynamicContextBuilding(false);
+        
+        const dynamicContextFiles = response.headers.get('X-Dynamic-Context-Files');
+        let contextFileCount = null;
+        if (dynamicContextFiles) {
+          contextFileCount = parseInt(dynamicContextFiles, 10);
+          setDynamicContextFileCount(contextFileCount);
+        }
+
+        const contextFiles = response.headers.get('X-Context-Files');
+        let parsedContextFiles: string[] = [];
+        if (contextFiles) {
+          parsedContextFiles = JSON.parse(contextFiles);
+        }
+
+        await processStreamResponse(response, contextFileCount, parsedContextFiles);
+
+        // Update file list after dynamic context is built
+        if (isDynamicContext) {
+          updateFileList();
+        }
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
           // Request was cancelled
@@ -371,31 +417,28 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             type: errorType,
             details: errorDetails
           });
-          // Simulate edit message action
           handleEditMessage(messagesRef.current.length - 1, userMessage.content);
         }
       } finally {
         setIsLoading(false);
         setIsAIResponding(false);
+        setIsDynamicContextBuilding(false);
         abortControllerRef.current = null;
       }
     }
   };
 
   const handleEditMessage = (index: number, newContent: string) => {
-    // If LLM is still responding, stop the response
     if (isAIResponding) {
       handleCancel();
     }
 
     setMessages((prevMessages) => {
-      // Remove all messages from the edited message onwards
       const newMessages = prevMessages.slice(0, index);
       messagesRef.current = newMessages;
       return newMessages;
     });
 
-    // Set the input to the edited message content
     setInput(newContent);
   };
 
@@ -404,6 +447,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       abortControllerRef.current.abort();
       setIsAIResponding(false);
       setIsLoading(false);
+      setIsDynamicContextBuilding(false);
     }
   };
 
@@ -428,7 +472,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }, []);
 
   const handleRestoreAlertClose = () => {
-    console.log('ChatInterface: handleRestoreAlertClose called');
     setShowRestoreAlert(false);
     window.location.reload();
   };
@@ -458,7 +501,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           onEditMessage={handleEditMessage}
           onEditCommand={handleEditCommand}
           projectDir={projectDir}
+          dynamicContextFileCount={dynamicContextFileCount}
         />
+        {isDynamicContextBuilding && (
+          <div className="bg-blue-100 dark:bg-blue-800 p-2 rounded">
+            Dynamic context being built...
+          </div>
+        )}
         <div ref={chatEndRef} />
       </div>
       <div 
