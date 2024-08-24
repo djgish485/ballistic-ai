@@ -1,6 +1,6 @@
 # Ballistic AI 🚀
 
-Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats into software development sessions. Put away the editor - work in broad strokes and go Ballistic.
+Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats into software development sessions. Put away the editor - work in just English and go Ballistic.
 
 ![Screenshot 2024-08-12 at 7 47 16 PM](https://github.com/user-attachments/assets/b5ffeb2e-5e37-4c35-a31c-1d68692df68c)
 
