@@ -60,3 +60,8 @@ Ballistic was created entirely via prompting. The .modification-prompts director
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## Contact
+
+[Hit me up on X](https://x.com/djgish) and lemme know if you're going Ballistic.
+
