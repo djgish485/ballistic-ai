@@ -8,7 +8,7 @@ Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats 
 ## Why Ballistic?
 - With AI code editors you're still juggling files and figuring out how code fits together.
 - With artifacts, you are copy & pasting code, unsure of what changes were made.
-- In Ballistic your software project is directly tied into the chat. Code is auto-loaded into Claude's context. Buttons like Write/Execute/Diff/Undo allow you to work with Claude's outputs w/ confidence and ease.
+- In Ballistic your software project is directly tied into the chat. Code is auto-loaded into Claude's context. Buttons like Write/Execute/Diff/Undo allow you to work with LLM outputs w/ confidence and ease.
 
 ## Getting Started
 
