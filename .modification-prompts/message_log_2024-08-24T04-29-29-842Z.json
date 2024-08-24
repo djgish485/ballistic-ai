@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Change it from \"Adjust context settings to target the specific areas of the project you're working on.\" to \"Use Dynamic Context or adjust context settings to target the specific areas.\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

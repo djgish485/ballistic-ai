@@ -18,6 +18,7 @@ interface ChatInterfaceProps {
   setShowRestoreAlert: (show: boolean) => void;
   isDynamicContext: boolean;
   updateFileList: () => void;
+  setIsDynamicContext: (isDynamic: boolean) => void;
 }
 
 interface ErrorDetails {
@@ -37,7 +38,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   showRestoreAlert,
   setShowRestoreAlert,
   isDynamicContext,
-  updateFileList
+  updateFileList,
+  setIsDynamicContext
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const messagesRef = useRef<Message[]>([]);
@@ -61,6 +63,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [initialMessage, setInitialMessage] = useState<string>('');
   const [isDynamicContextBuilding, setIsDynamicContextBuilding] = useState(false);
   const [dynamicContextFileCount, setDynamicContextFileCount] = useState<number | null>(null);
+  const [showDynamicContextPrompt, setShowDynamicContextPrompt] = useState(false);
+  const [showDynamicContextEnabledAlert, setShowDynamicContextEnabledAlert] = useState(false);
 
   useEffect(() => {
     const fetchInitialMessage = async () => {
@@ -77,7 +81,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
   useEffect(() => {
     if (isStarted && messages.length === 0) {
-      initiateChat();
+      checkProjectSize();
     }
   }, [isStarted, messages.length]);
 
@@ -127,6 +131,53 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
+  const checkProjectSize = async () => {
+    try {
+      const response = await fetch(`/api/list-files?projectDir=${encodeURIComponent(projectDir)}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch file list');
+      }
+      const data = await response.json();
+      const projectContentFile = data.files.find((file: any) => file.name === 'project-content.txt');
+      if (projectContentFile && projectContentFile.size > 250 * 1024 && !isDynamicContext) {
+        setShowDynamicContextPrompt(true);
+      } else {
+        initiateChat();
+      }
+    } catch (error) {
+      console.error('Error checking project size:', error);
+      initiateChat(); // Proceed with chat if there's an error
+    }
+  };
+
+  const handleDynamicContextPrompt = async (enable: boolean) => {
+    setShowDynamicContextPrompt(false);
+    if (enable) {
+      try {
+        const response = await fetch('/api/save-dynamic-context', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ projectDir, isDynamicContext: true }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save Dynamic Context preference');
+        }
+
+        setIsDynamicContext(true);
+        setIsStarted(false); // Reset start button
+        setShowDynamicContextEnabledAlert(true);
+      } catch (error) {
+        console.error('Error saving Dynamic Context preference:', error);
+        // Handle error (e.g., show an error message to the user)
+      }
+    } else {
+      initiateChat();
+    }
+  };
+
   const initiateChat = async () => {
     setIsLoading(true);
     setIsAIResponding(true);
@@ -134,18 +185,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setIsAddingFiles(true);
 
     try {
-      setIsBackupInProgress(true);
-      const backupResponse = await fetch('/api/project-backup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ projectDir }),
-      });
-      if (backupResponse.ok) {
-        setIsBackupInProgress(false);
-      } else {
-        setIsBackupInProgress(false);
-      }
-
       abortControllerRef.current = new AbortController();
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -564,6 +603,46 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <button 
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
               onClick={handleRestoreAlertClose}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
+      {showDynamicContextPrompt && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-darkBox p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4 dark:text-darkText">Large Project Detected</h2>
+            <p className="mb-4 dark:text-darkText">
+              The project content is larger than 250 KB. Would you like to enable Dynamic Context to optimize performance?
+            </p>
+            <div className="flex justify-end space-x-4">
+              <button 
+                className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+                onClick={() => handleDynamicContextPrompt(false)}
+              >
+                No, proceed normally
+              </button>
+              <button 
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+                onClick={() => handleDynamicContextPrompt(true)}
+              >
+                Yes, enable Dynamic Context
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showDynamicContextEnabledAlert && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-darkBox p-6 rounded-lg shadow-lg max-w-md w-full">
+            <h2 className="text-xl font-bold mb-4 dark:text-darkText">Dynamic Context Enabled</h2>
+            <p className="mb-4 dark:text-darkText">
+              Dynamic context has been enabled. Click Start again to begin.
+            </p>
+            <button 
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+              onClick={() => setShowDynamicContextEnabledAlert(false)}
             >
               OK
             </button>

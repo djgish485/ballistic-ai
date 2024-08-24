@@ -1,0 +1,23 @@
+[
+  {
+    "role": "user",
+    "content": "There is a race condition - when dynamic context is enabled, the LLM returns a list of files and then project_content.txt is created out of those file contents. Then the main call to the LLM begins, and it reads the project files. But the write to project_content.txt hasn't completed yet so the contents aren't found.\n\nIn the chat-with-images route, the dynamic context stuff w/ guessModifiedFiles needs to be put into it's own function, repeating a lot of the code above it that constructs the parameters guessModifiedFiles needs. Then this function needs to be called and awaited upon AT THE BEGINNING OF the POST function.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "No, handleDynamicContext needs to be called AT THE BEGINNING of post(). DON'T include systemPrompt,\n      serverMessages as parameters - COPY the code from POST to use within handleDynamicContext.\n\nBut DO NOT CHANGE anything you don't need to beyond that.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "NO!! const initialPrompt = getInitialPrompt(); was called after \"Collect received images\" and now you put it before. You did change the order! Fix this! Make it the same other than the dynamic context stuff.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

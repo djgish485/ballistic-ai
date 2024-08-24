@@ -1,0 +1,79 @@
+[
+  {
+    "role": "user",
+    "content": "After analyzing project, if size of project_content.txt is greater than 50 KB and dynamic context isn't enabled, ask user if they want to enable dynamic context before proceeding. If yes, enable dynamic context and initiateChat again. If no, proceed normally.\n\nTo find size of project_content, use the existing file list endpoint.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full FileList",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full page.tsx",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Where does the analyze-project api endpoint get called? Just answer the question, no modifications needed.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Ok, where does analyzeProject() get called?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "How does initiateChat get triggered when analyzeProject is done?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Ok, got it. So when the user clicks yes enable dynamic context from this popup, instead of calling initiateChat, call the handleStart function. We need to execute all of that again.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "when calling onStart here, the state needs to be set like the start button is clicked the first time. Because I'm getting a \"Are you sure you want to reload\" when I shouldn't here.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "I'm still getting a \"Are you sure? Chat will be reloaded.\" after clicking yes.\n\nList a couple hypothesis of why and then add in log messages to help figure it out.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full page.tsx",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

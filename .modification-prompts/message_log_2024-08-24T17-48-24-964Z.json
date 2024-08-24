@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "When checking for a large project to ask about enabling dynamic context, instead of 50 KB raise it to 250 KB.\n\nLook at ChatInterface and related files.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

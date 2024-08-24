@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "Currently, analyzeProject is done in handleStart, and /api/project-backup is done in initiateChat. Swap that. Do /api/project-backup in initiateChat and the /api/project-backup stuff in handleStart.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "You got cut off. Show the full page.tsx",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

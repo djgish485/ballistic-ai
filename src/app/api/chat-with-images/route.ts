@@ -5,6 +5,44 @@ import { fetchAPIResponse, guessModifiedFiles } from '@/utils/apiResponseHandler
 import { getInitialPrompt, constructInitialMessage, constructServerMessages } from '@/utils/messageProcessor';
 import { createResponseStream } from '@/utils/streamHandler';
 import { Message } from '@/types/chat';
+import fs from 'fs/promises';
+import path from 'path';
+import { getProjectFilesDir } from '@/utils/directoryUtils';
+
+async function handleDynamicContext(
+  projectDir: string,
+  isDynamicContext: boolean,
+  formData: FormData
+): Promise<{ dynamicContextFileCount: number | null; contextFiles: string[] }> {
+  if (!isDynamicContext) {
+    return { dynamicContextFileCount: null, contextFiles: [] };
+  }
+
+  const isInitial = formData.get('isInitial') === 'true';
+  const conversationHistory = JSON.parse(formData.get('conversationHistory') as string) as Message[];
+  const selectedAPIKeyIndex = formData.get('selectedAPIKeyIndex') as string;
+
+  let apiKey = selectedAPIKeyIndex !== null && selectedAPIKeyIndex !== ''
+    ? readAPIKeys().keys[parseInt(selectedAPIKeyIndex)]
+    : getSelectedAPIKey();
+
+  if (!apiKey) {
+    throw new Error('No API key selected');
+  }
+
+  const initialPrompt = getInitialPrompt();
+  const projectFiles = await getProjectFiles(projectDir);
+  const systemPrompt = initialPrompt;
+  const initialMessage = constructInitialMessage(projectFiles);
+
+  const serverMessages = constructServerMessages(isInitial, initialMessage, conversationHistory);
+
+  console.log('Dynamic Context is enabled. Guessing files to be modified...');
+  const guessedFiles = await guessModifiedFiles(apiKey, systemPrompt, serverMessages, projectDir);
+  console.log('Guessed files:', guessedFiles);
+
+  return { dynamicContextFileCount: guessedFiles.length, contextFiles: guessedFiles };
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,6 +57,13 @@ export async function POST(req: NextRequest) {
     if (!projectDir || typeof projectDir !== 'string') {
       return NextResponse.json({ error: 'Invalid project directory' }, { status: 400 });
     }
+
+    // Handle dynamic context at the beginning
+    const { dynamicContextFileCount, contextFiles } = await handleDynamicContext(
+      projectDir,
+      isDynamicContext,
+      formData
+    );
 
     let apiKey = selectedAPIKeyIndex !== null && selectedAPIKeyIndex !== ''
       ? readAPIKeys().keys[parseInt(selectedAPIKeyIndex)]
@@ -56,16 +101,6 @@ export async function POST(req: NextRequest) {
 
     const serverMessages = constructServerMessages(isInitial, initialMessage, updatedConversationHistory);
 
-    let dynamicContextFileCount = 0;
-    let contextFiles: string[] = [];
-    if (isDynamicContext) {
-      console.log('Dynamic Context is enabled. Guessing files to be modified...');
-      const guessedFiles = await guessModifiedFiles(apiKey, systemPrompt, serverMessages, projectDir);
-      console.log('Guessed files:', guessedFiles);
-      dynamicContextFileCount = guessedFiles.length;
-      contextFiles = guessedFiles;
-    }
-
     const apiResponse = await fetchAPIResponse(apiKey, systemPrompt, serverMessages, projectDir);
 
     const stream = createResponseStream(apiKey, apiResponse, (messages: Message[]) => {
@@ -102,7 +137,7 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
         'Connection': 'keep-alive',
-        'X-Dynamic-Context-Files': dynamicContextFileCount.toString(),
+        'X-Dynamic-Context-Files': dynamicContextFileCount?.toString() || '0',
         'X-Context-Files': JSON.stringify(contextFiles),
       },
     });

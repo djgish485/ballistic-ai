@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "'/api/project-backup' is getting called from both initiateChat and handleStart. Remove it from initiateChat. But call the setIsBackupInProgress stuff from handleStart instead.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "You got cut off. Show the full page.tsx",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

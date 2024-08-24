@@ -144,9 +144,9 @@ export async function guessModifiedFiles(apiKey: { type: string; key: string }, 
     const lastMessage = filteredMessages[filteredMessages.length - 1];
     if (lastMessage.role === 'user') {
       if (typeof lastMessage.content === 'string') {
-        lastMessage.content += "\n\nBased on this conversation, guess which files might be modified or needed for context. Guess liberally and also include project files that seem important in general. Respond ONLY with a list of file paths, one per line. Do NOT implement the modifications or include any explanations or additional text.";
+        lastMessage.content += "\n\nBased on this conversation, guess which files might be modified or needed for context. Guess liberally and also include project files that seem important in general. Respond ONLY with a list of ABSOLUTE file paths, one per line. Do NOT implement the modifications or include any explanations or additional text.";
       } else if (Array.isArray(lastMessage.content)) {
-        lastMessage.content.push({ type: 'text', text: "\n\nBased on this conversation, guess which files might be modified or needed for context. Guess liberally and also include project files that seem important in general. Respond ONLY with a list of file paths, one per line. Do NOT implement the modifications or include any explanations or additional text." });
+        lastMessage.content.push({ type: 'text', text: "\n\nBased on this conversation, guess which files might be modified or needed for context. Guess liberally and also include project files that seem important in general. Respond ONLY with a list of ABSOLUTE file paths, one per line. Do NOT implement the modifications or include any explanations or additional text." });
       }
     }
     
@@ -163,9 +163,9 @@ export async function guessModifiedFiles(apiKey: { type: string; key: string }, 
     const lastMessage = filteredMessages[filteredMessages.length - 1];
     if (lastMessage.role === 'user') {
       if (typeof lastMessage.content === 'string') {
-        lastMessage.content += "\n\nBased on this conversation, guess which files might be modified or needed for context. Respond ONLY with a list of file paths, one per line. Do not include any explanations or additional text.";
+        lastMessage.content += "\n\nBased on this conversation, guess which files might be modified or needed for context. Respond ONLY with a list of ABSOLUTE file paths, one per line. Do not include any explanations or additional text.";
       } else if (Array.isArray(lastMessage.content)) {
-        lastMessage.content.push({ type: 'text', text: "\n\nBased on this conversation, guess which files might be modified or needed for context. Respond ONLY with a list of file paths, one per line. Do not include any explanations or additional text." });
+        lastMessage.content.push({ type: 'text', text: "\n\nBased on this conversation, guess which files might be modified or needed for context. Respond ONLY with a list of ABSOLUTE file paths, one per line. Do not include any explanations or additional text." });
       }
     }
 

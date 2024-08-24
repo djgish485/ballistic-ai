@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "Add a \"Skip\" button to the message \"Dynamic context being built...\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

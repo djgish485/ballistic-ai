@@ -1,0 +1,51 @@
+[
+  {
+    "role": "user",
+    "content": "After analyzing project and before chat is started, if size of project_content.txt is greater than 50 KB and dynamic context isn't enabled, ask user if they want to enable dynamic context before proceeding. If yes, enable dynamic context and reset start button to original state and exit the execution (don't start chat). If no, proceed normally.\n\nTo find size of project_content, use the existing file list endpoint.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Show the full page.tsx",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "In page.tsx why is setIsStarted(true); called in the beginning of handleStart? I think it should be called after analyzeProject is finished.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  },
+  {
+    "role": "user",
+    "content": "When setShowDynamicContextPrompt is called from checkProjectSize, the checkbox is checking but the preference isn't getting saved. It works when I click the checkbox manually. Fix this.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "You were cutoff. Show the full page.tsx",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "After dynamic context is set to true here, popup a box that says \"Dynamic context enabled. Click Start again to begin.\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

@@ -21,6 +21,7 @@ export default function Home() {
   const [isDynamicContext, setIsDynamicContext] = useState(false);
   const fileListRef = useRef<{ fetchFiles: () => Promise<void> } | null>(null);
   const [fileListKey, setFileListKey] = useState(0);
+  const [isBackupInProgress, setIsBackupInProgress] = useState(false);
 
   useEffect(() => {
     if (projectDir) {
@@ -85,12 +86,12 @@ export default function Home() {
     }
 
     console.log('Start button clicked. Current state:', { isStarted, hasBackup, projectDir });
-    setIsStarted(true);
     setSystemMessages([]); // Clear previous system messages
-    console.log('isStarted set to true');
+    console.log('Starting project analysis and backup...');
 
     try {
       console.log('Creating backup...');
+      setIsBackupInProgress(true);
       const backupResponse = await fetch('/api/project-backup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -104,15 +105,18 @@ export default function Home() {
       } else {
         throw new Error(backupData.error || 'Failed to create backup');
       }
+      setIsBackupInProgress(false);
 
       await analyzeProject();
 
+      setIsStarted(true); // Set isStarted to true after successful analysis
       console.log('Project started successfully. Current state:', { isStarted: true, hasBackup: true });
     } catch (error) {
       console.error('Error starting project:', error);
       setIsStarted(false);
       setSystemMessages(prev => [...prev, { type: 'error', content: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }]);
       console.log('Project start failed. isStarted set back to false.');
+      setIsBackupInProgress(false);
     }
   }, [projectDir, isStarted]);
 
@@ -217,6 +221,7 @@ export default function Home() {
                     setShowRestoreAlert={setShowRestoreAlert}
                     isDynamicContext={isDynamicContext}
                     updateFileList={updateFileList}
+                    setIsDynamicContext={setIsDynamicContext}
                   />
                 )}
               </div>
