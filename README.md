@@ -1,6 +1,6 @@
 # Ballistic AI 🚀
 
-Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats into software development sessions. Put away the editor - work in broad strokes and go Ballistic.
+Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats into software development sessions. Put away the editor - work in plain English and go Ballistic.
 
 ![Screenshot 2024-08-12 at 7 47 16 PM](https://github.com/user-attachments/assets/b5ffeb2e-5e37-4c35-a31c-1d68692df68c)
 
@@ -8,7 +8,7 @@ Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats 
 ## Why Ballistic?
 - With AI code editors you're still juggling files and figuring out how code fits together.
 - With artifacts, you are copy & pasting code, unsure of what changes were made.
-- In Ballistic your software project is directly tied into the chat. Buttons like Write/Execute/Diff/Undo allow you to work with confidence and ease. The results will blow you away.
+- In Ballistic your software project is directly tied into the chat. Code is auto-loaded into Claude's context. Buttons like Write/Execute/Diff/Undo allow you to work with LLM outputs w/ confidence and ease.
 
 ## Getting Started
 
@@ -49,7 +49,7 @@ Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats 
 
 **Tips button** contains helpful prompts for debugging and problem solving.
 
-Manage context size in large projects by editing context settings to only include relevant paths. 
+Manage context size in large projects by using Dynamic Context.
 
 Keep chats manageable by clicking "Next Modification" or refreshing the page when you're confident a modification is finished.
 
