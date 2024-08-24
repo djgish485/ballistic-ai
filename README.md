@@ -49,7 +49,7 @@ Ballistic supercharges the latest SOTA LLMs like Claude 3.5, transforming chats 
 
 **Tips button** contains helpful prompts for debugging and problem solving.
 
-Manage context size in large projects by editing context settings to only include relevant paths. 
+Manage context size in large projects by using Dynamic Context.
 
 Keep chats manageable by clicking "Next Modification" or refreshing the page when you're confident a modification is finished.
 
