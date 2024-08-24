@@ -230,7 +230,7 @@ const FileList = forwardRef<{ fetchFiles: () => Promise<void> }, Props>(({ proje
           </div>
           {totalSize > 400 * 1024 && (
             <div className="mt-4 p-3 bg-yellow-100 dark:bg-yellow-800 text-yellow-800 dark:text-yellow-200 rounded-md mb-4">
-              Context length may be too long. Adjust context settings to target the specific areas of the project you're working on.
+              Context length may be too long. Use Dynamic Context or adjust context settings to target the specific areas.
             </div>
           )}
         </>
