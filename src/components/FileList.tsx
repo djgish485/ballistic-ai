@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useImperativeHandle, forwardRef } from 'react';
-import { ArrowUpTrayIcon, Cog6ToothIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { ArrowUpTrayIcon, Cog6ToothIcon, TrashIcon, InformationCircleIcon } from '@heroicons/react/24/outline';
 import ContextSettings from './ContextSettings';
 
 interface FileInfo {
@@ -36,13 +36,8 @@ const FileList = forwardRef<{ fetchFiles: () => Promise<void> }, Props>(({ proje
   ];
 
   useEffect(() => {
-    console.log('FileList: Initial render or projectDir changed, fetching files');
     fetchFiles();
   }, [projectDir]);
-
-  useEffect(() => {
-    console.log('FileList: isDynamicContext changed:', isDynamicContext);
-  }, [isDynamicContext]);
 
   useImperativeHandle(ref, () => ({
     fetchFiles,
@@ -50,25 +45,20 @@ const FileList = forwardRef<{ fetchFiles: () => Promise<void> }, Props>(({ proje
 
   const fetchFiles = async () => {
     if (!projectDir) {
-      console.log('FileList: Project directory not available, skipping file fetch');
       return;
     }
 
-    console.log('FileList: Fetching files for project directory:', projectDir);
     try {
       setLoading(true);
       const response = await fetch(`/api/list-files?projectDir=${encodeURIComponent(projectDir)}`);
-      console.log('FileList: API response status:', response.status);
       if (!response.ok) {
         throw new Error('Failed to fetch file list');
       }
       const data = await response.json();
-      console.log('FileList: Received file list:', data.files);
       setFiles(data.files);
       setTotalSize(data.totalSize);
-      console.log('FileList: Updated files state with', data.files.length, 'files');
     } catch (err) {
-      console.error('FileList: Error fetching files:', err);
+      console.error('Error fetching files:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     } finally {
       setLoading(false);
@@ -117,10 +107,9 @@ const FileList = forwardRef<{ fetchFiles: () => Promise<void> }, Props>(({ proje
         throw new Error('Failed to upload files');
       }
 
-      console.log('FileList: Files uploaded successfully');
       fetchFiles(); // Refresh the file list
     } catch (err) {
-      console.error('FileList: Error uploading files:', err);
+      console.error('Error uploading files:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
   };
@@ -157,10 +146,9 @@ const FileList = forwardRef<{ fetchFiles: () => Promise<void> }, Props>(({ proje
           throw new Error('Failed to delete file');
         }
 
-        console.log('FileList: File deleted successfully');
         fetchFiles(); // Refresh the file list
       } catch (err) {
-        console.error('FileList: Error deleting file:', err);
+        console.error('Error deleting file:', err);
         setError(err instanceof Error ? err.message : 'An unknown error occurred');
       }
     }
@@ -168,7 +156,6 @@ const FileList = forwardRef<{ fetchFiles: () => Promise<void> }, Props>(({ proje
 
   const handleDynamicContextChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = event.target.checked;
-    console.log('FileList: Dynamic Context changed to:', newValue);
     setIsDynamicContext(newValue);
 
     try {
@@ -184,10 +171,9 @@ const FileList = forwardRef<{ fetchFiles: () => Promise<void> }, Props>(({ proje
         throw new Error('Failed to save Dynamic Context preference');
       }
 
-      console.log('FileList: Dynamic Context preference saved successfully');
       fetchFiles(); // Refresh the file list after changing dynamic context
     } catch (err) {
-      console.error('FileList: Error saving Dynamic Context preference:', err);
+      console.error('Error saving Dynamic Context preference:', err);
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
     }
   };
@@ -282,8 +268,15 @@ const FileList = forwardRef<{ fetchFiles: () => Promise<void> }, Props>(({ proje
               onChange={handleDynamicContextChange}
               className="mr-2"
             />
-            <label htmlFor="dynamicContext" className="text-gray-700 dark:text-gray-300">
+            <label htmlFor="dynamicContext" className="text-gray-700 dark:text-gray-300 flex items-center">
               Dynamic Context
+              <div className="relative ml-1 group">
+                <InformationCircleIcon className="h-6 w-6 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" />
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-white dark:bg-gray-800 p-2 rounded shadow-lg hidden group-hover:block w-64 text-sm text-gray-700 dark:text-gray-300">
+                  <div>Guesses from your request a list of files to include in the context.</div>
+                  <div>Tip: if wrong files are included, give hints in your message of where the code could be.</div>
+                </div>
+              </div>
             </label>
           </div>
         </>

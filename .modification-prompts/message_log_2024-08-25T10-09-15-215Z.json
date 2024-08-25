@@ -1,0 +1,51 @@
+[
+  {
+    "role": "user",
+    "content": "The \"Dynamic context being built...\" message - add a Skip button to it that cancels dynamic context building. Cancel it by cancelled the api call to chat-with-images, and calling it again with an extra parameter that makes the api not run handleDynamicContext.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "No don't change any of the isCancelled stuff in chat-with-images/route.ts",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "show the full ChatInterface",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "When skipping, it's failing to resend sendChatMessage. Here's the logs:\n\n[Log] dyn ctx skipped\n[Log] {role: \"user\", content: \"replace readme.md with French translation\", images: [], isComplete: true, apiType: \"GPT-4o\"}\n[Log] user\n[Log] resending sendChatMessage\n[Error] Unhandled Promise Rejection: AbortError: The operation was aborted.\n\t(anonymous function) (ChatInterface.tsx:492)",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Good. Can you not show the Skip button for the first time dynamic context is getting built?",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Didn't work. I think you're calling setIsFirstDynamicContextBuild too early - call setIsFirstDynamicContextBuild when send message completes.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Good. Can you make the Skip button normal looking and not red, and put it right next to the text instead of aligned right in the box.\n",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

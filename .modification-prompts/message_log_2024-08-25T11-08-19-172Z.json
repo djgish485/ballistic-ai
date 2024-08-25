@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "Put an info icon next to the \"Dynamic Context\" checkbox text in the filelist component. When hovering over the icon put a popup that says \"Guesses from your request a list of files to include in the context. Tip: if wrong files are included, give hints in your message of where the code could be.\"",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "Make the icon bigger. ",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

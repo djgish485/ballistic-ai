@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "When sending a message to Claude with an image attached, getting this error:\n\n[Error] Failed to load resource: the server responded with a status of 500 (Internal Server Error) (chat-with-images, line 0)\n[Error] Error sending message: – Error: file.arrayBuffer is not a function\nError: file.arrayBuffer is not a function\n\t(anonymous function) (app-index.js:33)\n\t(anonymous function) (hydration-error-info.js:63)\n\t(anonymous function) (ChatInterface.tsx:368)\n\nThis ONLY happens when dynamic context is enabled. I'm guessing it has something to do with how the messages are constructed when guessing modified files. Don't include images at all when guessing modified files.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

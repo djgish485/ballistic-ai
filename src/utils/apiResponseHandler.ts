@@ -134,44 +134,37 @@ export async function guessModifiedFiles(apiKey: { type: string; key: string }, 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   let body: any;
 
-  const filteredMessages = await filterMessages(messages);
+  // Remove images from messages when guessing modified files
+  const messagesWithoutImages = messages.map(({ role, content }) => ({ role, content }));
 
   if (apiKey.type === 'Claude') {
     headers['x-api-key'] = apiKey.key;
     headers['anthropic-version'] = '2023-06-01';
     headers["anthropic-beta"] = "max-tokens-3-5-sonnet-2024-07-15";
     
-    const lastMessage = filteredMessages[filteredMessages.length - 1];
+    const lastMessage = messagesWithoutImages[messagesWithoutImages.length - 1];
     if (lastMessage.role === 'user') {
-      if (typeof lastMessage.content === 'string') {
-        lastMessage.content += "\n\nBased on this conversation, guess which files might be modified or needed for context. Guess liberally and also include project files that seem important in general. Respond ONLY with a list of ABSOLUTE file paths, one per line. Do NOT implement the modifications or include any explanations or additional text.";
-      } else if (Array.isArray(lastMessage.content)) {
-        lastMessage.content.push({ type: 'text', text: "\n\nBased on this conversation, guess which files might be modified or needed for context. Guess liberally and also include project files that seem important in general. Respond ONLY with a list of ABSOLUTE file paths, one per line. Do NOT implement the modifications or include any explanations or additional text." });
-      }
+      lastMessage.content += "\n\nBased on this conversation, guess which files might be modified or needed for context. Guess liberally and also include project files that seem important in general. Respond ONLY with a list of ABSOLUTE file paths, one per line. Do NOT implement the modifications or include any explanations or additional text.";
     }
     
     body = {
       model: 'claude-3-5-sonnet-20240620',
       max_tokens: 1000,
       system: systemPrompt,
-      messages: filteredMessages,
+      messages: messagesWithoutImages,
     };
 
   } else if (apiKey.type === 'OpenAI') {
     headers['Authorization'] = `Bearer ${apiKey.key}`;
 
-    const lastMessage = filteredMessages[filteredMessages.length - 1];
+    const lastMessage = messagesWithoutImages[messagesWithoutImages.length - 1];
     if (lastMessage.role === 'user') {
-      if (typeof lastMessage.content === 'string') {
-        lastMessage.content += "\n\nBased on this conversation, guess which files might be modified or needed for context. Respond ONLY with a list of ABSOLUTE file paths, one per line. Do not include any explanations or additional text.";
-      } else if (Array.isArray(lastMessage.content)) {
-        lastMessage.content.push({ type: 'text', text: "\n\nBased on this conversation, guess which files might be modified or needed for context. Respond ONLY with a list of ABSOLUTE file paths, one per line. Do not include any explanations or additional text." });
-      }
+      lastMessage.content += "\n\nBased on this conversation, guess which files might be modified or needed for context. Respond ONLY with a list of ABSOLUTE file paths, one per line. Do not include any explanations or additional text.";
     }
 
     body = {
       model: 'gpt-4o',
-      messages: [{ role: 'system', content: systemPrompt }, ...filteredMessages],
+      messages: [{ role: 'system', content: systemPrompt }, ...messagesWithoutImages],
       max_tokens: 1000,
     };
   } else {
@@ -193,8 +186,6 @@ export async function guessModifiedFiles(apiKey: { type: string; key: string }, 
 
   const data = await response.json();
   const content = apiKey.type === 'Claude' ? data.content[0].text : data.choices[0].message.content;
-  
-  console.log('Raw LLM response:', content);
 
   // Extract file paths from the content
   const filePaths = content.split('\n')
@@ -212,8 +203,6 @@ export async function guessModifiedFiles(apiKey: { type: string; key: string }, 
     })
     .filter(path => path !== ''); // Remove any empty strings
 
-  console.log('Extracted file paths:', filePaths);
-
   // Populate project-content.txt with file contents
   let projectContent = 'Project Content:\n================\n\n';
 
@@ -221,9 +210,7 @@ export async function guessModifiedFiles(apiKey: { type: string; key: string }, 
     try {
       const fileContent = await fs.readFile(filePath, 'utf8');
       projectContent += `File: ${filePath}\n${'='.repeat(filePath.length + 6)}\n${fileContent}\n\n`;
-      console.log(`Added content of ${filePath} to project-content.txt`);
     } catch (error) {
-      console.error(`Error reading file ${filePath}:`, error);
       projectContent += `File: ${filePath}\nError: Unable to read file content\n\n`;
     }
   }
@@ -233,7 +220,6 @@ export async function guessModifiedFiles(apiKey: { type: string; key: string }, 
   const projectContentPath = path.join(process.cwd(), ballisticFilesDir, 'project-content.txt');
   try {
     await fs.writeFile(projectContentPath, projectContent);
-    console.log('Successfully wrote project-content.txt');
   } catch (error) {
     console.error('Error writing project-content.txt:', error);
   }

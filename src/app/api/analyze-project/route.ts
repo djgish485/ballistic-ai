@@ -59,20 +59,15 @@ function isReadmeFile(basename: string): boolean {
 }
 
 function shouldExcludeContent(basename: string, fullPath: string, projectDir: string, settings: any, isDynamicContext: boolean): boolean {
-  console.log(`Checking file: ${basename}, isDynamicContext: ${isDynamicContext}`);
   if (!isPathIncluded(fullPath, settings.includePaths)) {
-    console.log(`${basename} not in includePaths`);
     return true;
   }
   if (isDynamicContext && !isReadmeFile(basename)) {
-    console.log(`${basename} is not a README file`);
     return true;
   }
   if (shouldExcludeStructure(basename, fullPath, projectDir, settings)) {
-    console.log(`${basename} excluded by structure rules`);
     return true;
   }
-  console.log(`${basename} will be included`);
   return false;
 }
 
@@ -92,7 +87,6 @@ export async function POST(request: Request) {
     const dynamicContextSettings = JSON.parse(fs.readFileSync(dynamicContextSettingsFile, 'utf-8'));
     isDynamicContext = dynamicContextSettings.isDynamicContext;
   }
-  console.log(`Dynamic Context is ${isDynamicContext ? 'enabled' : 'disabled'}`);
 
   // Analyze project structure
   let structureContent = `Project Structure:\n=================\n\nRoot: ${projectDir}\n\n`;
@@ -119,7 +113,6 @@ export async function POST(request: Request) {
   let contentContent = `Project Content:\n================\n\n`;
   let fileCount = 0;
   function analyzeContent(dir: string) {
-    console.log(`Analyzing directory: ${dir}`);
     const items = fs.readdirSync(dir);
     for (const item of items) {
       const fullPath = path.join(dir, item);
@@ -127,7 +120,6 @@ export async function POST(request: Request) {
       if (fs.statSync(fullPath).isDirectory()) {
         analyzeContent(fullPath);
       } else if (item.match(new RegExp(`\\.(${settings.fileExtensions})$`, 'i')) || isReadmeFile(item)) {
-        console.log(`Including file: ${fullPath}`);
         contentContent += `File: ${fullPath}\n${'='.repeat(fullPath.length + 6)}\n`;
         try {
           contentContent += fs.readFileSync(fullPath, 'utf8') + '\n\n';
@@ -140,7 +132,6 @@ export async function POST(request: Request) {
   }
 
   function analyzeContentDynamic(dir: string) {
-    console.log(`Analyzing directory (dynamic): ${dir}`);
     const items = fs.readdirSync(dir);
     for (const item of items) {
       const fullPath = path.join(dir, item);
@@ -149,7 +140,6 @@ export async function POST(request: Request) {
           analyzeContentDynamic(fullPath);
         }
       } else if (isReadmeFile(item) && !shouldExcludeContent(item, fullPath, projectDir, settings, isDynamicContext)) {
-        console.log(`Including README file: ${fullPath}`);
         contentContent += `File: ${fullPath}\n${'='.repeat(fullPath.length + 6)}\n`;
         try {
           contentContent += fs.readFileSync(fullPath, 'utf8') + '\n\n';
@@ -167,7 +157,6 @@ export async function POST(request: Request) {
     analyzeContent(projectDir);
   }
   
-  console.log(`Content to be written:\n${contentContent}`);
   fs.writeFileSync(contentFile, contentContent);
 
   return NextResponse.json({ message: `${fileCount} files added to project context` });

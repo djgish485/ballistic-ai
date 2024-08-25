@@ -67,9 +67,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             </div>
           )}
           {msg.role === 'assistant' && msg.dynamicContextFileCount !== undefined && msg.dynamicContextFileCount > 0 && (
-            <div className="bg-green-100 dark:bg-green-800 p-2 rounded mb-2 relative">
+            <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
               <span 
-                className="cursor-pointer relative"
+                className="cursor-pointer underline"
                 onMouseEnter={() => setShowContextFiles(true)}
                 onMouseLeave={() => setShowContextFiles(false)}
               >

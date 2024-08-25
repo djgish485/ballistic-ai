@@ -53,17 +53,20 @@ export async function POST(req: NextRequest) {
     const conversationHistory = JSON.parse(formData.get('conversationHistory') as string) as Message[];
     const selectedAPIKeyIndex = formData.get('selectedAPIKeyIndex') as string;
     const isDynamicContext = formData.get('isDynamicContext') === 'true';
+    const skipDynamicContext = formData.get('skipDynamicContext') === 'true';
 
     if (!projectDir || typeof projectDir !== 'string') {
       return NextResponse.json({ error: 'Invalid project directory' }, { status: 400 });
     }
 
     // Handle dynamic context at the beginning
-    const { dynamicContextFileCount, contextFiles } = await handleDynamicContext(
-      projectDir,
-      isDynamicContext,
-      formData
-    );
+    const { dynamicContextFileCount, contextFiles } = skipDynamicContext
+      ? { dynamicContextFileCount: null, contextFiles: [] }
+      : await handleDynamicContext(
+          projectDir,
+          isDynamicContext,
+          formData
+        );
 
     let apiKey = selectedAPIKeyIndex !== null && selectedAPIKeyIndex !== ''
       ? readAPIKeys().keys[parseInt(selectedAPIKeyIndex)]

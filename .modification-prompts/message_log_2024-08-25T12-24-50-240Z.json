@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "remove the \"Home: showRestoreAlert changed:\" log message",
+    "images": [],
+    "isComplete": true,
+    "apiType": "GPT-4o"
+  }
+]

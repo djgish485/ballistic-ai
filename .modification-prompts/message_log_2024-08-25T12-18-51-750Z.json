@@ -1,0 +1,16 @@
+[
+  {
+    "role": "user",
+    "content": "Remove the following console log messages:\n\nHome: showRestoreAlert changed:\nall \"FileList\" log messages",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "You were cutoff. Show full apiResponseHandler.ts",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

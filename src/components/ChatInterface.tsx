@@ -65,6 +65,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [dynamicContextFileCount, setDynamicContextFileCount] = useState<number | null>(null);
   const [showDynamicContextPrompt, setShowDynamicContextPrompt] = useState(false);
   const [showDynamicContextEnabledAlert, setShowDynamicContextEnabledAlert] = useState(false);
+  const [isFirstDynamicContextBuild, setIsFirstDynamicContextBuild] = useState(true);
 
   useEffect(() => {
     const fetchInitialMessage = async () => {
@@ -385,47 +386,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           setDynamicContextFileCount(null);
         }
 
-        const formData = new FormData();
-        formData.append('projectDir', projectDir);
-        formData.append('message', userMessage.content);
-        formData.append('isInitial', 'false');
-        formData.append('conversationHistory', JSON.stringify(messagesRef.current));
-        formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
-        formData.append('isDynamicContext', isDynamicContext.toString());
-
-        messagesRef.current.forEach((msg, msgIndex) => {
-          msg.images?.forEach((image, imgIndex) => {
-            formData.append(`image_${msgIndex}_${imgIndex}`, image);
-          });
-        });
-
-        const response = await fetch('/api/chat-with-images', {
-          method: 'POST',
-          body: formData,
-          signal: abortControllerRef.current.signal,
-        });
-
-        setIsDynamicContextBuilding(false);
-        
-        const dynamicContextFiles = response.headers.get('X-Dynamic-Context-Files');
-        let contextFileCount = null;
-        if (dynamicContextFiles) {
-          contextFileCount = parseInt(dynamicContextFiles, 10);
-          setDynamicContextFileCount(contextFileCount);
-        }
-
-        const contextFiles = response.headers.get('X-Context-Files');
-        let parsedContextFiles: string[] = [];
-        if (contextFiles) {
-          parsedContextFiles = JSON.parse(contextFiles);
-        }
-
-        await processStreamResponse(response, contextFileCount, parsedContextFiles);
+        await sendChatMessage(userMessage, false);
 
         // Update file list after dynamic context is built
         if (isDynamicContext) {
           updateFileList();
         }
+
+        // Set isFirstDynamicContextBuild to false after the message is sent successfully
+        setIsFirstDynamicContextBuild(false);
       } catch (error) {
         if (error instanceof Error && error.name === 'AbortError') {
           // Request was cancelled
@@ -465,6 +434,46 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         abortControllerRef.current = null;
       }
     }
+  };
+
+  const sendChatMessage = async (userMessage: Message, skipDynamicContext: boolean = false) => {
+    const formData = new FormData();
+    formData.append('projectDir', projectDir);
+    formData.append('message', userMessage.content);
+    formData.append('isInitial', 'false');
+    formData.append('conversationHistory', JSON.stringify(messagesRef.current));
+    formData.append('selectedAPIKeyIndex', sessionStorage.getItem('selectedAPIKeyIndex') || '');
+    formData.append('isDynamicContext', isDynamicContext.toString());
+    formData.append('skipDynamicContext', skipDynamicContext.toString());
+
+    messagesRef.current.forEach((msg, msgIndex) => {
+      msg.images?.forEach((image, imgIndex) => {
+        formData.append(`image_${msgIndex}_${imgIndex}`, image);
+      });
+    });
+
+    const response = await fetch('/api/chat-with-images', {
+      method: 'POST',
+      body: formData,
+      signal: abortControllerRef.current?.signal,
+    });
+
+    setIsDynamicContextBuilding(false);
+    
+    const dynamicContextFiles = response.headers.get('X-Dynamic-Context-Files');
+    let contextFileCount = null;
+    if (dynamicContextFiles) {
+      contextFileCount = parseInt(dynamicContextFiles, 10);
+      setDynamicContextFileCount(contextFileCount);
+    }
+
+    const contextFiles = response.headers.get('X-Context-Files');
+    let parsedContextFiles: string[] = [];
+    if (contextFiles) {
+      parsedContextFiles = JSON.parse(contextFiles);
+    }
+
+    await processStreamResponse(response, contextFileCount, parsedContextFiles);
   };
 
   const handleEditMessage = (index: number, newContent: string) => {
@@ -515,6 +524,38 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     window.location.reload();
   };
 
+  const handleSkipDynamicContext = async () => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    setIsDynamicContextBuilding(false);
+    
+    // Create a new AbortController for the new request
+    abortControllerRef.current = new AbortController();
+    
+    // Resend the last user message with skipDynamicContext set to true
+    const lastUserMessage = messagesRef.current[messagesRef.current.length - 1];
+    if (lastUserMessage.role === 'user') {
+      try {
+        await sendChatMessage(lastUserMessage, true);
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          // New request was cancelled
+        } else {
+          console.error('Error sending message after skipping dynamic context:', error);
+          setErrorDetails({
+            message: 'An error occurred while processing the chat after skipping dynamic context',
+            details: error instanceof Error ? error.message : 'Unknown error'
+          });
+        }
+      } finally {
+        setIsLoading(false);
+        setIsAIResponding(false);
+        abortControllerRef.current = null;
+      }
+    }
+  };
+
   return (
     <div className="flex flex-col h-full" ref={chatContainerRef}>
       <div className="flex-grow overflow-y-auto space-y-4 pb-24">
@@ -543,8 +584,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           dynamicContextFileCount={dynamicContextFileCount}
         />
         {isDynamicContextBuilding && (
-          <div className="bg-blue-100 dark:bg-blue-800 p-2 rounded">
-            Dynamic context being built...
+          <div className="bg-blue-100 dark:bg-blue-800 p-2 rounded flex items-center space-x-2">
+            <span>Dynamic context being built...</span>
+            {!isFirstDynamicContextBuild && (
+              <button
+                onClick={handleSkipDynamicContext}
+                className="px-2 py-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
+              >
+                Skip
+              </button>
+            )}
           </div>
         )}
         <div ref={chatEndRef} />

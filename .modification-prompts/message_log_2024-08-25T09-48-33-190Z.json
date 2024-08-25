@@ -1,0 +1,23 @@
+[
+  {
+    "role": "user",
+    "content": "The \"X files added to context\" green box - take away the green box and just make it a line of text that looks  like a link.",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "The \"Dynamic context being built...\" message - add a Skip button to it that cancels the dynamic context api call (this is different than what handleCancel does, see page.tsx for the call) and instead reuses the existing project files (which will happen without any code changes).",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  },
+  {
+    "role": "user",
+    "content": "You were cut off. give complete page.tsx",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]

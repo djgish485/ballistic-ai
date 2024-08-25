@@ -30,10 +30,6 @@ export default function Home() {
     }
   }, [projectDir]);
 
-  useEffect(() => {
-    console.log('Home: showRestoreAlert changed:', showRestoreAlert);
-  }, [showRestoreAlert]);
-
   const fetchIncludePaths = async () => {
     try {
       if (projectDir) {

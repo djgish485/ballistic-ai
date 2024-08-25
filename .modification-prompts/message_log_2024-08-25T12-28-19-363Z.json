@@ -1,0 +1,9 @@
+[
+  {
+    "role": "user",
+    "content": "Getting this in the console logs. It doesn't seem to be affecting anything.\n\n[Error] Warning: Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()?\n\nCheck the render method of `Home`.\nLoadableComponent\ndiv\ndiv\ndiv\nmain\nLayout\nHome\nClientPageRoot\nInnerLayoutRouter\nComponent@\nRedirectBoundary\nComponent@\nNotFoundBoundary\nLoadingBoundary\nErrorBoundary\nComponent@\nScrollAndFocusHandler\nRenderFromTemplateContext\nOuterLayoutRouter\nbody\nhtml\nRootLayout (Server)\nComponent@\nRedirectBoundary\nComponent@\nNotFoundBoundary\nDevRootNotFoundBoundary\nPureComponent@\nHotReload\nRouter\nComponent@\nErrorBoundary\nAppRouter\nServerRoot\nRoot\n\t(anonymous function) (app-index.js:33)\n\t(anonymous function) (hydration-error-info.js:63)\n\tprintWarning (react-dom.development.js:94)\n\terror (react-dom.development.js:68)\n\tvalidateFunctionComponentInDev (react-dom.development.js:16970)\n\tmountIndeterminateComponent (react-dom.development.js:16941)\n\tbeginWork (react-dom.development.js:26927)\n\tperformUnitOfWork (react-dom.development.js:25748)\n\tworkLoopSync (react-dom.development.js:25464)\n\trenderRootSync (react-dom.development.js:25419)\n\tperformConcurrentWorkOnRoot (react-dom.development.js:24504:89)\n\tworkLoop (scheduler.development.js:256)\n\tflushWork (scheduler.development.js:225)\n\tperformWorkUntilDeadline (scheduler.development.js:534)",
+    "images": [],
+    "isComplete": true,
+    "apiType": "Claude 3.5 Sonnet"
+  }
+]
